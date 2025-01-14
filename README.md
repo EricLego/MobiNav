@@ -1,2 +1,2 @@
 # MobiNav
- Campus navigation for KSU that allows for accessibility constraints.
+The MobiNav Project is a campus navigation system for Kennesaw State University's Marietta campus, aimed at improving accessibility for individuals with mobility needs. The web-based application provides a user-friendly map that routes around obstacles such as stairs and construction zones. Key features include real-time construction updates, optimized routing, and mobile accessibility. The project emphasizes accessibility compliance, including screen reader compatibility and contrast adjustments.
