@@ -1,0 +1,35 @@
+{
+  "platform": "react",
+  "code": {
+    "lang": "js",
+    "scheme": "blackbox",
+    "reactRuntime": "classic"
+  },
+  "style": {
+    "scheme": "css-modules",
+    "defaultStyleCssFilePath": "./src/styles/plasmic-styles.css"
+  },
+  "images": {
+    "scheme": "inlined",
+    "publicDir": "./public",
+    "publicUrlPrefix": "/static/"
+  },
+  "tokens": {
+    "scheme": "theo",
+    "tokensFilePath": "./plasmic-tokens.theo.json"
+  },
+  "srcDir": "./src",
+  "defaultPlasmicDir": "./plasmic",
+  "projects": [
+    {
+      "projectId": "cqPqdm5dVjtUHr8PKgNf76",
+      "projectApiToken": "ZvhcnLc1GV6G0Nny8dVYftI7vnP7ZO66i9HOcGfRfmINuudUvB6LcDOttmrnitPWYGUPOzeKZU8Xjhdzc6g"
+    }
+  ],
+  "globalVariants": {
+    "variantGroups": []
+  },
+  "wrapPagesWithGlobalContexts": true,
+  "cliVersion": "0.1.335",
+  "$schema": "https://unpkg.com/@plasmicapp/cli@0.1.335/dist/plasmic.schema.json"
+}

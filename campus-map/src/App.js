@@ -1,13 +1,13 @@
-import React from "react";
-import Dashboard from "./components/Dashboard";
+import { PlasmicRootProvider } from "@plasmicapp/react-web";
+import { PlasmicMobiNavMap } from "./plasmic/mobi_nav/PlasmicMobiNavMap"; // Corrected import
 import GoogleMapsComponent from "./components/GoogleMap";
 
 function App() {
   return (
-    <div className="h-screen flex flex-col">
-      <Dashboard />
+    <PlasmicRootProvider>
+      <PlasmicMobiNavMap />
       <GoogleMapsComponent />
-    </div>
+    </PlasmicRootProvider>
   );
 }
 
