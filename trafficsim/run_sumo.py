@@ -4,7 +4,7 @@ sumo_config_path = "/home/administrator/sumo/trafficsim/osm.sumocfg"  # Full pat
 
 traci.start(["sumo", "-c", sumo_config_path])
 
-for step in range(1000):  # Run for 1000 simulation steps
+for step in range(86400):  # Run for 1000 simulation steps
     traci.simulationStep()
 
 traci.close()
