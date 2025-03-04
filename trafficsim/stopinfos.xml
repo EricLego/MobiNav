@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-03-02 09:02:39 by Eclipse SUMO sumo Version 1.21.0
+<!-- generated on 2025-03-03 18:44:02 by Eclipse SUMO sumo Version 1.21.0
 <sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="C:\Users\evans\Sumo\2025-03-02-09-02-35\osm.net.xml.gz"/>
-        <route-files value="C:\Users\evans\Sumo\2025-03-02-09-02-35\trips.trips.xml"/>
-        <additional-files value="C:\Users\evans\Sumo\2025-03-02-09-02-35\osm_stops.add.xml"/>
+        <net-file value="C:\Users\evans\Sumo\2025-03-03-18-43-58\osm.net.xml.gz"/>
+        <route-files value="C:\Users\evans\Sumo\2025-03-03-18-43-58\trips.trips.xml"/>
+        <additional-files value="C:\Users\evans\Sumo\2025-03-03-18-43-58\osm_stops.add.xml"/>
     </input>
 
     <output>
-        <vehroute-output value="C:\Users\evans\Sumo\2025-03-02-09-02-35\vehroutes.xml"/>
-        <stop-output value="C:\Users\evans\Sumo\2025-03-02-09-02-35\stopinfos.xml"/>
+        <vehroute-output value="C:\Users\evans\Sumo\2025-03-03-18-43-58\vehroutes.xml"/>
+        <stop-output value="C:\Users\evans\Sumo\2025-03-03-18-43-58\stopinfos.xml"/>
     </output>
 
     <time>
@@ -28,7 +28,7 @@
 
     <report>
         <aggregate-warnings value="5"/>
-        <error-log value="C:\Users\evans\Sumo\2025-03-02-09-02-35\trips.trips.xml.errorlog"/>
+        <error-log value="C:\Users\evans\Sumo\2025-03-03-18-43-58\trips.trips.xml.errorlog"/>
         <no-step-log value="true"/>
     </report>
 

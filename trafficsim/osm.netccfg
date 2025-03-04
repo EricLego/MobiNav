@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-03-02 09:02:38 by Eclipse SUMO netconvert Version 1.21.0
+<!-- generated on 2025-03-03 18:44:01 by Eclipse SUMO netconvert Version 1.21.0
 -->
 
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <type-files value="${SUMO_HOME}\data\typemap\osmNetconvert.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertUrbanDe.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertPedestrians.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertBicycle.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertAerialway.typ.xml"/>
+        <type-files value="${SUMO_HOME}\data\typemap\osmNetconvert.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertBicycle.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertAerialway.typ.xml"/>
         <osm-files value="osm_bbox.osm.xml.gz"/>
     </input>
 
@@ -39,17 +39,12 @@
         <junctions.corner-detail value="5"/>
     </junctions>
 
-    <pedestrian>
-        <crossings.guess value="true"/>
-    </pedestrian>
-
     <railway>
         <railway.topology.repair value="true"/>
     </railway>
 
     <formats>
         <osm.bike-access value="true"/>
-        <osm.sidewalks value="true"/>
     </formats>
 
 </netconvertConfiguration>
