@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobiNav KSU Campus Navigator Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+                Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            max-width: 300px;
+        }
+        
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        p {
+            margin-bottom: 10px;
+        }
+        
+        .building-info {
+            margin-bottom: 15px;
+        }
+        
+        .route-info {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f0f9ff;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #0088FF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0066CC;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="controls">
+        <h2>KSU Campus Navigator</h2>
+        <p>Select two buildings to find a route:</p>
+        
+        <div class="building-info">
+            <strong>From:</strong> <span id="origin-building">Not selected</span>
+        </div>
+        
+        <div class="building-info">
+            <strong>To:</strong> <span id="destination-building">Not selected</span>
+        </div>
+        
+        <div id="route-info" class="route-info" style="display: none;">
+            <p>Route found!</p>
+            <p id="distance-info"></p>
+            <p id="time-info"></p>
+        </div>
+        
+        <button id="reset-button">Reset Selection</button>
+    </div>
+
+    <script>
+        // KSU Marietta Campus coordinates
+        const DEFAULT_CENTER = {
+            lat: 33.9416,
+            lng: -84.5199
+        };
+
+        // KSU Marietta Campus buildings with their actual coordinates
+        const CAMPUS_BUILDINGS = [
+            { id: 1, name: 'Atrium Building (J)', position: { lat: 33.9382, lng: -84.5220 } },
+            { id: 2, name: 'Student Center (A)', position: { lat: 33.9369, lng: -84.5206 } },
+            { id: 3, name: 'Engineering Technology Center (Q)', position: { lat: 33.9372, lng: -84.5182 } },
+            { id: 4, name: 'Lawrence V. Johnson Library (L)', position: { lat: 33.9399, lng: -84.5204 } },
+            { id: 5, name: 'Norton Hall (R)', position: { lat: 33.9386, lng: -84.5171 } },
+            { id: 6, name: 'Mathematics Building (D)', position: { lat: 33.9396, lng: -84.5182 } },
+            { id: 7, name: 'Howell Hall (H)', position: { lat: 33.9401, lng: -84.5223 } },
+            { id: 8, name: 'Academic Building (G)', position: { lat: 33.9407, lng: -84.5214 } }
+        ];
+
+        // State variables
+        let map;
+        let originBuilding = null;
+        let destinationBuilding = null;
+        let selectedMarker = null;
+        let infoWindow = null;
+        let pathPolyline = null;
+        let buildingMarkers = [];
+
+        // Initialize the map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: DEFAULT_CENTER,
+                zoom: 16,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            infoWindow = new google.maps.InfoWindow();
+
+            // Create markers for each building
+            CAMPUS_BUILDINGS.forEach(building => {
+                const marker = new google.maps.Marker({
+                    position: building.position,
+                    map: map,
+                    title: building.name,
+                    icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                });
+
+                marker.buildingData = building;
+                buildingMarkers.push(marker);
+
+                // Add click event to markers
+                marker.addListener('click', function() {
+                    handleMarkerClick(marker);
+                });
+            });
+
+            // Reset button event
+            document.getElementById('reset-button').addEventListener('click', resetSelection);
+        }
+
+        // Handle marker click
+        function handleMarkerClick(marker) {
+            const building = marker.buildingData;
+            
+            // Show info window
+            infoWindow.setContent(`<h3>${building.name}</h3>`);
+            infoWindow.open(map, marker);
+            
+            // If no origin is set, set this as origin
+            if (!originBuilding) {
+                originBuilding = building;
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+                document.getElementById('origin-building').textContent = building.name;
+                return;
+            }
+            
+            // If origin is set but no destination, set this as destination and calculate route
+            if (originBuilding && !destinationBuilding && building.id !== originBuilding.id) {
+                destinationBuilding = building;
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                document.getElementById('destination-building').textContent = building.name;
+                calculateMockRoute(originBuilding.position, building.position);
+            }
+        }
+
+        // Generate a mock route between two points
+        function calculateMockRoute(origin, destination) {
+            // Create a path with intermediate points for a more realistic route
+            const latDiff = destination.lat - origin.lat;
+            const lngDiff = destination.lng - origin.lng;
+            
+            const numberOfPoints = 5; // Number of points in our path
+            const mockPath = [];
+
+            for (let i = 0; i <= numberOfPoints; i++) {
+                const ratio = i / numberOfPoints;
+                
+                // Add some random offset for a more realistic path (not straight line)
+                const randomLat = (Math.random() - 0.5) * 0.0015;
+                const randomLng = (Math.random() - 0.5) * 0.0015;
+                
+                mockPath.push({
+                    lat: origin.lat + (latDiff * ratio) + (i === 0 || i === numberOfPoints ? 0 : randomLat),
+                    lng: origin.lng + (lngDiff * ratio) + (i === 0 || i === numberOfPoints ? 0 : randomLng)
+                });
+            }
+            
+            // Create or update the polyline
+            if (pathPolyline) {
+                pathPolyline.setMap(null);
+            }
+            
+            pathPolyline = new google.maps.Polyline({
+                path: mockPath,
+                geodesic: true,
+                strokeColor: '#0088FF',
+                strokeOpacity: 0.8,
+                strokeWeight: 5,
+                map: map
+            });
+            
+            // Show route info
+            const distance = (Math.random() * 0.5 + 0.3).toFixed(2);
+            const time = Math.floor(Math.random() * 10 + 5);
+            
+            document.getElementById('distance-info').textContent = `Distance: ${distance} km`;
+            document.getElementById('time-info').textContent = `Estimated walking time: ${time} minutes`;
+            document.getElementById('route-info').style.display = 'block';
+            
+            // Fit the map to the route
+            const bounds = new google.maps.LatLngBounds();
+            mockPath.forEach(point => bounds.extend(point));
+            map.fitBounds(bounds);
+        }
+
+        // Reset the selection to start a new route
+        function resetSelection() {
+            // Reset state variables
+            originBuilding = null;
+            destinationBuilding = null;
+            
+            // Reset UI
+            document.getElementById('origin-building').textContent = 'Not selected';
+            document.getElementById('destination-building').textContent = 'Not selected';
+            document.getElementById('route-info').style.display = 'none';
+            
+            // Reset markers
+            buildingMarkers.forEach(marker => {
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+            });
+            
+            // Reset polyline
+            if (pathPolyline) {
+                pathPolyline.setMap(null);
+                pathPolyline = null;
+            }
+            
+            // Close info window
+            infoWindow.close();
+        }
+    </script>
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap" async defer></script>
+</body>
+</html>
