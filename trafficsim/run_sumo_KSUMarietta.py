@@ -1,7 +1,7 @@
 import traci
 import random
 
-traci.start(["sumo-gui", "-c", "osm.sumocfg"])
+traci.start(["sumo", "-c", "KSUMarietta.sumocfg"])
 
 all_edges = traci.edge.getIDList()
 pedestrian_edges = []
@@ -11,7 +11,7 @@ for edge in all_edges:
     lane_count = traci.edge.getLaneNumber(edge) #geta number of lanes in each edge
     for i in range(lane_count):
         lane_id = f"{edge}_{i}" #generates lane id
-        # Find edges that allow pedestrians
+        #Find edges that allow pedestrians
         try:
             allowed_vehicles = traci.lane.getAllowed(lane_id) #gets the allowed vehicle types for the edge (i.e., car, truck, pedestrian, etc.)
             if "pedestrian" in allowed_vehicles: #if teh lane allows pedestrian, add the edge to pedestrian_edges and exit inner for loop
@@ -21,9 +21,12 @@ for edge in all_edges:
             print(f"Error retrieving data for lane {lane_id}: {e}")
 
 # Spawn number of pedestrians dynamically
-for i in range(100):
+for i in range(1):
     start_edge = "225485336#4" #specifies starting edge
-    end_edge = "1134398603"
+    end_edge = random.choice(pedestrian_edges)
+    while end_edge.startswith(":"):
+        end_edge = random.choice(pedestrian_edges)
+    print(f"Ending edge: {end_edge}")
     ped_id = f"ped_{i+1}" # Unique pedestrian ID
 
 
