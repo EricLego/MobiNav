@@ -2,8 +2,8 @@ import traci
 import sumolib
 import random
 
-traci.start(["sumo-gui", "-c", "KSUMariettaConfig.sumocfg"])
-net = sumolib.net.readNet("KSUMarietta.net.xml.gz")
+traci.start(["sumo-gui", "-c", "CS_4632_W01_CastroEvansLegostaev_Milestone4_RunScriptKSUMariettaConfig.sumocfg"])
+net = sumolib.net.readNet("CS_4632_W01_CastroEvansLegostaev_Milestone4_RunScriptKSUMarietta.net.xml.gz")
 
 # Find the nearest edge from coordinates
 cur_lat, cur_lon = 33.939520, -84.518931 # Replace withG PS coordinates pulled from database (building location or parking lot)
