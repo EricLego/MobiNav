@@ -6,8 +6,8 @@ traci.start(["sumo-gui", "-c", "KSUMariettaConfig.sumocfg"])
 net = sumolib.net.readNet("KSUMarietta.net.xml.gz")
 
 # Find the nearest edge from coordinates
-cur_lat, cur_lon = 33.939520, -84.518931 # Replace withG PS coordinates pulled from database (building location or parking lot)
-dest_lat, dest_lon = 33.9365841870687, -84.52225348427882  # Replace with GPS coordinates pulled from database (building location or parking lot)
+cur_lat, cur_lon = 33.938286, -84.518969 # Replace withG PS coordinates pulled from database (building location or parking lot)
+dest_lat, dest_lon = 33.940275, -84.520132 # Replace with GPS coordinates pulled from database (building location or parking lot)
 cur_edge, cur_edge_position, cur_lane_index = traci.simulation.convertRoad(cur_lon, cur_lat, isGeo=1) # convert GPS coordinate to Open Maps edge network location
 dest_edge, dest_edge_position, dest_lane_index = traci.simulation.convertRoad(dest_lon, dest_lat, isGeo=1) # convert GPS coordinate to Open Maps edge network location
 # print(f"cur_edge: {cur_edge} and dest_edge: {dest_edge}") #use this to check if correct GPS coordinates are pulled from database when connection is made
@@ -18,7 +18,7 @@ for i in range(building_occupancy):
     start_edge = cur_edge #specifies starting edge
     end_edge = dest_edge #specifed ending edge
     ped_id = f"ped_{i+1}" # Unique pedestrian ID
-    route = traci.simulation.findRoute(start_edge, end_edge, vType="ped_pedestrian", depart=0, routingMode=1) # force SUMO to find a route
+    route = traci.simulation.findRoute(start_edge, end_edge, vType="ped_pedestrian", depart=0, routingMode=0) # force SUMO to find a route
     route_edges = [edge for edge in route.edges if not edge.startswith(":")] # remove internal edges of duplicated junctions that will error the route
 
  # Add pedestrian to SUMO
