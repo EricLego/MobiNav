@@ -4,9 +4,6 @@
   "private": true,
   "proxy": "http://127.0.0.1:5000",
   "dependencies": {
-    "@plasmicapp/loader-nextjs": "^1.0.415",
-    "@plasmicapp/react-web": "^0.2.374",
-    "@plasmicpkgs/react-aria": "^0.0.117",
     "@react-google-maps/api": "^2.20.6",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -17,7 +14,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^6.23.0",
+    "react-router-dom": "^6.30.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -53,6 +50,5 @@
   "description": "front-end initial",
   "main": "index.js",
   "author": "",
-  "license": "ISC",
-  "proxy": "http://127.0.0.1:5000"
+  "license": "ISC"
 }

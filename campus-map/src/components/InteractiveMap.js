@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
+import React, { useState, useEffect, useContext } from 'react';
+import { GoogleMap, LoadScript, InfoWindow, Polyline } from '@react-google-maps/api';
 import { AccessibilityContext } from '../App';
-import Header from './Header';
-import Footer from './Footer';
 import '../styles/InteractiveMap.css';
 
 const InteractiveMap = () => {
@@ -38,11 +36,45 @@ const InteractiveMap = () => {
   ];
 
   const campusLocations = [
-    { id: 1, name: 'Engineering Building', lat: 33.942, lng: -84.521, type: 'building', hasElevator: true },
-    { id: 2, name: 'Student Center', lat: 33.939, lng: -84.518, type: 'building', hasElevator: true },
-    { id: 3, name: 'Library', lat: 33.941, lng: -84.517, type: 'building', hasElevator: true },
-    { id: 4, name: 'Parking Deck A', lat: 33.943, lng: -84.520, type: 'parking', hasElevator: true },
-    { id: 5, name: 'Bus Stop', lat: 33.938, lng: -84.519, type: 'transportation' },
+    { 
+      id: 1, 
+      name: 'Engineering Building', 
+      lat: 33.942, 
+      lng: -84.521, 
+      type: 'building', 
+      hasElevator: true 
+    },
+    { 
+      id: 2, 
+      name: 'Student Center', 
+      lat: 33.939, 
+      lng: -84.518, 
+      type: 'building', 
+      hasElevator: true 
+    },
+    { 
+      id: 3,
+      name: 'Library', 
+      lat: 33.941, 
+      lng: -84.517, 
+      type: 'building', 
+      hasElevator: true 
+    },
+    { 
+      id: 4, 
+      name: 'Parking Deck A', 
+      lat: 33.943, 
+      lng: -84.520, 
+      type: 'parking', 
+      hasElevator: true 
+    },
+    { 
+      id: 5, 
+      name: 'Bus Stop', 
+      lat: 33.938, 
+      lng: -84.519, 
+      type: 'transportation' 
+    },
     // Add more campus locations as needed
   ];
 
@@ -162,7 +194,7 @@ const InteractiveMap = () => {
   
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
-      <Header />
+      
       <div className="interactive-map">
         <div className="map-controls">
         <form onSubmit={handleSearch} className="search-form">
@@ -324,7 +356,6 @@ const InteractiveMap = () => {
         </ul>
       </div>
       </div>
-      <Footer />
     </div>
   );
 };
