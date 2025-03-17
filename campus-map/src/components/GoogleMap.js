@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Polyline, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Polyline, Marker, Polygon } from "@react-google-maps/api";
 
 const mapContainerStyle = {
   width: "100%",
@@ -7,9 +7,18 @@ const mapContainerStyle = {
 };
 
 const center = {
-  lat: 33.9416, // KSU Marietta Campus Latitude
-  lng: -84.5199, // Longitude
+  lat: 33.9386, // KSU Marietta Campus (center point of the polygon)
+  lng: -84.5187, // Longitude
 };
+
+// KSU Marietta Campus boundary polygon
+const campusBoundary = [
+  { lat: 33.940912, lng: -84.524504 }, // NW
+  { lat: 33.941486, lng: -84.515582 }, // NE
+  { lat: 33.935908, lng: -84.512786 }, // SE
+  { lat: 33.935673, lng: -84.524473 }, // SW
+  { lat: 33.940912, lng: -84.524504 }, // NW (close the polygon)
+];
 
 const GoogleMapsComponent = () => {
   const [route, setRoute] = useState([]);
@@ -61,7 +70,25 @@ const GoogleMapsComponent = () => {
 
   return (
     <LoadScript googleMapsApiKey={apiKey}>
-      <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={16}>
+      <GoogleMap 
+        mapContainerStyle={mapContainerStyle} 
+        center={center} 
+        zoom={16}
+        options={{
+          streetViewControl: false,
+          fullscreenControl: true,
+          mapTypeControl: true,
+          zoomControl: true,
+          restriction: {
+            latLngBounds: {
+              north: 33.943,
+              south: 33.934,
+              east: -84.511,
+              west: -84.526
+            },
+            strictBounds: true
+          }
+        }}>
         {/* Display the route as a polyline */}
         {route.length > 0 && (
           <Polyline
@@ -74,9 +101,9 @@ const GoogleMapsComponent = () => {
           />
         )}
         
-        {/* Display markers for origin and destination */}
-        {origin && <Marker position={origin} />}
-        {destination && <Marker position={destination} />}
+        {/* Origin and destination markers removed as requested */}
+        
+        {/* Campus Boundary Polygon - invisible but still restricts the map */}
       </GoogleMap>
     </LoadScript>
   );
