@@ -8,7 +8,7 @@ import requests
 main = Blueprint("main", __name__)
 
 # Load API key from environment variables
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", api_key_local)  # Replace with your actual API key
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 def get_google_route(start, end):
     """
