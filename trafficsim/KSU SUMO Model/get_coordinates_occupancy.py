@@ -34,9 +34,6 @@ def connect_and_fetch():
         results = cursor.fetchall()
         return results
 
-        #for row in results:
-         #   print(row)
-
         # Close connection
         cursor.close()
         connection.close()

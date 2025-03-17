@@ -1,6 +1,5 @@
 # File: simulation.py
 import traci
-import sumolib
 import config
 
 def start_simulation():

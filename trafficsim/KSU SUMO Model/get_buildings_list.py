@@ -19,18 +19,17 @@ def connect_and_fetch():
         )
         cursor = connection.cursor()
 
-        # Execute a query
-        cursor.execute("SELECT * FROM building;")  # Change table name
-        rows = cursor.fetchall()
-        # Print results
-        for row in rows:
-            print(row)
+        table1 = "building"
+        table2 = "occupancy_schedule"
+        common_column = "building_id"
 
-        cursor.execute("SELECT * FROM occupancy_schedule;")  # Change table name
-        rows = cursor.fetchall()
-        # Print results
-        for row in rows:
-            print(row)
+        # This code fetches the building locations (coordinates) and occupancy schedule (if available) by querying the database.
+        query = f"""
+            SELECT * FROM building;
+            """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        return results
 
         # Close connection
         cursor.close()
@@ -41,3 +40,5 @@ def connect_and_fetch():
 
 if __name__ == "__main__":
     connect_and_fetch()
+
+

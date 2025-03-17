@@ -7,7 +7,7 @@
 
     <input>
         <net-file value="KSUMarietta.net.xml.gz"/>
-        <route-files value="osm.bicycle.trips.xml,osm.bus.trips.xml,osm.motorcycle.trips.xml,osm.passenger.trips.xml,osm.truck.trips.xml,osm.pedestrian.rou.xml"/>
+        <route-files value="osm.pedestrian.rou.xml"/>
         <additional-files value="osm.poly.xml.gz"/>
     </input>
 
