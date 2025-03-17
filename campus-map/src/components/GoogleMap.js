@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Polyline, Marker, Polygon } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Polyline, Marker, Polyline, Marker, Polygon } from "@react-google-maps/api";
+import PlaceAutocomplete from "./SearchBar";
 
 const mapContainerStyle = {
   width: "100%",
@@ -24,18 +25,41 @@ const GoogleMapsComponent = () => {
   const [route, setRoute] = useState([]);
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
-  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY; // Fetch API key from .env
 
-    // Function to fetch route from Flask API
+  console.log(apiKey);
+  console.log(process.env);
+
+  useEffect(() => {
+    // These would normally come from user interaction
+    setOrigin({ lat: 33.9416, lng: -84.5199 });
+    setDestination({ lat: 33.9400, lng: -84.5180 });
+  }, []);
+
+    // Fetch the route whenever origin or destination changes
+  useEffect(() => {
+    fetchRoute();
+  }, [origin, destination]);
+
+
+  if (!apiKey) {
+    console.log(process.env);
+    console.error("Google Maps API Key is missing. Please check your .env file.");
+    return <div className="text-red-500">Error: Missing Google Maps API Key</div>;
+  }
+
+  
+    // Function to fetch route from your Flask API
   const fetchRoute = async () => {
     if (!origin || !destination) return;
     
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/get_route?start=${origin.lat},${origin.lng}&end=${destination.lat},${destination.lng}`
+        `/api/get_route?start=${origin.lat},${origin.lng}&end=${destination.lat},${destination.lng}`
       );
       console.log(response);
       const data = await response.json();
+      console.log(data);
       
       if (data.route) {
         // Convert the route data to the format Google Maps expects
@@ -46,66 +70,61 @@ const GoogleMapsComponent = () => {
     }
   };
 
-  // REMOVE LATER
+  const handleOriginSelect = (place) => {
+    // Will be implemented with Google Places Autocomplete
+    console.log("Origin selected:", place);
+    if (place && place.geometry && place.geometry.location) {
+      setOrigin({
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      });
+    }
+  };
 
-  // Example: Set some sample points and fetch a route
-  useEffect(() => {
-    // These would normally come from user interaction
-    setOrigin({ lat: 33.9416, lng: -84.5199 });
-    setDestination({ lat: 33.9400, lng: -84.5180 });
-  }, []);
-
-  // Fetch the route whenever origin or destination changes
-  useEffect(() => {
-    fetchRoute();
-  }, [origin, destination]);
-
-  // REMOVE LATER
-
-  if (!apiKey) {
-    console.log(process.env);
-    console.error("Google Maps API Key is missing. Please check your .env file.");
-    return <div className="text-red-500">Error: Missing Google Maps API Key</div>;
-  }
+  const handleDestinationSelect = (place) => {
+    // Will be implemented with Google Places Autocomplete
+    console.log("Destination selected:", place);
+    if (place && place.geometry && place.geometry.location) {
+      setDestination({
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      });
+    }
+  };
 
   return (
-    <LoadScript googleMapsApiKey={apiKey}>
-      <GoogleMap 
-        mapContainerStyle={mapContainerStyle} 
-        center={center} 
-        zoom={16}
-        options={{
-          streetViewControl: false,
-          fullscreenControl: true,
-          mapTypeControl: true,
-          zoomControl: true,
-          restriction: {
-            latLngBounds: {
-              north: 33.943,
-              south: 33.934,
-              east: -84.511,
-              west: -84.526
-            },
-            strictBounds: true
-          }
-        }}>
-        {/* Display the route as a polyline */}
-        {route.length > 0 && (
-          <Polyline
-            path={route}
-            options={{
-              strokeColor: "#0000FF",
-              strokeOpacity: 1,
-              strokeWeight: 5,
-            }}
-          />
-        )}
-        
-        {/* Origin and destination markers removed as requested */}
-        
-        {/* Campus Boundary Polygon - invisible but still restricts the map */}
-      </GoogleMap>
-    </LoadScript>
+    <div className="map-container">
+      <div className="search-controls mb-4 flex flex-col md:flex-row gap-2">
+        <PlaceAutocomplete 
+          placeholder="Enter origin location" 
+          onPlaceSelect={handleOriginSelect} 
+        />
+        <PlaceAutocomplete 
+          placeholder="Enter destination" 
+          onPlaceSelect={handleDestinationSelect} 
+        />
+      </div>
+      
+      <LoadScript googleMapsApiKey={apiKey} libraries={["places"]}>
+        <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={16}>
+          {/* Display the route as a polyline */}
+          {route.length > 0 && (
+            <Polyline
+              path={route}
+              options={{
+                strokeColor: "#0000FF",
+                strokeOpacity: 1,
+                strokeWeight: 5,
+              }}
+            />
+          )}
+          
+          {/* Display markers for origin and destination */}
+          {origin && <Marker position={origin} />}
+          {destination && <Marker position={destination} />}
+        </GoogleMap>
+      </LoadScript>
+    </div>
   );
 };
 

@@ -4,3 +4,9 @@
 .env.development
 .env.test
 .env.production
+campus-map/.env
+__pycache__/
+*.pyc
+CLAUDE.md
+MobiNav.code-workspace
+campus-map/yarn.lock
