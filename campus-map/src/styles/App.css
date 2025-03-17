@@ -1,0 +1,244 @@
+/* App.css - Global styles */
+
+:root {
+  /* KSU Brand Colors */
+  --ksu-black: #000000;
+  --ksu-gold: #FFC629;
+  --ksu-gold-light: #FFD45E;
+  --ksu-gold-dark: #E6AC00;
+  --ksu-gray: #707070;
+  --ksu-gray-light: #E6E6E6;
+  --ksu-gray-dark: #333333;
+  --ksu-white: #FFFFFF;
+  
+  /* Accessibility Route Colors */
+  --route-standard: #FE5E41; /* Orange-red for standard routes */
+  --route-accessible: #6C63FF; /* Purple for accessible routes */
+  
+  /* UI Colors */
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --info: #3498DB;
+  
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-xxl: 3rem;
+  
+  /* Borders & Shadows */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--ksu-gray-dark);
+  background-color: var(--ksu-gray-light);
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  text-decoration: none;
+  color: var(--ksu-black);
+  transition: color var(--transition-fast);
+  font-weight: 500;
+}
+
+a:hover {
+  color: var(--ksu-gold-dark);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+button {
+  cursor: pointer;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: none;
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+}
+
+button:hover {
+  background-color: var(--ksu-gold-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+  color: var(--ksu-black);
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: var(--space-md);
+}
+
+input, select, textarea {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Accessibility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --ksu-black: #000000;
+  --ksu-gold: #FFFF00; /* Brighter yellow for high contrast */
+  --ksu-gold-light: #FFFF99;
+  --ksu-gold-dark: #CCCC00;
+  --ksu-gray: #999999;
+  --ksu-gray-light: #333333;
+  --ksu-gray-dark: #CCCCCC;
+  --ksu-white: #FFFFFF;
+  
+  --route-standard: #FF0000; /* Bright red for standard routes */
+  --route-accessible: #00FFFF; /* Cyan for accessible routes */
+  
+  color: var(--ksu-white);
+  background-color: var(--ksu-black);
+}
+
+.high-contrast a {
+  color: var(--ksu-gold);
+  text-decoration: underline;
+}
+
+.high-contrast a:hover {
+  color: var(--ksu-gold-light);
+}
+
+.high-contrast button {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  border: 2px solid var(--ksu-white);
+}
+
+/* Large Text Mode */
+.large-text {
+  font-size: 120%;
+}
+
+.large-text h1 {
+  font-size: 3rem;
+}
+
+.large-text h2 {
+  font-size: 2.4rem;
+}
+
+.large-text h3 {
+  font-size: 1.8rem;
+}
+
+.large-text p, 
+.large-text li, 
+.large-text a,
+.large-text button,
+.large-text input,
+.large-text select {
+  font-size: 1.2rem;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-medium);
+}
+
+.slide-up {
+  animation: slideUp var(--transition-medium);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  .container {
+    padding: 0 var(--space-md);
+  }
+}

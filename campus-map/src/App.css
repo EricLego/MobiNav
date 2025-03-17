@@ -1,0 +1,152 @@
+/* App.css - Global styles and accessibility settings */
+
+/* Base app styles */
+.app, .page-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+.page-container main {
+  padding: var(--space-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Large Text Mode */
+.large-text {
+  --font-size-base: 18px;
+  --font-size-sm: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --space-lg: 24px;
+  --space-md: 16px;
+  --space-xl: 32px;
+}
+
+.large-text body {
+  font-size: var(--font-size-base, 18px);
+}
+
+.large-text h1 {
+  font-size: var(--font-size-2xl, 32px);
+}
+
+.large-text h2 {
+  font-size: var(--font-size-xl, 24px);
+}
+
+.large-text h3 {
+  font-size: var(--font-size-lg, 20px);
+}
+
+.large-text p,
+.large-text li,
+.large-text input,
+.large-text button,
+.large-text select,
+.large-text textarea {
+  font-size: var(--font-size-base, 18px);
+}
+
+.large-text .logo span {
+  font-size: 1.8rem;
+}
+
+.large-text .main-nav a,
+.large-text .dropdown-button {
+  font-size: 1.2rem;
+}
+
+.large-text .dropdown-content {
+  min-width: 320px;
+  padding: var(--space-xl);
+}
+
+.large-text .setting label {
+  font-size: 1.1rem;
+}
+
+.large-text .route-select,
+.large-text .search-input,
+.large-text .calculate-button {
+  font-size: 1.1rem;
+  padding: 12px 16px;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --contrast-black: #000000;
+  --contrast-white: #ffffff;
+  --contrast-yellow: #ffff00;
+}
+
+.high-contrast body {
+  background-color: var(--contrast-black);
+  color: var(--contrast-white);
+}
+
+.high-contrast .header,
+.high-contrast .footer {
+  background-color: var(--contrast-black);
+  border-color: var(--contrast-yellow);
+}
+
+.high-contrast .logo span {
+  color: var(--contrast-yellow);
+}
+
+.high-contrast a:focus,
+.high-contrast button:focus,
+.high-contrast input:focus {
+  outline: 3px solid var(--contrast-yellow);
+  outline-offset: 2px;
+}
+
+.high-contrast .main-nav a:hover,
+.high-contrast .dropdown-button:hover {
+  color: var(--contrast-yellow);
+}
+
+.high-contrast .search-input,
+.high-contrast .route-select {
+  background-color: var(--contrast-black);
+  color: var(--contrast-white);
+  border-color: var(--contrast-yellow);
+}
+
+.high-contrast .login-button,
+.high-contrast .calculate-button {
+  background-color: var(--contrast-yellow);
+  color: var(--contrast-black);
+  border: 2px solid var(--contrast-white);
+}
+
+/* Accessibility Helpers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
