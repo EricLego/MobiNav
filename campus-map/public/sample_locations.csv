@@ -1,0 +1,16 @@
+id,name,lat,lng,type,hasElevator
+1,Engineering Building,33.942,-84.521,building,true
+2,Student Center,33.939,-84.518,building,true
+3,Library,33.941,-84.517,building,true
+4,Parking Deck A,33.943,-84.52,parking,true
+5,Bus Stop,33.938,-84.519,transportation,false
+6,Science Building,33.9405,-84.5195,building,true
+7,Cafeteria,33.9395,-84.5215,building,false
+8,Visitor Parking,33.9415,-84.5225,parking,false
+9,Main Entrance,33.9435,-84.5235,transportation,false
+10,Arts Center,33.937,-84.516,building,true
+11,Administration Building,33.9385,-84.5175,building,true
+12,Recreation Center,33.941,-84.522,building,true
+13,Health Services,33.9425,-84.5185,building,true
+14,Faculty Offices,33.9375,-84.5205,building,false
+15,Shuttle Stop North,33.944,-84.517,transportation,false

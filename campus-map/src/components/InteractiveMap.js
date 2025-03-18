@@ -40,14 +40,157 @@ const InteractiveMap = () => {
     { lat: 33.940912, lng: -84.524504 }, // NW (close the polygon)
   ];
 
-  const campusLocations = [
+  // State to store campus locations
+  const [campusLocations, setCampusLocations] = useState([
     { id: 1, name: 'Engineering Building', lat: 33.942, lng: -84.521, type: 'building', hasElevator: true },
     { id: 2, name: 'Student Center', lat: 33.939, lng: -84.518, type: 'building', hasElevator: true },
     { id: 3, name: 'Library', lat: 33.941, lng: -84.517, type: 'building', hasElevator: true },
     { id: 4, name: 'Parking Deck A', lat: 33.943, lng: -84.520, type: 'parking', hasElevator: true },
-    { id: 5, name: 'Bus Stop', lat: 33.938, lng: -84.519, type: 'transportation' },
-    // Add more campus locations as needed
-  ];
+    { id: 5, name: 'Bus Stop', lat: 33.938, lng: -84.519, type: 'transportation' }
+  ]);
+
+  // State for the new location form
+  const [newLocation, setNewLocation] = useState({
+    name: '',
+    lat: '',
+    lng: '',
+    type: 'building',
+    hasElevator: true
+  });
+  
+  // Function to handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewLocation(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+  
+  // Function to add a new location
+  const addNewLocation = (e) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!newLocation.name || !newLocation.lat || !newLocation.lng) {
+      alert('Please fill out all required fields');
+      return;
+    }
+    
+    // Create new location object
+    const location = {
+      id: campusLocations.length > 0 ? Math.max(...campusLocations.map(l => l.id)) + 1 : 1,
+      name: newLocation.name,
+      lat: parseFloat(newLocation.lat),
+      lng: parseFloat(newLocation.lng),
+      type: newLocation.type,
+      ...(newLocation.type === 'building' && { hasElevator: newLocation.hasElevator })
+    };
+    
+    // Add to locations array
+    setCampusLocations(prev => [...prev, location]);
+    
+    // Reset form
+    setNewLocation({
+      name: '',
+      lat: '',
+      lng: '',
+      type: 'building',
+      hasElevator: true
+    });
+  };
+  
+  // Function to delete a location
+  const deleteLocation = (id) => {
+    // Confirm delete
+    if (window.confirm('Are you sure you want to delete this location?')) {
+      setCampusLocations(prev => prev.filter(location => location.id !== id));
+      
+      // If this location was set as start or end point, clear it
+      if (startPoint && campusLocations.find(loc => loc.id === id && loc.name === startPoint)) {
+        setStartPoint('');
+      }
+      
+      if (endPoint && campusLocations.find(loc => loc.id === id && loc.name === endPoint)) {
+        setEndPoint('');
+      }
+    }
+  };
+  
+  // Function to load locations from a CSV file
+  const loadLocationsFromCSV = (csvContent) => {
+    // Split the CSV content by newlines
+    const lines = csvContent.split('\n');
+    
+    // The first line should be the header
+    const headers = lines[0].split(',');
+    
+    // Process remaining lines (skip the header)
+    const newLocations = lines.slice(1).filter(line => line.trim() !== '').map((line, index) => {
+      const values = line.split(',');
+      const location = {};
+      
+      // Map values to properties based on headers
+      headers.forEach((header, i) => {
+        if (header === 'id') {
+          location[header] = parseInt(values[i], 10);
+        } else if (header === 'lat' || header === 'lng') {
+          location[header] = parseFloat(values[i]);
+        } else if (header === 'hasElevator') {
+          location[header] = values[i].toLowerCase() === 'true';
+        } else {
+          location[header] = values[i];
+        }
+      });
+      
+      // Add ID if not provided in CSV
+      if (!location.id) {
+        location.id = index + 1;
+      }
+      
+      return location;
+    });
+    
+    setCampusLocations(newLocations);
+  };
+
+  // Function to handle file upload
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        loadLocationsFromCSV(content);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Function to export locations as CSV
+  const exportLocationsAsCSV = () => {
+    if (campusLocations.length === 0) return;
+    
+    // Get headers from the first location
+    const headers = Object.keys(campusLocations[0]);
+    
+    // Create CSV content
+    const csvContent = 
+      headers.join(',') + '\n' + 
+      campusLocations.map(loc => (
+        headers.map(header => loc[header]).join(',')
+      )).join('\n');
+    
+    // Create a downloadable link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'campus_locations.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Fetch obstacles from backend API
   useEffect(() => {
@@ -111,7 +254,7 @@ const InteractiveMap = () => {
       // Also set a timeout to detect loading issues
       const timeout = setTimeout(() => {
         // If Google Maps is not loaded after 5 seconds, show the placeholder
-        if (!window.google || !window.google.maps) {
+        if (typeof window.google === 'undefined') {
           console.error('Google Maps API failed to load within timeout');
           setGoogleMapsError(true);
         }
@@ -254,6 +397,165 @@ const InteractiveMap = () => {
           <button type="submit" className="search-button">Search</button>
         </form>
         
+        <div className="location-management">
+          <h3>Manage Locations</h3>
+          <div className="location-controls">
+            <div className="file-input-container">
+              <input
+                type="file"
+                id="csv-upload"
+                accept=".csv"
+                onChange={handleFileUpload}
+                className="file-input"
+              />
+              <label htmlFor="csv-upload" className="file-input-label">
+                Import Locations (CSV)
+              </label>
+            </div>
+            <button 
+              onClick={exportLocationsAsCSV} 
+              className="export-button"
+            >
+              Export Locations (CSV)
+            </button>
+          </div>
+          <p className="location-help">
+            CSV format: id,name,lat,lng,type,hasElevator<br/>
+            <a href="/sample_locations.csv" download className="sample-link">Download Sample CSV</a>
+          </p>
+          
+          <div className="add-location-form">
+            <h4>Add New Location</h4>
+            <form onSubmit={addNewLocation}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="location-name">Name*</label>
+                  <input
+                    type="text"
+                    id="location-name"
+                    name="name"
+                    value={newLocation.name}
+                    onChange={handleInputChange}
+                    placeholder="Building Name"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="location-lat">Latitude*</label>
+                  <input
+                    type="number"
+                    id="location-lat"
+                    name="lat"
+                    value={newLocation.lat}
+                    onChange={handleInputChange}
+                    step="0.0001"
+                    placeholder="e.g. 33.9420"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="location-lng">Longitude*</label>
+                  <input
+                    type="number"
+                    id="location-lng"
+                    name="lng"
+                    value={newLocation.lng}
+                    onChange={handleInputChange}
+                    step="0.0001"
+                    placeholder="e.g. -84.5210"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="location-type">Type*</label>
+                  <select
+                    id="location-type"
+                    name="type"
+                    value={newLocation.type}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="building">Building</option>
+                    <option value="parking">Parking</option>
+                    <option value="transportation">Transportation</option>
+                  </select>
+                </div>
+                
+                {newLocation.type === 'building' && (
+                  <div className="form-group checkbox-group">
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="hasElevator"
+                        checked={newLocation.hasElevator}
+                        onChange={handleInputChange}
+                      />
+                      Has Elevator
+                    </label>
+                  </div>
+                )}
+              </div>
+              
+              <button type="submit" className="add-location-button">Add Location</button>
+            </form>
+          </div>
+          
+          {/* Location Table */}
+          {campusLocations.length > 0 && (
+            <div className="location-table-container">
+              <h4>Current Locations ({campusLocations.length})</h4>
+              <div className="location-table-wrapper">
+                <table className="location-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Coordinates</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {campusLocations.map(location => (
+                      <tr key={location.id}>
+                        <td>{location.name}</td>
+                        <td>
+                          {location.type === 'building' ? 'Building' : 
+                           location.type === 'parking' ? 'Parking' : 'Transport'}
+                          {location.type === 'building' && (
+                            <span className="elevator-badge">
+                              {location.hasElevator ? '♿' : ''}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <span className="coordinates">
+                            {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            onClick={() => deleteLocation(location.id)}
+                            className="delete-button"
+                            title="Delete location"
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+        
         <div className="route-planner">
           <h3>Plan Your Route</h3>
           <div className="route-inputs">
@@ -375,16 +677,8 @@ const InteractiveMap = () => {
                     name: `${feature.feature_type}: ${feature.description}`
                   })}
                   // Accessibility feature markers with different shapes
-                  icon={{
-                    path: feature.feature_type === 'elevator' ? window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW :
-                          feature.feature_type === 'ramp' ? window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW :
-                          window.google.maps.SymbolPath.CIRCLE,
-                    scale: 6,
-                    fillColor: '#9C27B0', // Purple for accessibility features
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: '#FFFFFF'
-                  }}
+                  label={feature.feature_type === 'elevator' ? 'E' : 
+                         feature.feature_type === 'ramp' ? 'R' : 'A'}
                 />
               ))}
               
@@ -405,19 +699,7 @@ const InteractiveMap = () => {
                     reportedAt: obstacle.reported_at
                   })}
                   // Obstacle markers with warning symbols
-                  icon={{
-                    path: window.google.maps.SymbolPath.BACKWARD_OPEN_ARROW,
-                    scale: 7,
-                    fillColor: 
-                      obstacle.obstacle_type === 'construction' ? '#FF5722' : // Orange-red for construction
-                      obstacle.obstacle_type === 'stairs' ? '#F44336' :       // Red for stairs
-                      obstacle.obstacle_type === 'steep' ? '#D32F2F' :        // Dark red for steep inclines
-                      obstacle.obstacle_type === 'temporary' ? '#FFC107' :    // Amber for temporary
-                      '#E91E63',                                              // Pink for other obstacles
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: '#FFFFFF'
-                  }}
+                  label="!"
                 />
               ))}
             
@@ -464,24 +746,18 @@ const InteractiveMap = () => {
                   {/* Add markers at start and end of route */}
                   <Marker
                     position={route[0]}
-                    icon={{
-                      path: window.google.maps.SymbolPath.CIRCLE,
-                      scale: 10,
-                      fillColor: '#4CAF50', // Green for start
-                      fillOpacity: 1,
-                      strokeWeight: 3,
-                      strokeColor: '#FFFFFF'
+                    label={{
+                      text: "S",
+                      color: "white",
+                      fontWeight: "bold"
                     }}
                   />
                   <Marker
                     position={route[route.length - 1]}
-                    icon={{
-                      path: window.google.maps.SymbolPath.STAR,
-                      scale: 12,
-                      fillColor: '#F44336', // Red for destination
-                      fillOpacity: 1,
-                      strokeWeight: 3,
-                      strokeColor: '#FFFFFF'
+                    label={{
+                      text: "D",
+                      color: "white",
+                      fontWeight: "bold"
                     }}
                   />
                 </>
