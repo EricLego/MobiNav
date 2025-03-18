@@ -87,6 +87,42 @@
   margin-bottom: var(--space-sm);
 }
 
+.pin-mode-button {
+  flex: 1;
+  padding: var(--space-md);
+  background-color: var(--ksu-gray-light);
+  color: var(--ksu-black);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pin-mode-button.active {
+  background-color: var(--ksu-gold);
+  border-color: var(--ksu-gold-dark);
+}
+
+.pin-mode-button:hover {
+  background-color: var(--ksu-gold-light);
+  border-color: var(--ksu-gold);
+}
+
+.pin-mode-instructions {
+  margin: var(--space-md) 0;
+  padding: var(--space-sm) var(--space-md);
+  background-color: rgba(255, 198, 41, 0.1);
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--ksu-gold);
+}
+
+.pin-mode-instructions p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ksu-white);
+}
+
 .file-input-container {
   position: relative;
   flex: 1;
@@ -324,6 +360,87 @@
   transform: scale(1.1);
 }
 
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg);
+}
+
+.modal-content {
+  background-color: var(--ksu-black);
+  border: 2px solid var(--ksu-gold);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: var(--space-md);
+  color: var(--ksu-gold);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.modal-coordinates {
+  font-family: monospace;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-sm);
+  color: var(--ksu-white);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.cancel-button {
+  padding: var(--space-sm) var(--space-lg);
+  background-color: transparent;
+  color: var(--ksu-white);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.add-button {
+  padding: var(--space-sm) var(--space-lg);
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.add-button:hover {
+  background-color: var(--ksu-gold-dark);
+  transform: translateY(-2px);
+}
+
 .route-planner {
   background-color: rgba(255, 255, 255, 0.05);
   padding: var(--space-lg);
@@ -432,6 +549,25 @@
   position: relative;
   border-top: 2px solid rgba(255, 198, 41, 0.2);
   border-bottom: 2px solid rgba(255, 198, 41, 0.2);
+}
+
+/* Pin mode indicator */
+.map-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 4px solid var(--ksu-gold);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  transition: opacity var(--transition-fast);
+}
+
+.pin-mode-active .map-container::before {
+  opacity: 1;
 }
 
 .api-key-error {

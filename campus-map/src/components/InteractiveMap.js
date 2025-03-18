@@ -58,6 +58,15 @@ const InteractiveMap = () => {
     hasElevator: true
   });
   
+  // State for map click mode (pin mode)
+  const [isPinMode, setIsPinMode] = useState(false);
+  
+  // State for temporary marker when in pin mode
+  const [tempMarker, setTempMarker] = useState(null);
+  
+  // State for the location form modal
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  
   // Function to handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,7 +78,7 @@ const InteractiveMap = () => {
   
   // Function to add a new location
   const addNewLocation = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     
     // Validate form
     if (!newLocation.name || !newLocation.lat || !newLocation.lng) {
@@ -98,6 +107,20 @@ const InteractiveMap = () => {
       type: 'building',
       hasElevator: true
     });
+    
+    // Clear temporary marker
+    setTempMarker(null);
+    
+    // Close modal if open
+    setShowLocationModal(false);
+    
+    // Show confirmation message
+    alert(`Location "${location.name}" added successfully!`);
+    
+    // If we were in pin mode, exit it
+    if (isPinMode) {
+      setIsPinMode(false);
+    }
   };
   
   // Function to delete a location
@@ -192,6 +215,26 @@ const InteractiveMap = () => {
     document.body.removeChild(link);
   };
 
+  // Handle escape key to exit pin mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showLocationModal) {
+          // If modal is open, close it
+          setShowLocationModal(false);
+          setTempMarker(null);
+        } else if (isPinMode) {
+          // Otherwise, exit pin mode if active
+          setIsPinMode(false);
+          setTempMarker(null);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPinMode, showLocationModal]);
+  
   // Fetch obstacles from backend API
   useEffect(() => {
     const fetchObstacles = async () => {
@@ -267,6 +310,42 @@ const InteractiveMap = () => {
   // Function to handle map load
   const onMapLoad = (mapInstance) => {
     setMap(mapInstance);
+  };
+  
+  // Function to handle map clicks when in pin mode
+  const handleMapClick = (event) => {
+    if (!isPinMode) return;
+    
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    
+    // Set the temporary marker
+    setTempMarker({ lat, lng });
+    
+    // Pre-fill the new location form with coordinates
+    setNewLocation(prev => ({
+      ...prev,
+      lat,
+      lng
+    }));
+    
+    // Open the location form modal
+    setShowLocationModal(true);
+  };
+  
+  // Function to toggle pin mode
+  const togglePinMode = () => {
+    setIsPinMode(!isPinMode);
+    // Clear temporary marker when exiting pin mode
+    if (isPinMode) {
+      setTempMarker(null);
+    }
+  };
+  
+  // Function to cancel adding a new pin
+  const cancelAddPin = () => {
+    setShowLocationModal(false);
+    setTempMarker(null);
   };
 
   // Function to handle marker click
@@ -383,6 +462,72 @@ const InteractiveMap = () => {
   
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
+      {/* Location Form Modal */}
+      {showLocationModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add New Location</h3>
+            <p className="modal-coordinates">
+              Coordinates: {tempMarker ? `${tempMarker.lat.toFixed(6)}, ${tempMarker.lng.toFixed(6)}` : ''}
+            </p>
+            
+            <form onSubmit={addNewLocation}>
+              <div className="form-group">
+                <label htmlFor="modal-name">Location Name*</label>
+                <input
+                  type="text"
+                  id="modal-name"
+                  name="name"
+                  value={newLocation.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter location name"
+                  required
+                  autoFocus
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="modal-type">Type*</label>
+                <select
+                  id="modal-type"
+                  name="type"
+                  value={newLocation.type}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="building">Building</option>
+                  <option value="parking">Parking</option>
+                  <option value="transportation">Transportation</option>
+                </select>
+              </div>
+              
+              {newLocation.type === 'building' && (
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="hasElevator"
+                      checked={newLocation.hasElevator}
+                      onChange={handleInputChange}
+                    />
+                    Has Elevator Access
+                  </label>
+                </div>
+              )}
+              
+              <div className="modal-actions">
+                <button type="button" onClick={cancelAddPin} className="cancel-button">
+                  Cancel
+                </button>
+                <button type="submit" className="add-button">
+                  Add Location
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
       <Header />
       <div className="interactive-map">
         <div className="map-controls">
@@ -400,6 +545,14 @@ const InteractiveMap = () => {
         <div className="location-management">
           <h3>Manage Locations</h3>
           <div className="location-controls">
+            <button 
+              onClick={togglePinMode} 
+              className={`pin-mode-button ${isPinMode ? 'active' : ''}`}
+              title={isPinMode ? 'Exit Pin Mode' : 'Enter Pin Mode (Click on map to add locations)'}
+            >
+              {isPinMode ? 'Exit Pin Mode' : 'Pin Mode'}
+            </button>
+            
             <div className="file-input-container">
               <input
                 type="file"
@@ -419,6 +572,15 @@ const InteractiveMap = () => {
               Export Locations (CSV)
             </button>
           </div>
+          
+          {isPinMode && (
+            <div className="pin-mode-instructions">
+              <p>
+                <strong>Pin Mode Active:</strong> Click anywhere on the map to place a new location marker.
+                Press ESC or click "Exit Pin Mode" to cancel.
+              </p>
+            </div>
+          )}
           <p className="location-help">
             CSV format: id,name,lat,lng,type,hasElevator<br/>
             <a href="/sample_locations.csv" download className="sample-link">Download Sample CSV</a>
@@ -603,7 +765,7 @@ const InteractiveMap = () => {
         </div>
       </div>
       
-      <div className="map-container">
+      <div className={`map-container ${isPinMode ? 'pin-mode-active' : ''}`}
         {googleMapsError ? (
           <div className="map-placeholder">
             <div className="map-placeholder-content">
@@ -630,6 +792,7 @@ const InteractiveMap = () => {
               center={center}
               zoom={16}
               onLoad={onMapLoad}
+              onClick={handleMapClick}
               options={{
                 streetViewControl: false,
                 fullscreenControl: true,
@@ -643,7 +806,9 @@ const InteractiveMap = () => {
                     west: -84.526
                   },
                   strictBounds: true
-                }
+                },
+                // Change cursor style when in pin mode
+                cursor: isPinMode ? 'crosshair' : 'default'
               }}
             >
               {/* Location Markers */}
@@ -758,6 +923,19 @@ const InteractiveMap = () => {
                     }}
                   />
                 </>
+              )}
+              
+              {/* Show temporary marker when in pin mode */}
+              {tempMarker && (
+                <Marker
+                  position={{ lat: tempMarker.lat, lng: tempMarker.lng }}
+                  animation={2} // BOUNCE animation
+                  label={{
+                    text: "New",
+                    color: "white",
+                    fontWeight: "bold"
+                  }}
+                />
               )}
               
               {/* Campus Boundary Polygon */}
