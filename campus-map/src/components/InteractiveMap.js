@@ -314,23 +314,31 @@ const InteractiveMap = () => {
   
   // Function to handle map clicks when in pin mode
   const handleMapClick = (event) => {
-    if (!isPinMode) return;
+    console.log("Map clicked in pin mode:", event);
     
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-    
-    // Set the temporary marker
-    setTempMarker({ lat, lng });
-    
-    // Pre-fill the new location form with coordinates
-    setNewLocation(prev => ({
-      ...prev,
-      lat,
-      lng
-    }));
-    
-    // Open the location form modal
-    setShowLocationModal(true);
+    try {
+      // Get coordinates directly from event
+      const lat = typeof event.latLng.lat === 'function' ? event.latLng.lat() : event.latLng.lat;
+      const lng = typeof event.latLng.lng === 'function' ? event.latLng.lng() : event.latLng.lng;
+      
+      console.log("Extracted coordinates:", lat, lng);
+      
+      // Set the temporary marker
+      setTempMarker({ lat, lng });
+      
+      // Pre-fill the new location form with coordinates
+      setNewLocation(prev => ({
+        ...prev,
+        lat,
+        lng
+      }));
+      
+      // Open the location form modal
+      setShowLocationModal(true);
+    } catch (error) {
+      console.error("Error handling map click:", error);
+      alert("Error placing pin. Please try again.");
+    }
   };
   
   // Function to toggle pin mode
@@ -792,7 +800,10 @@ const InteractiveMap = () => {
               center={center}
               zoom={16}
               onLoad={onMapLoad}
-              onClick={handleMapClick}
+              onClick={(e) => {
+                console.log("Map was clicked", e);
+                if (isPinMode) handleMapClick(e);
+              }}
               options={{
                 streetViewControl: false,
                 fullscreenControl: true,
@@ -806,9 +817,7 @@ const InteractiveMap = () => {
                     west: -84.526
                   },
                   strictBounds: true
-                },
-                // Change cursor style when in pin mode
-                cursor: isPinMode ? 'crosshair' : 'default'
+                }
               }}
             >
               {/* Location Markers */}

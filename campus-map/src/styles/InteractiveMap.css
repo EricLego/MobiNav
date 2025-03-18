@@ -570,6 +570,10 @@
   opacity: 1;
 }
 
+.pin-mode-active .gm-style {
+  cursor: crosshair !important;
+}
+
 .api-key-error {
   height: 100%;
   display: flex;
