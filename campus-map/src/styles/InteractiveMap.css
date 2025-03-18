@@ -145,6 +145,14 @@
   transform: translateY(0);
 }
 
+.calculate-button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .map-container {
   height: 500px;
   width: 100%;
@@ -361,9 +369,19 @@
 }
 
 .legend-icon.route {
-  background-color: var(--route-accessible);
+  background-color: #2196F3;
   border-radius: 0;
   height: 4px;
+}
+
+.legend-icon.accessible-route {
+  background-color: #4CAF50;
+  border-radius: 0;
+  height: 4px;
+}
+
+.legend-icon.accessibility {
+  background-color: #9C27B0;
 }
 
 /* Responsive Design */
