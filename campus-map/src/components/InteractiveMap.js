@@ -765,7 +765,7 @@ const InteractiveMap = () => {
         </div>
       </div>
       
-      <div className={`map-container ${isPinMode ? 'pin-mode-active' : ''}`}
+      <div className={`map-container ${isPinMode ? 'pin-mode-active' : ''}`}>
         {googleMapsError ? (
           <div className="map-placeholder">
             <div className="map-placeholder-content">
