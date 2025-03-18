@@ -652,15 +652,12 @@ const InteractiveMap = () => {
                   key={location.id}
                   position={{ lat: location.lat, lng: location.lng }}
                   onClick={() => handleMarkerClick(location)}
-                  // Default marker with customized color based on location type
-                  icon={{
-                    path: window.google.maps.SymbolPath.CIRCLE,
-                    scale: 8,
-                    fillColor: location.type === 'building' ? '#3F51B5' : 
-                               location.type === 'parking' ? '#FF9800' : '#03A9F4',
-                    fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: '#FFFFFF'
+                  // Use simple label-based markers instead of custom icons
+                  label={{
+                    text: location.type === 'building' ? 'B' : 
+                          location.type === 'parking' ? 'P' : 'T',
+                    color: 'white',
+                    fontWeight: 'bold'
                   }}
                 />
               ))}
