@@ -5,7 +5,7 @@
 .env.test
 .env.production
 #Campus-Map
-campus-map/.env
+    
     # dependencies
     campus-map/node_modules
     campus-map/.pnp
