@@ -9,8 +9,9 @@ import '../styles/HomePage.css';
 
 const HomePage = () => {
   return (
-    <div className="homepage">
+    <div className="page-wrapper">
       <Header />
+      <div className="homepage">
       
       {/* Hero Section */}
       <section className="hero-section">
@@ -30,7 +31,6 @@ const HomePage = () => {
       
       {/* Interactive Map Section */}
       <section className="map-section">
-        <h2>Interactive Campus Map</h2>
         <InteractiveMap />
       </section>
       
@@ -47,6 +47,7 @@ const HomePage = () => {
       </section>
       
       <Footer />
+    </div>
     </div>
   );
 };

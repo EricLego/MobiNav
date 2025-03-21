@@ -11,6 +11,16 @@
     width: 100%;
     display: flex;
   }
+
+  .autocomplete-input {
+    width: 40vw;
+    padding: var(--space-md);
+    border: 1px solid var(--ksu-gray-light);
+    border-radius: var(--border-radius-md);
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-md);
+    background-color: var(--ksu-white);
+  }
   
   /* Styles for the Google Places Autocomplete widget */
   .building-autocomplete-card gmp-place-autocomplete-element {

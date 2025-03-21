@@ -3,9 +3,14 @@
 .header {
   background-color: var(--ksu-black);
   box-shadow: var(--shadow-md);
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 72px; /* Explicit height */
   z-index: 1000;
+  flex-shrink: 0;
 }
 
 .header-container {

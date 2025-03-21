@@ -1,8 +1,23 @@
 /* HomePage.css */
 
+.page-wrapper {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
 .homepage {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--ksu-gray-dark);
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: calc(100vh - 72px); /* Full viewport minus header height */
+  position: absolute;
+  top: 72px; /* Position right below header */
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /* Hero Section */
@@ -13,6 +28,9 @@
   padding: var(--space-xxl) var(--space-lg);
   text-align: center;
   overflow: hidden;
+  scroll-snap-align: start;
+  min-height: 60vh;
+  
 }
 
 .hero-background {

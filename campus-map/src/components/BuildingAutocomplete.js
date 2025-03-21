@@ -1,38 +1,50 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, forwardRef } from 'react';
 import '../styles/BuildingAutocomplete.css';
 
-const BuildingAutocomplete = ({ 
-  onPlaceSelect, 
-  mapRef, 
-  restrictToCampus = true,
-  campusBoundary = null,
-  placeholder = "Search for buildings, parking, etc...",
-  isRouteSelector = false,  // New prop to indicate route selection usage
-  routePointType = null     // 'start' or 'end' to indicate which point
-}) => {
+const BuildingAutocomplete = forwardRef(({ 
+    onPlaceSelect, 
+    mapRef, 
+    restrictToCampus = true,
+    campusBoundary = null,
+    placeholder = "Search for buildings, parking, etc...",
+    isRouteSelector = false,
+    routePointType = null
+  }, ref) => {
   const inputRef = useRef(null);
   const autocompleteRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
+    // Expose the input reference to the parent component
+    React.useImperativeHandle(ref, () => ({
+        clear: () => {
+          if (inputRef.current) {
+            console.log("Clearing input field");
+            inputRef.current.value = '';
+          }
+        }
+      }));
+
+    useEffect(() => {
     // Only set up autocomplete if Google Maps API is loaded
     if (window.google && window.google.maps && window.google.maps.places) {
-      initializeAutocomplete();
-      setIsLoaded(true);
+        initializeAutocomplete();
+        setIsLoaded(true);
     } else {
-      // Google Maps API not available yet, set up a listener for when it loads
-      const checkGoogleExists = setInterval(() => {
+        // Google Maps API not available yet, set up a listener for when it loads
+        const checkGoogleExists = setInterval(() => {
         if (window.google && window.google.maps && window.google.maps.places) {
-          clearInterval(checkGoogleExists);
-          initializeAutocomplete();
-          setIsLoaded(true);
+            clearInterval(checkGoogleExists);
+            initializeAutocomplete();
+            setIsLoaded(true);
         }
-      }, 100);
+        }, 100);
 
-      // Clean up interval on component unmount
-      return () => clearInterval(checkGoogleExists);
+        // Clean up interval on component unmount
+        return () => clearInterval(checkGoogleExists);
     }
-  }, []);
+    }, []);
+
+
     useEffect(() => {
         if (!isLoaded || !autocompleteRef.current) return;
     
@@ -112,6 +124,6 @@ const BuildingAutocomplete = ({
       </div>
     </div>
   );
-};
+});
 
 export default BuildingAutocomplete;

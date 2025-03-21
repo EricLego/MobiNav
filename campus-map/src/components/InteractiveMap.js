@@ -4,6 +4,7 @@ import { AccessibilityContext } from '../App';
 import BuildingAutocomplete from './BuildingAutocomplete';
 import '../styles/InteractiveMap.css';
 import RoutePointDisplay from './RoutePointDisplay';
+import RoutePlanner from './RoutePlanner';
 
 // Define libraries as a constant array to avoid unnecessary reloads
 const libraries = ['places'];
@@ -11,6 +12,8 @@ const libraries = ['places'];
 const InteractiveMap = () => {
   const [map, setMap] = useState(null);
   const mapRef = useRef(null);
+  const searchRef = useRef(null);
+  const routeRef = useRef(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
@@ -141,6 +144,8 @@ const InteractiveMap = () => {
     
     // Create a DirectionsService instance
     const directionsService = new window.google.maps.DirectionsService();
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
     
     // Configure route options
     const routeOptions = {
@@ -163,6 +168,8 @@ const InteractiveMap = () => {
     .then(result => {
       console.log(result);
       if (result.routes.length > 0) {
+        directionsRenderer.setDirections(result);
+        directionsRenderer.setPanel(document.getElementById('route-planner'));
         // Convert the directions result to a route path
         const routePath = [];
         const legs = result.routes[0].legs;
@@ -216,6 +223,7 @@ const InteractiveMap = () => {
       
       // Show the info window for this location
       setSelectedLocation(newLocation);
+
     }
   };
 
@@ -230,6 +238,15 @@ const InteractiveMap = () => {
       if (map) {
         map.setCenter(place);
         map.setZoom(18);
+      }
+
+
+      if(searchRef.current){
+        console.log(searchRef.current, "clearing search");
+        searchRef.current.clear();
+        setSelectedLocation(null);
+      }else{
+        console.log(searchRef.current, "search ref not found");
       }
     } else{
       console.log(place);
@@ -248,6 +265,15 @@ const InteractiveMap = () => {
         map.setCenter(place);
         map.setZoom(18);
       }
+
+
+      if(searchRef.current){
+        console.log(searchRef.current, "clearing search");
+        searchRef.current.clear();
+        setSelectedLocation(null);
+      }else{
+        console.log(searchRef.current, "search ref not found");
+      }
       
     }
   }
@@ -263,160 +289,113 @@ const InteractiveMap = () => {
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
       <div className="interactive-map">
-        <div className="map-controls">
-        
-          <div className="route-planner">
-            <h3>Plan Your Route</h3>
-
-            <div className="search-and-route-container">
-              {/* Search functionality */}
-              <div className="search-container">
-                <BuildingAutocomplete 
-                  onPlaceSelect={handlePlaceSelect} 
-                  mapRef={mapRef}
-                  restrictToCampus={true}
-                  campusBoundary={{
-                    north: 33.941486,
-                    south: 33.935673,
-                    east: -84.512786,
-                    west: -84.524504
-                  }}
-                  placeholder="Search for a location..."
-                />
-              </div>
-              
-              <div className="route-options">
-                {/* Route point displays */}
-                <RoutePointDisplay 
-                  label="Starting Point" 
-                  point={startPoint ? startPoint.name : 'Not selected'}
-                  onClear={() => setStartPoint('')}
-                />
-                
-                <RoutePointDisplay 
-                  label="Destination" 
-                  point={endPoint ? endPoint.name : 'Not selected'}
-                  onClear={() => setEndPoint('')}
-                />
-              </div>
-            </div>
-
-            
-            
-            
-            <div className="route-options">
-              <label className="wheelchair-toggle">
-                <input 
-                  type="checkbox" 
-                  checked={wheelchairMode}
-                  onChange={toggleWheelchairMode}
-                />
-                Wheelchair-Accessible Only
-              </label>
-            </div>
-            
-            <button 
-              onClick={calculateRoute} 
-              className="calculate-button"
-              disabled={!startPoint || !endPoint}
-            >
-              Calculate Route
-            </button>
-          </div>
-        </div>
-      
-        <div className="map-container">
-          {googleMapsError ? (
-            <div className="map-placeholder">
-              <div className="map-placeholder-content">
-                <h3>Interactive Campus Map</h3>
-                <p>There was an error loading the Google Maps API. Please check your API key and try again.</p>
-                <div className="mock-map">
-                  <div className="mock-location" style={{top: '30%', left: '40%'}}>Engineering Building</div>
-                  <div className="mock-location" style={{top: '50%', left: '60%'}}>Student Center</div>
-                  <div className="mock-location" style={{top: '40%', left: '70%'}}>Library</div>
-                  <div className="mock-location" style={{top: '20%', left: '45%'}}>Parking Deck A</div>
-                  <div className="mock-location" style={{top: '60%', left: '55%'}}>Bus Stop</div>
+        <div className="map-container-wrapper">
+          <div className="map-container">
+            {googleMapsError ? (
+              <div className="map-placeholder">
+                <div className="map-placeholder-content">
+                  <h3>Interactive Campus Map</h3>
+                  <p>There was an error loading the Google Maps API. Please check your API key and try again.</p>
+                  <div className="mock-map">
+                    <div className="mock-location" style={{top: '30%', left: '40%'}}>Engineering Building</div>
+                    <div className="mock-location" style={{top: '50%', left: '60%'}}>Student Center</div>
+                    <div className="mock-location" style={{top: '40%', left: '70%'}}>Library</div>
+                    <div className="mock-location" style={{top: '20%', left: '45%'}}>Parking Deck A</div>
+                    <div className="mock-location" style={{top: '60%', left: '55%'}}>Bus Stop</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <LoadScript 
-              googleMapsApiKey={apiKey} 
-              libraries={libraries}
-              onLoad={() => console.log('Google Maps API loaded')}
-              onError={() => setGoogleMapsError(true)}
-            >
-              <GoogleMap
-                mapContainerStyle={mapContainerStyle}
-                center={center}
-                zoom={16}
-                onLoad={onMapLoad}
-                options={{
-                  streetViewControl: false,
-                  fullscreenControl: true,
-                  mapTypeControl: true,
-                  zoomControl: true,
-                  restriction: {
-                    latLngBounds: {
-                      north: 33.943,
-                      south: 33.934,
-                      east: -84.511,
-                      west: -84.526
-                    },
-                    strictBounds: true
-                  }
-                }}
+            ) : (
+              <LoadScript 
+                googleMapsApiKey={apiKey} 
+                libraries={libraries}
+                onLoad={() => console.log('Google Maps API loaded')}
+                onError={() => setGoogleMapsError(true)}
               >
-                {/* Campus markers would be here in production */}
-                
-                {/* Info Window for Selected Location */}
-                {selectedLocation && (
-                  <InfoWindow
-                    position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
-                    onCloseClick={() => setSelectedLocation(null)}
-                  >
-                    <div className="info-window">
-                      <h3>{selectedLocation.name || selectedLocation.location}</h3>
-                      {selectedLocation.formattedAddress && (
-                        <p>{selectedLocation.formattedAddress}</p>
-                      )}
-                      {selectedLocation.type === 'building' && (
-                        <p>Elevator Available: {selectedLocation.hasElevator ? 'Yes' : 'No'}</p>
-                      )}
-                      {selectedLocation.status && (
-                        <div className="obstacle-info">
-                          <p className="status">{selectedLocation.status}</p>
-                          <p className="reported">Reported: {selectedLocation.reportedAt}</p>
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={center}
+                  zoom={16}
+                  onLoad={onMapLoad}
+                  options={{
+                    streetViewControl: false,
+                    fullscreenControl: true,
+                    mapTypeControl: true,
+                    zoomControl: true,
+                    mapId: 'bdd7d136cc4cd64c',
+                    restriction: {
+                      latLngBounds: {
+                        north: 33.943,
+                        south: 33.934,
+                        east: -84.511,
+                        west: -84.526
+                      },
+                      strictBounds: true
+                    }
+                  }}
+                >
+                  
+                  
+                  {/* Info Window for Selected Location */}
+                  {selectedLocation && (
+                    <InfoWindow
+                      position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
+                      onCloseClick={() => setSelectedLocation(null)}
+                    >
+                      <div className="info-window">
+                        <h3>{selectedLocation.name || selectedLocation.location}</h3>
+                        {selectedLocation.formattedAddress && (
+                          <p>{selectedLocation.formattedAddress}</p>
+                        )}
+                        {selectedLocation.type === 'building' && (
+                          <p>Elevator Available: {selectedLocation.hasElevator ? 'Yes' : 'No'}</p>
+                        )}
+                        {selectedLocation.status && (
+                          <div className="obstacle-info">
+                            <p className="status">{selectedLocation.status}</p>
+                            <p className="reported">Reported: {selectedLocation.reportedAt}</p>
+                          </div>
+                        )}
+                        <div className="info-actions">
+                          <button onClick={() => handleStartPointPlaceSelect(selectedLocation)}>
+                            Set as Start
+                          </button>
+                          <button onClick={() => handleEndPointPlaceSelect(selectedLocation)}>
+                            Set as Destination
+                          </button>
                         </div>
-                      )}
-                      <div className="info-actions">
-                        <button onClick={() => handleStartPointPlaceSelect(selectedLocation)}>
-                          Set as Start
-                        </button>
-                        <button onClick={() => handleEndPointPlaceSelect(selectedLocation)}>
-                          Set as Destination
-                        </button>
                       </div>
-                    </div>
-                  </InfoWindow>
-                )}
-                
-                {/* Route Polyline */}
-                {route.length > 0 && (
-                  <Polyline
-                    path={route}
-                    options={{
-                      strokeColor: wheelchairMode ? '#4CAF50' : '#2196F3',
-                      strokeOpacity: 0.8,
-                      strokeWeight: 5
-                    }}
-                  />
-                )}
-              </GoogleMap>
-            </LoadScript>
-          )}
+                    </InfoWindow>
+                  )}
+                </GoogleMap>
+              </LoadScript>
+            )}
+          </div>
+
+          <RoutePlanner 
+            startPoint={startPoint}
+            setStartPoint={setStartPoint}
+            endPoint={endPoint}
+            setEndPoint={setEndPoint}
+            wheelchairMode={wheelchairMode}
+            setWheelchairMode={setWheelchairMode}
+            mapRef={mapRef}
+            handlePlaceSelect={handlePlaceSelect}
+            handleStartPointPlaceSelect={handleStartPointPlaceSelect}
+            handleEndPointPlaceSelect={handleEndPointPlaceSelect}
+            calculateRoute={calculateRoute}
+            campusBoundary={{
+              north: 33.941486,
+              south: 33.935673,
+              east: -84.512786,
+              west: -84.524504
+            }}
+          />
+
         </div>
+      
+      
+        
         
         <div className="map-legend">
           <h3>Map Legend</h3>
