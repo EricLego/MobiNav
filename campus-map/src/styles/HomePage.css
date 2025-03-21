@@ -30,8 +30,12 @@
   overflow: hidden;
   scroll-snap-align: start;
   min-height: 60vh;
-  
+  /* Tmp Changes */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 
 .hero-background {
   position: absolute;
@@ -177,6 +181,10 @@ section h2:after {
   background-color: var(--ksu-white);
   border-top: 1px solid var(--ksu-gray-light);
   border-bottom: 1px solid var(--ksu-gray-light);
+  scroll-snap-align: start;
+  padding-top: var(--space-xxl);
+  padding-bottom: var(--space-xxl);
+  height: calc(100vh - 72px); /* Full viewport minus header & padding */
 }
 
 .accessibility-toggles {
@@ -211,6 +219,8 @@ section h2:after {
   background-color: var(--ksu-gray-light);
   position: relative;
   overflow: hidden;
+  scroll-snap-align: start;
+  padding: var(--space-xxl) var(--space-lg);
 }
 
 .obstacles-section:before {
@@ -227,6 +237,8 @@ section h2:after {
 .how-it-works {
   background-color: var(--ksu-white);
   position: relative;
+  scroll-snap-align: start;
+  padding: var(--space-xxl) var(--space-lg);
 }
 
 /* Responsive Design */
@@ -266,6 +278,10 @@ section h2:after {
   
   .toggle-btn {
     width: 100%;
+  }
+
+  .interactive-map {
+    height: 500px;
   }
 }
 

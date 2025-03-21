@@ -1,10 +1,10 @@
 /* HowItWorks.css */
 
 .how-it-works {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xl);
-  padding: var(--space-lg);
+  background-color: var(--ksu-white);
+  position: relative;
+  scroll-snap-align: start;
+  padding: var(--space-xxl) var(--space-lg);
 }
 
 .steps-container {

@@ -14,6 +14,8 @@ const InteractiveMap = () => {
   const mapRef = useRef(null);
   const searchRef = useRef(null);
   const routeRef = useRef(null);
+  const [campusBounds, setCampusBounds] = useState(null);
+  const [mapOptions, setMapOptions] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
@@ -26,7 +28,7 @@ const InteractiveMap = () => {
   
   const mapContainerStyle = {
     width: '100%',
-    height: '500px',
+    height: '100%',
   };
   
   const center = {
@@ -34,23 +36,7 @@ const InteractiveMap = () => {
     lng: -84.5187,
   };
   
-  // KSU Marietta Campus boundary polygon
-  const campusBoundary = [
-    { lat: 33.940912, lng: -84.524504 }, // NW
-    { lat: 33.941486, lng: -84.515582 }, // NE
-    { lat: 33.935908, lng: -84.512786 }, // SE
-    { lat: 33.935673, lng: -84.524473 }, // SW
-    { lat: 33.940912, lng: -84.524504 }, // NW (close the polygon)
-  ];
 
-  const campusLocations = [
-    { id: 1, name: 'Engineering Building', lat: 33.942, lng: -84.521, type: 'building', hasElevator: true },
-    { id: 2, name: 'Student Center', lat: 33.939, lng: -84.518, type: 'building', hasElevator: true },
-    { id: 3, name: 'Library', lat: 33.941, lng: -84.517, type: 'building', hasElevator: true },
-    { id: 4, name: 'Parking Deck A', lat: 33.943, lng: -84.520, type: 'parking', hasElevator: true },
-    { id: 5, name: 'Bus Stop', lat: 33.938, lng: -84.519, type: 'transportation' },
-    // Add more campus locations as needed
-  ];
 
   // Mock obstacles data - this would come from an API in production
   useEffect(() => {
@@ -106,7 +92,25 @@ const InteractiveMap = () => {
       new window.google.maps.LatLng(33.941486, -84.512786)  // NE corner
     );
 
+    setCampusBounds(campusBounds);
+
+    setMapOptions({
+      streetViewControl: false,
+      fullscreenControl: true,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        position: window.google.maps.ControlPosition.BOTTOM_LEFT
+      },
+      zoomControl: true,
+      mapId: 'bdd7d136cc4cd64c',
+      restriction: {
+        latLngBounds: campusBounds,
+        strictBounds: true
+      }
+    });
+
     mapInstance.fitBounds(campusBounds);
+    
   };
 
   // Function to handle marker click
@@ -278,12 +282,6 @@ const InteractiveMap = () => {
     }
   }
 
-  // Function to toggle wheelchair mode
-  const toggleWheelchairMode = () => {
-    setWheelchairMode(!wheelchairMode);
-    // In a real app, you would recalculate routes here
-  };
-
   const { accessibilitySettings } = useContext(AccessibilityContext);
   
   return (
@@ -317,22 +315,7 @@ const InteractiveMap = () => {
                   center={center}
                   zoom={16}
                   onLoad={onMapLoad}
-                  options={{
-                    streetViewControl: false,
-                    fullscreenControl: true,
-                    mapTypeControl: true,
-                    zoomControl: true,
-                    mapId: 'bdd7d136cc4cd64c',
-                    restriction: {
-                      latLngBounds: {
-                        north: 33.943,
-                        south: 33.934,
-                        east: -84.511,
-                        west: -84.526
-                      },
-                      strictBounds: true
-                    }
-                  }}
+                  options={mapOptions}
                 >
                   
                   

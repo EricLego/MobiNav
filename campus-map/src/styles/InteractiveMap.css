@@ -5,11 +5,9 @@
   overflow: hidden;
   background-color: var(--ksu-white);
   box-shadow: var(--shadow-md);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  min-height: 100vh; /* Full height of its container */
-  max-height: 100vh - 72px; /* Full height of its container */
-  top: 72px; /* Height of the header */
+  position: relative;
+  height: calc(100vh - 140px); /* Adjusted height to account for padding */
+  min-height: 500px;
 }
 
 .map-controls {
@@ -22,7 +20,7 @@
 .map-container-wrapper{
   position: relative;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 80px); /* Adjusted to account for legend */
 }
 
 .map-container {
@@ -269,6 +267,25 @@
   
   .info-actions button {
     width: 100%;
+  }
+
+  .interactive-map {
+    height: 500px; /* Fixed height on mobile */
+  }
+
+  .map-legend {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .map-legend h3 {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .map-legend ul {
+    flex-direction: column;
+    gap: var(--space-sm);
   }
 }
 
