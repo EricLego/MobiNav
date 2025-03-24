@@ -1,3 +1,4 @@
+#File: get_buildings_list.py
 import psycopg2
 
 # PostgreSQL connection details
@@ -23,7 +24,7 @@ def connect_and_fetch():
         table2 = "occupancy_schedule"
         common_column = "building_id"
 
-        # This code fetches the building locations (coordinates) and occupancy schedule (if available) by querying the database.
+        # This code fetches the building locations (coordinates).
         query = f"""
             SELECT * FROM building;
             """

@@ -2,10 +2,4 @@
 SUMO_CONFIG_FILE = "KSUMariettaConfig.sumocfg"
 NET_FILE = "KSUMarietta.net.xml.gz"
 
-# GPS Coordinates (replace with database connection later)
-#CURRENT_LOCATION = (33.938286, -84.518969)  # Latitude, Longitude
-#DESTINATION_LOCATION = (33.940275, -84.520132)  # Latitude, Longitude
-
-# Simulation parameters
-#BUILDING_OCCUPANCY = 100  # Number of pedestrians to simulate
-SIMULATION_STEPS = 3600
+SIMULATION_STEPS = 86400 # Simulation is preset to run for one day. However, the simulation will stop when no pedestrians are in the network any longer

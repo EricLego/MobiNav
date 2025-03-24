@@ -1,22 +1,23 @@
-# File: routing.py
 import traci
 import sumolib
 import config
 import random
+from functools import lru_cache
 
-def get_network():
-    """Load SUMO network file."""
-    return sumolib.net.readNet(config.NET_FILE)
-
+@lru_cache(maxsize=5000)  # Cache GPS-to-edge lookups
 def get_edge_from_gps(lat, lon):
-    """Convert GPS coordinates to SUMO network edge."""
-    adjustment = float(0.0005) #adjust GPS coordinates slightly to ensure SUMS does not identify a junction instead of an edge
-    lat = float(lat) + adjustment
-    lon = float(lon) + adjustment
-    return traci.simulation.convertRoad(lon, lat, isGeo=1)
+
+    # Convert GPS coordinates to SUMO network edge.
+    adjustment = 0.0004 #small adjustment to move off any internal edges / junctions that will cause error.
+
+    # Convert Decimal to float for conversion
+    lat = float(lat)
+    lon = float(lon)
+
+    return traci.simulation.convertRoad(lon + adjustment, lat + adjustment, isGeo=True)
 
 def find_route(start_edge, end_edge):
-    """Find a route between two edges."""
-    route_type =random.randint(0,4) #assigns random routing type
+    #Find the routes between two edges.
+    route_type = random.choices([1, 3, 5], weights=[0.5, 0.3, 0.2])[0]  # Bias towards best routing types (1 = shortes path, 3 = shortest path with consideration of congestion conditions, 5 = shorted path using historical data)
     route = traci.simulation.findRoute(start_edge, end_edge, vType="ped_pedestrian", depart=0, routingMode=route_type)
-    return [edge for edge in route.edges if not edge.startswith(":")]  # Remove internal edges
+    return [edge for edge in route.edges if not edge.startswith(":")]
