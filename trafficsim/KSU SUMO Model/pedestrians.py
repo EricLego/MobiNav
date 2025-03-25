@@ -20,8 +20,6 @@ def spawn_pedestrians(step):
 
     current_time = (datetime.min + timedelta(seconds=step)).time()
 
-    test_data = occupancy_data
-
     new_pedestrians = [row for row in occupancy_data if row[4] == current_time and (row[0], row[4]) not in pedestrians_spawned]
 
     if not new_pedestrians:

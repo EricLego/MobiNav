@@ -1,18 +1,10 @@
 import traci
 import config
 import csv
+import math
 import pedestrians
-import psycopg2
 from datetime import datetime, timedelta
 
-# PostgreSQL connection details
-DB_PARAMS = {
-    "dbname": "mobinav",
-    "user": "sumo",
-    "password": "sumouser",
-    "host": "localhost",
-    "port": "5432",
-}
 
 def start_simulation():
     # Start SUMO simulation; to run with gui change "sumo" to "sumo-gui'
@@ -25,22 +17,9 @@ def close_simulation():
     print("Simulation done.")
 
 
-def connect_to_db():
-    try:
-        conn = psycopg2.connect(**DB_PARAMS)
-        return conn
-    except psycopg2.Error as e:
-        print(f"❌ Database connection error: {e}")
-        return None
-
 def run_simulation(steps=config.SIMULATION_STEPS):
-    current_date = datetime.today().strftime('%Y-%m-%d')
-    conn = connect_to_db()
-    if not conn:
-        print("❌ Unable to connect to the database. Exiting simulation.")
-        return
-    cursor = conn.cursor()
 
+    pedestrian_data = {}
     lane_lengths = {lane: traci.lane.getLength(lane) for lane in traci.lane.getIDList()}
     start_time = datetime.combine(datetime.today(), datetime.min.time())  # Midnight
 
@@ -83,19 +62,6 @@ def run_simulation(steps=config.SIMULATION_STEPS):
                         x, y = edge_shape[0]  # Use the first coordinate of the edge
                         longitude, latitude = traci.simulation.convertGeo(x, y, fromGeo=False)  # Convert to GPS coordinates
                     edge_writer.writerow([step, current_time, lane, density, latitude, longitude])
-
-                    try:
-                        cursor.execute(
-                            """
-                            INSERT INTO edge_density_schedule (time_step, time, edge_id, pedestrian_density, latitude, longitude, date)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s)
-                            """,
-                            (step, current_time, lane, density, latitude, longitude, datetime.today().strftime('%Y-%m-%d'))
-                        )
-                    except psycopg2.Error as e:
-                        print(f"❌ Database insertion error: {e}")
-
-            conn.commit()
 
             #print(f"Simulation step {step} - Time: {current_time}")
             traci.simulationStep()  # Move simulation forward
