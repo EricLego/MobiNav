@@ -1,13 +1,11 @@
 # File: main.py
 import simulation
-import pedestrians
 import time
 
 def main():
     """Main function to start the simulation."""
     start_time = time.time() # Start time tracking
     simulation.start_simulation()
-    pedestrians.spawn_pedestrians()
     simulation.run_simulation()
     end_time = time.time()  # Capture end time
     simulation.close_simulation()

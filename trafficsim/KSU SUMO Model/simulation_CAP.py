@@ -1,12 +1,14 @@
 import traci
 import config
 import csv
+import math
+import pedestrians
 from datetime import datetime, timedelta
 
 
 def start_simulation():
     # Start SUMO simulation; to run with gui change "sumo" to "sumo-gui'
-    traci.start(["sumo", "-c", config.SUMO_CONFIG_FILE])
+    traci.start(["sumo-gui", "-c", config.SUMO_CONFIG_FILE])
 
 
 def close_simulation():
@@ -17,11 +19,9 @@ def close_simulation():
 
 def run_simulation(steps=config.SIMULATION_STEPS):
 
-    # Cache lane lengths once
+    pedestrian_data = {}
     lane_lengths = {lane: traci.lane.getLength(lane) for lane in traci.lane.getIDList()}
-
-    # Get the start of the current hour
-    start_time = datetime.now().replace(minute=0, second=0, microsecond=0)
+    start_time = datetime.combine(datetime.today(), datetime.min.time())  # Midnight
 
     # Open CSV for logging edge density statistics
     with open("edge_density_stats.csv", "w", newline="") as edgefile:
@@ -30,12 +30,14 @@ def run_simulation(steps=config.SIMULATION_STEPS):
 
         step = 0
 
-        while traci.simulation.getMinExpectedNumber() > 0: # runs the simulation while pedestrians are in the network
-            if step % 60 != 0: # every 30 seconds the rest of the script outside of this if statement is run to capture statistics of the model.
+        while step < 86400:  # Run for 24 hours (1 step = 1 second)
+            pedestrians.spawn_pedestrians(step)  # Add pedestrians at correct step
+
+            traci.simulationStep()  # Move simulation forward
+
+            if step % 60 != 0:
                 step += 1
-                traci.simulationStep()
                 continue
-            traci.simulationStep()
 
             # Compute actual time corresponding to the current step
             current_time = (start_time + timedelta(seconds=step)).strftime("%H:%M:%S")

@@ -1,55 +1,65 @@
-# File: pedestrians.py
 import traci
 import random
 import routing
 import get_buildings_list
 import get_coordinates_occupancy
+from datetime import timedelta, datetime
 
-def spawn_pedestrians():
-    """Spawn pedestrians efficiently using batch processing."""
+# Retrieve all building and occupancy data for the entire day
+building_data = get_buildings_list.connect_and_fetch() or []
+occupancy_data = get_coordinates_occupancy.connect_and_fetch() or []
 
-    # Retrieve building data and occupancy data from database
-    building_data = get_buildings_list.connect_and_fetch() or []
-    spawning_data = get_coordinates_occupancy.connect_and_fetch() or []
+pedestrians_spawned = set()
 
-    if not building_data or not spawning_data:
-        print("Warning: No data retrieved from the database.")
-        return
+def spawn_pedestrians(step):
 
-    pedestrians_count = 0
+    global pedestrians_spawned # Tracks already spawned pedestrians
+
     building_edge_map = {(b[7], b[8]): routing.get_edge_from_gps(b[7], b[8])[:2] for b in building_data}
     building_locations = list(building_edge_map.keys())
 
-    # Use a list to store a batch of pedestrians for TraCI commands
-    batch_pedestrians = []
+    current_time = (datetime.min + timedelta(seconds=step)).time()
 
-    for row in spawning_data:
+    test_data = occupancy_data
+
+    new_pedestrians = [row for row in occupancy_data if row[4] == current_time and (row[0], row[4]) not in pedestrians_spawned]
+
+    if not new_pedestrians:
+        return
+
+
+
+    for row in new_pedestrians:
+        batch_pedestrians = []
         start_lat, start_lon = row[2], row[3]
         occupancy = row[6]
 
         if occupancy <= 0:
             continue
 
-        start_edge, start_edge_position, lane_index = routing.get_edge_from_gps(start_lat, start_lon)
+        start_edge, start_edge_position, _ = routing.get_edge_from_gps(start_lat, start_lon)
 
-        for _ in range(occupancy): #iterate the creation of a pedestrian the number of times equal to occupancy received from database.
-            end_lat, end_lon = random.choice(building_locations) # chooses a random building on campus to route pedestrian to.
+        for _ in range(occupancy):
+            end_lat, end_lon = random.choice(building_locations)
             end_edge, end_edge_position = building_edge_map[(end_lat, end_lon)]
 
-            ped_id = f"ped_{pedestrians_count + 1}"
+            ped_id = f"ped_{step}_{random.randint(1, 1000000)}"
             route_edges = routing.find_route(start_edge, end_edge)
-            speed = random.uniform(0.7, 2.0) # assigns rqandom speed to pedestrian in the range of average human walking speeds.
+            speed = random.uniform(0.7, 2.0)
 
-            # Store commands instead of executing immediately
             batch_pedestrians.append((ped_id, start_edge, start_edge_position, end_edge, end_edge_position, route_edges, speed))
-            pedestrians_count += 1
 
-    # Process batch TraCI commands
-    for ped_id, start_edge, start_edge_position, end_edge, end_edge_position, route_edges, speed in batch_pedestrians:
-        try:
-            traci.person.add(personID=ped_id, edgeID=start_edge, pos=start_edge_position, typeID="ped_pedestrian", depart=random.randint(10, 600))
-            traci.person.appendWalkingStage(personID=ped_id, edges=route_edges, arrivalPos=end_edge_position)
-            traci.person.setSpeed(ped_id, speed)
-            #print (f"Added pedestrian {ped_id} with speed {speed}")
-        except traci.TraCIException as e:
-            print(f"Skipping {ped_id} due to error: {e}")
+        pedestrians_spawned.add((row[0], row[4])) # Mark these pedestrians as added
+
+        # Add pedestrians to SUMO
+        for ped_id, start_edge, start_edge_position, end_edge, end_edge_position, route_edges, speed in batch_pedestrians:
+            try:
+                traci.person.add(personID=ped_id, edgeID=start_edge, pos=start_edge_position,
+                                 typeID="ped_pedestrian", depart=step)
+                traci.person.appendWalkingStage(personID=ped_id, edges=route_edges, arrivalPos=end_edge_position)
+                traci.person.setSpeed(ped_id, speed)
+            except traci.TraCIException as e:
+                print(f"⚠️ Skipping {ped_id} due to error: {e}")
+
+        print(f"✅ {len(batch_pedestrians)} pedestrians added at {current_time}.")
+
