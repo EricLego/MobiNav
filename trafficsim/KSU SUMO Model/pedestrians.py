@@ -15,12 +15,14 @@ def spawn_pedestrians(step):
 
     global pedestrians_spawned # Tracks already spawned pedestrians
 
+    test_data = occupancy_data
+
     building_edge_map = {(b[7], b[8]): routing.get_edge_from_gps(b[7], b[8])[:2] for b in building_data}
     building_locations = list(building_edge_map.keys())
 
     current_time = (datetime.min + timedelta(seconds=step)).time()
 
-    new_pedestrians = [row for row in occupancy_data if row[4] == current_time and (row[0], row[4]) not in pedestrians_spawned]
+    new_pedestrians = [row for row in occupancy_data if row[5] == current_time and (row[0], row[5]) not in pedestrians_spawned]
 
     if not new_pedestrians:
         return
@@ -47,7 +49,7 @@ def spawn_pedestrians(step):
 
             batch_pedestrians.append((ped_id, start_edge, start_edge_position, end_edge, end_edge_position, route_edges, speed))
 
-        pedestrians_spawned.add((row[0], row[4])) # Mark these pedestrians as added
+        pedestrians_spawned.add((row[0], row[5])) # Mark these pedestrians as added
 
         # Add pedestrians to SUMO
         for ped_id, start_edge, start_edge_position, end_edge, end_edge_position, route_edges, speed in batch_pedestrians:

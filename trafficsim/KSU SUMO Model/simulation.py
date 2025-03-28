@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 def start_simulation():
     """Start the SUMO simulation."""
-    traci.start(["sumo-gui", "-c", config.SUMO_CONFIG_FILE])
+    traci.start(["sumo", "-c", config.SUMO_CONFIG_FILE])
 
 def close_simulation():
     """Close the SUMO simulation."""
@@ -27,7 +27,7 @@ def run_simulation():
             "Time", "Total Pedestrians", "Mean Speed", "Waiting Pedestrians",
             "Average Route Time", "Throughput", "Max Pedestrian Density",
             "Max Density Lane", "Max Waiting Time", "Total Distance Traveled",
-            "Average Distance", "Deviation from Shortest Route"
+            "Average Distance"
         ])
 
         step = 0
@@ -94,12 +94,6 @@ def run_simulation():
             avg_route_time = sum(total_route_times) / len(total_route_times) if total_route_times else 0
             avg_traveled_distance = sum(total_traveled_distances) / len(total_traveled_distances) if total_traveled_distances else 0
 
-            # Compute deviation from shortest route
-            deviation_ratios = [
-                pedestrian_data[p]["distance_traveled"] / pedestrian_data[p]["shortest_distance"]
-                for p in pedestrian_data if pedestrian_data[p]["shortest_distance"] > 0
-            ]
-            avg_deviation = sum(deviation_ratios) / len(deviation_ratios) if deviation_ratios else 1.0
 
             # Log statistics every 60 steps (1 minute)
             if step % 60 == 0:
@@ -107,7 +101,7 @@ def run_simulation():
                     current_time, num_pedestrians, mean_speed, waiting_pedestrians,
                     avg_route_time, len(finished_pedestrians), max_density,
                     max_density_lane, max_wait_time, sum(total_traveled_distances),
-                    avg_traveled_distance, avg_deviation
+                    avg_traveled_distance
                 ])
                 print(f"📝 Logged statistics for {current_time}")
 

@@ -16,7 +16,7 @@ DB_PARAMS = {
 
 def start_simulation():
     # Start SUMO simulation; to run with gui change "sumo" to "sumo-gui'
-    traci.start(["sumo-gui", "-c", config.SUMO_CONFIG_FILE])
+    traci.start(["sumo", "-c", config.SUMO_CONFIG_FILE])
 
 
 def close_simulation():
@@ -42,6 +42,7 @@ def run_simulation(steps=config.SIMULATION_STEPS):
     cursor = conn.cursor()
 
     lane_lengths = {lane: traci.lane.getLength(lane) for lane in traci.lane.getIDList()}
+
     start_time = datetime.combine(datetime.today(), datetime.min.time())  # Midnight
 
     # Open CSV for logging edge density statistics
@@ -66,6 +67,7 @@ def run_simulation(steps=config.SIMULATION_STEPS):
             # Fetch all pedestrian data
             pedestrian_ids = traci.person.getIDList()
 
+
             # Store lane locations instead of repeated TraCI API calls
             pedestrian_lane_count = {}
             for p in pedestrian_ids:
@@ -76,7 +78,7 @@ def run_simulation(steps=config.SIMULATION_STEPS):
             # Write edge density statistics, filtering for densities >= 2
             for lane, count in pedestrian_lane_count.items():
                 density = count / lane_lengths.get(lane, 1)
-                if density >= 2:
+                if density >= 2 and count > 10:
                     latitude, longitude = (0, 0)
                     edge_shape = traci.lane.getShape(lane)
                     if edge_shape:
