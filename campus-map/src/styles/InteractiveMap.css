@@ -1,46 +1,67 @@
 /* InteractiveMap.css */
 
 .interactive-map {
-  border-radius: var(--border-radius-lg);
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar map";
+  border-radius: 0;
   overflow: hidden;
   background-color: var(--ksu-white);
   box-shadow: var(--shadow-md);
+  min-height: 100vh;
+  height: 100%;
+  flex: 1;
 }
 
 .map-controls {
-  padding: var(--space-lg);
+  grid-area: sidebar;
+  padding: var(--space-md);
   background-color: var(--ksu-black);
-  border-bottom: 3px solid var(--ksu-gold);
+  border-right: 3px solid var(--ksu-gold);
   color: var(--ksu-white);
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
 }
 
 .search-form {
   display: flex;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .search-input {
   flex: 1;
   padding: var(--space-md) var(--space-lg);
-  border: 1px solid var(--ksu-gray);
-  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+  border: 2px solid var(--ksu-gold);
+  border-radius: var(--border-radius-md);
   font-size: 1rem;
-  background-color: var(--ksu-white);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--ksu-white);
   transition: all var(--transition-fast);
+  width: 100%;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--ksu-gold);
+  background-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 0 0 2px rgba(255, 198, 41, 0.3);
 }
 
 .search-button {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
   background-color: var(--ksu-gold);
   color: var(--ksu-black);
   border: none;
-  padding: 0 var(--space-xl);
-  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  padding: 0 var(--space-md);
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   font-weight: 600;
   transition: all var(--transition-fast);
@@ -48,17 +69,18 @@
 
 .search-button:hover {
   background-color: var(--ksu-gold-dark);
-  transform: translateY(-2px);
 }
 
 /* Location Management */
 .location-management {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
   background-color: rgba(255, 255, 255, 0.05);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 198, 41, 0.2);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1; /* Less priority than route planner */
 }
 
 .location-management h3 {
@@ -68,6 +90,12 @@
   color: var(--ksu-gold);
   position: relative;
   font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition-fast);
+  padding-bottom: 5px;
 }
 
 .location-management h3:after {
@@ -79,6 +107,21 @@
   height: 3px;
   background-color: var(--ksu-gold);
   border-radius: var(--border-radius-sm);
+}
+
+.location-management h3:hover {
+  color: var(--ksu-gold-light);
+}
+
+.toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+}
+
+.toggle-icon.open {
+  transform: rotate(180deg);
 }
 
 .location-controls {
@@ -442,11 +485,14 @@
 }
 
 .route-planner {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: var(--space-lg);
+  background-color: rgba(255, 198, 41, 0.2);
+  padding: var(--space-md);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 198, 41, 0.2);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 198, 41, 0.4);
+  margin-bottom: var(--space-md);
+  position: relative;
+  z-index: 2; /* Make sure it's visually prioritized */
 }
 
 .route-planner h3 {
@@ -511,6 +557,71 @@
   height: 18px;
 }
 
+/* Route provider options */
+.route-provider-options {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.route-provider-options h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ksu-gold);
+}
+
+.provider-option {
+  margin-bottom: 8px;
+}
+
+.radio-toggle {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--ksu-white);
+}
+
+.radio-toggle input {
+  margin-right: 8px;
+  accent-color: var(--ksu-gold);
+}
+
+/* Legend for dual routes */
+.route-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.legend-color {
+  width: 20px;
+  height: 3px;
+  margin-right: 6px;
+}
+
+.google-color {
+  background-color: #2196F3;
+}
+
+.osrm-color {
+  background-color: #4CAF50;
+}
+
 .calculate-button {
   width: 100%;
   padding: var(--space-md);
@@ -519,19 +630,24 @@
   border: none;
   border-radius: var(--border-radius-md);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2), var(--shadow-sm);
+  letter-spacing: 0.5px;
+  position: relative;
+  top: 0;
 }
 
 .calculate-button:hover {
   background-color: var(--ksu-gold-dark);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2), var(--shadow-md);
 }
 
 .calculate-button:active {
+  top: 2px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
   transform: translateY(0);
 }
 
@@ -544,11 +660,12 @@
 }
 
 .map-container {
-  height: 500px;
+  grid-area: map;
+  height: 100%;
   width: 100%;
   position: relative;
-  border-top: 2px solid rgba(255, 198, 41, 0.2);
-  border-bottom: 2px solid rgba(255, 198, 41, 0.2);
+  border-left: 2px solid rgba(255, 198, 41, 0.2);
+  min-height: 100vh;
 }
 
 /* Pin mode indicator */
@@ -669,8 +786,10 @@
 
 .info-window {
   padding: var(--space-md);
-  min-width: 200px;
+  min-width: 220px;
   font-family: 'Segoe UI', sans-serif;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
 }
 
 .info-window h3 {
@@ -679,6 +798,8 @@
   font-size: 1.1rem;
   color: var(--ksu-black);
   font-weight: 700;
+  border-bottom: 2px solid var(--ksu-gold);
+  padding-bottom: 5px;
 }
 
 .obstacle-info {
@@ -710,106 +831,98 @@
   flex: 1;
   padding: var(--space-sm) var(--space-md);
   background-color: var(--ksu-gray-light);
-  border: 1px solid var(--ksu-gray);
+  border: none;
   border-radius: var(--border-radius-sm);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
   color: var(--ksu-black);
-}
-
-.info-actions button:hover {
-  background-color: var(--ksu-gold-light);
-  border-color: var(--ksu-gold);
-  color: var(--ksu-black);
-}
-
-.map-legend {
-  padding: var(--space-lg);
-  background-color: var(--ksu-white);
-  border-top: 1px solid var(--ksu-gray-light);
-}
-
-.map-legend h3 {
-  margin-top: 0;
-  margin-bottom: var(--space-md);
-  font-size: 1.2rem;
-  color: var(--ksu-black);
-  font-weight: 700;
-}
-
-.map-legend ul {
-  display: flex;
-  flex-wrap: wrap;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  gap: var(--space-lg);
-}
-
-.map-legend li {
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-  color: var(--ksu-gray-dark);
-  font-weight: 500;
-}
-
-.legend-icon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-right: var(--space-sm);
-  border-radius: 50%;
   box-shadow: var(--shadow-sm);
 }
 
-.legend-icon.building {
-  background-color: var(--ksu-black);
+.info-actions button:first-child {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
 }
 
-.legend-icon.parking {
-  background-color: var(--warning);
+.info-actions button:hover {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.legend-icon.transportation {
-  background-color: var(--info);
+/* Accessible Entrance Info Styles */
+.accessibility-features {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #4CAF50;
 }
 
-.legend-icon.obstacle {
-  background-color: var(--danger);
+.feature-title {
+  font-weight: 600;
+  color: #4CAF50;
+  margin: 0 0 8px 0;
 }
 
-.legend-icon.route {
-  background-color: #2196F3;
-  border-radius: 0;
-  height: 4px;
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.legend-icon.accessible-route {
-  background-color: #4CAF50;
-  border-radius: 0;
-  height: 4px;
+.feature-list li {
+  margin-bottom: 4px;
+  font-size: 0.9rem;
 }
 
-.legend-icon.accessibility {
-  background-color: #9C27B0;
-}
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .interactive-map {
+    grid-template-columns: 260px 1fr;
+  }
+  
   .map-controls {
-    padding: var(--space-md);
+    padding: var(--space-sm);
   }
   
   .route-inputs {
     grid-template-columns: 1fr;
   }
   
-  .map-legend ul {
+  .location-controls {
     flex-direction: column;
     gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .interactive-map {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "map"
+      "sidebar";
+    min-height: auto;
+  }
+  
+  .map-controls {
+    max-height: none;
+    overflow-y: visible;
+    border-right: none;
+    border-top: 3px solid var(--ksu-gold);
+    border-bottom: none;
+    order: 2;
+  }
+  
+  .map-container {
+    min-height: 450px;
+    height: 50vh;
+    order: 1;
   }
   
   .info-actions {
@@ -819,6 +932,7 @@
   .info-actions button {
     width: 100%;
   }
+  
 }
 
 /* High Contrast Mode */
@@ -851,8 +965,7 @@
   border: 1px solid var(--ksu-gold);
 }
 
-.high-contrast .route-planner h3,
-.high-contrast .map-legend h3 {
+.high-contrast .route-planner h3 {
   color: var(--ksu-gold);
 }
 
@@ -864,14 +977,6 @@
   border-color: var(--ksu-gold);
 }
 
-.high-contrast .map-legend {
-  background-color: var(--ksu-black);
-  border-top: 2px solid var(--ksu-gold);
-}
-
-.high-contrast .map-legend li {
-  color: var(--ksu-white);
-}
 
 .high-contrast .mock-map {
   background-color: #111;

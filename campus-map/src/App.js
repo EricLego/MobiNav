@@ -3,7 +3,39 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import InteractiveMap from './components/InteractiveMap';
 import ObstacleReports from './components/ObstacleReports';
+import TestMap from './components/TestMap';
+import AppLayout from './components/AppLayout';
 import './App.css';
+
+// Debug component to check environment variables
+const DebugInfo = () => {
+  // For React, environment variables must be prefixed with REACT_APP_
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+  
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '10px',
+      right: '10px',
+      background: 'rgba(0,0,0,0.8)',
+      color: 'white',
+      padding: '10px',
+      borderRadius: '5px',
+      zIndex: 9999,
+      fontSize: '12px',
+      maxWidth: '400px',
+      overflow: 'auto'
+    }}>
+      <h4>Environment Debug:</h4>
+      <p>API Key: {apiKey ? 
+        `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : 
+        'Not found'}</p>
+      <p>Key Length: {apiKey ? apiKey.length : 0}</p>
+      <p>Environment: {process.env.NODE_ENV}</p>
+      <p>Direct Key Check: {"AIzaSyACo9gj_wQRJBCq5iAmWcwyNmAq_x8daEg".substring(0, 4)}...</p>
+    </div>
+  );
+};
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -50,14 +82,23 @@ function App() {
   return (
     <AccessibilityContext.Provider value={{ accessibilitySettings, setAccessibilitySettings }}>
       <Router>
-        <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
+        <div className={`app ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/map" element={<InteractiveMap />} />
-            <Route path="/route" element={<InteractiveMap />} />
-            <Route path="/report" element={<ObstacleReports />} />
-            <Route path="*" element={<HomePage />} />
+            <Route path="/*" element={
+              <AppLayout>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/map" element={<InteractiveMap />} />
+                  <Route path="/route" element={<InteractiveMap />} />
+                  <Route path="/report" element={<ObstacleReports />} />
+                  <Route path="/test" element={<TestMap />} />
+                  <Route path="*" element={<HomePage />} />
+                </Routes>
+              </AppLayout>
+            } />
           </Routes>
+          {/* Add debug component in development mode */}
+          {process.env.NODE_ENV !== 'production' && <DebugInfo />}
         </div>
       </Router>
     </AccessibilityContext.Provider>
