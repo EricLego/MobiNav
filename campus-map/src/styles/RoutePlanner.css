@@ -1,0 +1,174 @@
+/* RoutePlanner.css */
+.route-planner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Allow clicks to pass through to the map */
+  }
+  
+  /* Search overlay in top left */
+  .search-overlay {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    width: 300px;
+    max-width: 40%;
+    pointer-events: auto; /* Restore click interactions for this element */
+  }
+  
+  /* Route display overlay in top right */
+  .route-display-overlay {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 300px;
+    max-width: 40%;
+    background-color: var(--ksu-white);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    pointer-events: auto; /* Restore click interactions for this element */
+  }
+  
+  .route-points-container {
+    padding: var(--space-md);
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    border-bottom: 3px solid var(--ksu-gold);
+  }
+  
+  .route-options {
+    margin-top: var(--space-sm);
+  }
+  
+  .wheelchair-toggle {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--ksu-white);
+    cursor: pointer;
+  }
+  
+  .wheelchair-toggle input {
+    margin-right: var(--space-sm);
+    accent-color: var(--ksu-gold);
+    width: 18px;
+    height: 18px;
+  }
+  
+  .route-details-popdown {
+    padding: var(--space-md);
+    background-color: var(--ksu-white);
+    border-top: 1px solid var(--ksu-gray-light);
+    animation: slideDown var(--transition-medium);
+  }
+  
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .route-details-popdown h4 {
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+    font-size: 1rem;
+    color: var(--ksu-black);
+    font-weight: 600;
+  }
+  
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+  
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .detail-label {
+    font-size: 0.8rem;
+    color: var(--ksu-gray);
+    margin-bottom: 2px;
+  }
+  
+  .detail-value {
+    font-size: 0.95rem;
+    color: var(--ksu-black);
+    font-weight: 600;
+  }
+  
+  .directions-button {
+    width: 100%;
+    padding: var(--space-sm);
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .directions-button:hover {
+    background-color: var(--ksu-gold-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* High contrast mode styles */
+  .high-contrast .route-display-overlay {
+    background-color: var(--ksu-black);
+    border: 2px solid var(--ksu-gold);
+  }
+  
+  .high-contrast .route-points-container {
+    border-bottom: 2px solid var(--ksu-gold);
+  }
+  
+  .high-contrast .route-details-popdown {
+    background-color: var(--ksu-black);
+    border-top: 1px solid var(--ksu-gold);
+  }
+  
+  .high-contrast .route-details-popdown h4 {
+    color: var(--ksu-gold);
+  }
+  
+  .high-contrast .detail-label {
+    color: var(--ksu-gray-light);
+  }
+  
+  .high-contrast .detail-value {
+    color: var(--ksu-white);
+  }
+  
+  .high-contrast .directions-button {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+    border: 1px solid var(--ksu-white);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .search-overlay,
+    .route-display-overlay {
+      position: static;
+      width: 100%;
+      max-width: 100%;
+      margin: var(--space-md);
+    }
+    
+    .route-planner-overlay {
+      position: relative;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+    }
+  }

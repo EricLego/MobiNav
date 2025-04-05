@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import InteractiveMap from './components/InteractiveMap';
 import ObstacleReports from './components/ObstacleReports';
+import RoutePlanner from './components/RoutePlanner';
 import './App.css';
 
 // Create context for accessibility settings

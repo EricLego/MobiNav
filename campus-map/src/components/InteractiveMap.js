@@ -1,26 +1,34 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
 import { AccessibilityContext } from '../App';
-import Header from './Header';
-import Footer from './Footer';
+import BuildingAutocomplete from './BuildingAutocomplete';
 import '../styles/InteractiveMap.css';
+import RoutePointDisplay from './RoutePointDisplay';
+import RoutePlanner from './RoutePlanner';
+
+// Define libraries as a constant array to avoid unnecessary reloads
+const libraries = ['places'];
 
 const InteractiveMap = () => {
   const [map, setMap] = useState(null);
+  const mapRef = useRef(null);
+  const searchRef = useRef(null);
+  const routeRef = useRef(null);
+  const [campusBounds, setCampusBounds] = useState(null);
+  const [mapOptions, setMapOptions] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [startPoint, setStartPoint] = useState('');
-  const [endPoint, setEndPoint] = useState('');
+  const [startPoint, setStartPoint] = useState(null);
+  const [endPoint, setEndPoint] = useState(null);
   const [route, setRoute] = useState([]);
   const [obstacles, setObstacles] = useState([]);
   const [wheelchairMode, setWheelchairMode] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [googleMapsError, setGoogleMapsError] = useState(false);
   
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
   
   const mapContainerStyle = {
     width: '100%',
-    height: '500px',
+    height: '100%',
   };
   
   const center = {
@@ -28,23 +36,7 @@ const InteractiveMap = () => {
     lng: -84.5187,
   };
   
-  // KSU Marietta Campus boundary polygon
-  const campusBoundary = [
-    { lat: 33.940912, lng: -84.524504 }, // NW
-    { lat: 33.941486, lng: -84.515582 }, // NE
-    { lat: 33.935908, lng: -84.512786 }, // SE
-    { lat: 33.935673, lng: -84.524473 }, // SW
-    { lat: 33.940912, lng: -84.524504 }, // NW (close the polygon)
-  ];
 
-  const campusLocations = [
-    { id: 1, name: 'Engineering Building', lat: 33.942, lng: -84.521, type: 'building', hasElevator: true },
-    { id: 2, name: 'Student Center', lat: 33.939, lng: -84.518, type: 'building', hasElevator: true },
-    { id: 3, name: 'Library', lat: 33.941, lng: -84.517, type: 'building', hasElevator: true },
-    { id: 4, name: 'Parking Deck A', lat: 33.943, lng: -84.520, type: 'parking', hasElevator: true },
-    { id: 5, name: 'Bus Stop', lat: 33.938, lng: -84.519, type: 'transportation' },
-    // Add more campus locations as needed
-  ];
 
   // Mock obstacles data - this would come from an API in production
   useEffect(() => {
@@ -93,6 +85,32 @@ const InteractiveMap = () => {
   // Function to handle map load
   const onMapLoad = (mapInstance) => {
     setMap(mapInstance);
+    mapRef.current = mapInstance;
+
+    const campusBounds = new window.google.maps.LatLngBounds(
+      new window.google.maps.LatLng(33.935673, -84.524504), // SW corner
+      new window.google.maps.LatLng(33.941486, -84.512786)  // NE corner
+    );
+
+    setCampusBounds(campusBounds);
+
+    setMapOptions({
+      streetViewControl: false,
+      fullscreenControl: true,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        position: window.google.maps.ControlPosition.BOTTOM_LEFT
+      },
+      zoomControl: true,
+      mapId: 'bdd7d136cc4cd64c',
+      restriction: {
+        latLngBounds: campusBounds,
+        strictBounds: true
+      }
+    });
+
+    mapInstance.fitBounds(campusBounds);
+    
   };
 
   // Function to handle marker click
@@ -100,231 +118,279 @@ const InteractiveMap = () => {
     setSelectedLocation(location);
   };
 
-  // Function to handle location selection for route planning
-  const handleStartPointSelect = (location) => {
-    setStartPoint(location.name);
-    setSelectedLocation(null);
-  };
 
-  const handleEndPointSelect = (location) => {
-    setEndPoint(location.name);
-    setSelectedLocation(null);
-  };
-
-  // Function to calculate route - this would call your backend API in production
+  // Function to calculate route using Google Maps Directions API
   const calculateRoute = () => {
     // Find selected locations
-    const start = campusLocations.find(loc => loc.name === startPoint);
-    const end = campusLocations.find(loc => loc.name === endPoint);
     
+    const start = startPoint;
+    const end = endPoint;
+    console.log(start); console.log(end);
     if (!start || !end) {
       alert('Please select valid start and end points');
       return;
     }
     
-    // In a real app, you would call your backend API here
-    // For now, create a simple mock route
-    const mockRoute = [
-      { lat: start.lat, lng: start.lng },
-      { lat: (start.lat + end.lat) / 2, lng: (start.lng + end.lng) / 2 - 0.001 },
-      { lat: end.lat, lng: end.lng }
-    ];
+    // Check if DirectionsService is available
+    if (!window.google || !window.google.maps || !window.google.maps.DirectionsService) {
+      console.error('Google Maps Directions API not available');
+      
+      // Fallback to mock route if API is not available
+      const mockRoute = [
+        { lat: start.lat, lng: start.lng },
+        { lat: (start.lat + end.lat) / 2, lng: (start.lng + end.lng) / 2 - 0.001 },
+        { lat: end.lat, lng: end.lng }
+      ];
+      
+      setRoute(mockRoute);
+      return;
+    }
     
-    setRoute(mockRoute);
+    // Create a DirectionsService instance
+    const directionsService = new window.google.maps.DirectionsService();
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+    
+    // Configure route options
+    const routeOptions = {
+      origin: { lat: start.lat, lng: start.lng },
+      destination: { lat: end.lat, lng: end.lng },
+      travelMode: window.google.maps.TravelMode.WALKING, // Default to walking for campus navigation
+    };
+    
+    // Add wheelchair/accessibility mode if selected
+    if (wheelchairMode) {
+      // For wheelchair accessibility, we need to avoid stairs and steep slopes
+      // Note: Wheelchair route planning is limited in standard Google Maps API
+      // In production, you might want to use a specialized accessibility routing API
+      routeOptions.avoidHighways = true;
+      routeOptions.avoidFerries = true;
+    }
+    
+    // Request directions
+    directionsService.route(routeOptions)
+    .then(result => {
+      console.log(result);
+      if (result.routes.length > 0) {
+        directionsRenderer.setDirections(result);
+        directionsRenderer.setPanel(document.getElementById('route-planner'));
+        // Convert the directions result to a route path
+        const routePath = [];
+        const legs = result.routes[0].legs;
+        
+        legs.forEach(leg => {
+          leg.steps.forEach(step => {
+            // Each step has a path of LatLng points
+            const path = step.path || [];
+            path.forEach(point => {
+              routePath.push({ lat: point.lat(), lng: point.lng() });
+            });
+          });
+        });
+        
+        setRoute(routePath);
+        
+        // Optional: fit the map to the route bounds
+        if (map && result.routes[0].bounds) {
+          map.fitBounds(result.routes[0].bounds);
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Directions request failed:', error);
+      alert('Could not calculate route between these points. Please try different locations.');
+    });
   };
 
-  // Function to handle search
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Search logic would go here - filter locations, etc.
-    console.log('Searching for:', searchQuery);
-    
-    const searchResults = campusLocations.filter(
-      location => location.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    if (searchResults.length > 0) {
-      // Center the map on the first result
+  const handlePlaceSelect = (place) => {
+    if (place && place.location) {
+      console.log("Place selected:", place);
+      
+      // Center the map on the selected place
       if (map) {
-        map.panTo({ lat: searchResults[0].lat, lng: searchResults[0].lng });
-        map.setZoom(18);
+        if (place.viewport) {
+          map.fitBounds(place.viewport);
+        } else {
+          map.setCenter(place.location);
+          map.setZoom(18);
+        }
       }
+      
+      // Create a location object from the place
+      const newLocation = {
+        name: place.displayName || 'Selected Location',
+        lat: place.location.lat,
+        lng: place.location.lng,
+        formattedAddress: place.formattedAddress || '',
+        type: 'search'
+      };
+      
+      // Show the info window for this location
+      setSelectedLocation(newLocation);
+
     }
   };
 
-  // Function to toggle wheelchair mode
-  const toggleWheelchairMode = () => {
-    setWheelchairMode(!wheelchairMode);
-    // In a real app, you would recalculate routes here
+  const handleStartPointPlaceSelect = (place) => {
+    if (place) {
+      console.log("Start point selected:", place);
+      
+      // Set the place as the end point
+      setStartPoint(place);
+      
+      // Optionally center the map
+      if (map) {
+        map.setCenter(place);
+        map.setZoom(18);
+      }
+
+
+      if(searchRef.current){
+        console.log(searchRef.current, "clearing search");
+        searchRef.current.clear();
+        setSelectedLocation(null);
+      }else{
+        console.log(searchRef.current, "search ref not found");
+      }
+    } else{
+      console.log(place);
+    }
   };
+
+  const handleEndPointPlaceSelect = (place) => {
+    if(place) {
+      console.log("End point selected:", place);
+
+      // Set the place as the end point
+      setEndPoint(place);
+
+      // Optionally center the map
+      if (map) {
+        map.setCenter(place);
+        map.setZoom(18);
+      }
+
+
+      if(searchRef.current){
+        console.log(searchRef.current, "clearing search");
+        searchRef.current.clear();
+        setSelectedLocation(null);
+      }else{
+        console.log(searchRef.current, "search ref not found");
+      }
+      
+    }
+  }
 
   const { accessibilitySettings } = useContext(AccessibilityContext);
   
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
-      <Header />
       <div className="interactive-map">
-        <div className="map-controls">
-        <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            placeholder="Search for campus locations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-          <button type="submit" className="search-button">Search</button>
-        </form>
-        
-        <div className="route-planner">
-          <h3>Plan Your Route</h3>
-          <div className="route-inputs">
-            <select 
-              value={startPoint} 
-              onChange={(e) => setStartPoint(e.target.value)}
-              className="route-select"
-            >
-              <option value="">Starting Point</option>
-              {campusLocations.map(location => (
-                <option key={location.id} value={location.name}>{location.name}</option>
-              ))}
-            </select>
-            
-            <select 
-              value={endPoint} 
-              onChange={(e) => setEndPoint(e.target.value)}
-              className="route-select"
-            >
-              <option value="">Destination</option>
-              {campusLocations.map(location => (
-                <option key={location.id} value={location.name}>{location.name}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="route-options">
-            <label className="wheelchair-toggle">
-              <input 
-                type="checkbox" 
-                checked={wheelchairMode}
-                onChange={toggleWheelchairMode}
-              />
-              Wheelchair-Accessible Only
-            </label>
-          </div>
-          
-          <button onClick={calculateRoute} className="calculate-button">
-            Calculate Route
-          </button>
-        </div>
-      </div>
-      
-      <div className="map-container">
-        {googleMapsError ? (
-          <div className="map-placeholder">
-            <div className="map-placeholder-content">
-              <h3>Interactive Campus Map</h3>
-              <p>There was an error loading the Google Maps API. Please check your API key and try again.</p>
-              <div className="mock-map">
-                <div className="mock-location" style={{top: '30%', left: '40%'}}>Engineering Building</div>
-                <div className="mock-location" style={{top: '50%', left: '60%'}}>Student Center</div>
-                <div className="mock-location" style={{top: '40%', left: '70%'}}>Library</div>
-                <div className="mock-location" style={{top: '20%', left: '45%'}}>Parking Deck A</div>
-                <div className="mock-location" style={{top: '60%', left: '55%'}}>Bus Stop</div>
-                
-                {/* Mock obstacles removed as requested */}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <LoadScript 
-            googleMapsApiKey={apiKey} 
-            onLoad={() => console.log('Google Maps API loaded')}
-            onError={() => setGoogleMapsError(true)}
-            libraries={['places']}
-          >
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={center}
-              zoom={16}
-              onLoad={onMapLoad}
-              options={{
-                streetViewControl: false,
-                fullscreenControl: true,
-                mapTypeControl: true,
-                zoomControl: true,
-                restriction: {
-                  latLngBounds: {
-                    north: 33.943,
-                    south: 33.934,
-                    east: -84.511,
-                    west: -84.526
-                  },
-                  strictBounds: true
-                }
-              }}
-            >
-            {/* Campus and Obstacle Markers removed as requested */}
-            
-            {/* Info Window for Selected Location */}
-            {selectedLocation && (
-              <InfoWindow
-                position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
-                onCloseClick={() => setSelectedLocation(null)}
-              >
-                <div className="info-window">
-                  <h3>{selectedLocation.name || selectedLocation.location}</h3>
-                  {selectedLocation.type === 'building' && (
-                    <p>Elevator Available: {selectedLocation.hasElevator ? 'Yes' : 'No'}</p>
-                  )}
-                  {selectedLocation.status && (
-                    <div className="obstacle-info">
-                      <p className="status">{selectedLocation.status}</p>
-                      <p className="reported">Reported: {selectedLocation.reportedAt}</p>
-                    </div>
-                  )}
-                  <div className="info-actions">
-                    <button onClick={() => handleStartPointSelect(selectedLocation)}>
-                      Set as Start
-                    </button>
-                    <button onClick={() => handleEndPointSelect(selectedLocation)}>
-                      Set as Destination
-                    </button>
+        <div className="map-container-wrapper">
+          <div className="map-container">
+            {googleMapsError ? (
+              <div className="map-placeholder">
+                <div className="map-placeholder-content">
+                  <h3>Interactive Campus Map</h3>
+                  <p>There was an error loading the Google Maps API. Please check your API key and try again.</p>
+                  <div className="mock-map">
+                    <div className="mock-location" style={{top: '30%', left: '40%'}}>Engineering Building</div>
+                    <div className="mock-location" style={{top: '50%', left: '60%'}}>Student Center</div>
+                    <div className="mock-location" style={{top: '40%', left: '70%'}}>Library</div>
+                    <div className="mock-location" style={{top: '20%', left: '45%'}}>Parking Deck A</div>
+                    <div className="mock-location" style={{top: '60%', left: '55%'}}>Bus Stop</div>
                   </div>
                 </div>
-              </InfoWindow>
+              </div>
+            ) : (
+              <LoadScript 
+                googleMapsApiKey={apiKey} 
+                libraries={libraries}
+                onLoad={() => console.log('Google Maps API loaded')}
+                onError={() => setGoogleMapsError(true)}
+              >
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={center}
+                  zoom={16}
+                  onLoad={onMapLoad}
+                  options={mapOptions}
+                >
+                  
+                  
+                  {/* Info Window for Selected Location */}
+                  {selectedLocation && (
+                    <InfoWindow
+                      position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
+                      onCloseClick={() => setSelectedLocation(null)}
+                    >
+                      <div className="info-window">
+                        <h3>{selectedLocation.name || selectedLocation.location}</h3>
+                        {selectedLocation.formattedAddress && (
+                          <p>{selectedLocation.formattedAddress}</p>
+                        )}
+                        {selectedLocation.type === 'building' && (
+                          <p>Elevator Available: {selectedLocation.hasElevator ? 'Yes' : 'No'}</p>
+                        )}
+                        {selectedLocation.status && (
+                          <div className="obstacle-info">
+                            <p className="status">{selectedLocation.status}</p>
+                            <p className="reported">Reported: {selectedLocation.reportedAt}</p>
+                          </div>
+                        )}
+                        <div className="info-actions">
+                          <button onClick={() => handleStartPointPlaceSelect(selectedLocation)}>
+                            Set as Start
+                          </button>
+                          <button onClick={() => handleEndPointPlaceSelect(selectedLocation)}>
+                            Set as Destination
+                          </button>
+                        </div>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </GoogleMap>
+              </LoadScript>
             )}
-            
-            {/* Route Polyline */}
-            {route.length > 0 && (
-              <Polyline
-                path={route}
-                options={{
-                  strokeColor: wheelchairMode ? '#4CAF50' : '#2196F3',
-                  strokeOpacity: 0.8,
-                  strokeWeight: 5
-                }}
-              />
-            )}
-            
-            {/* Campus Boundary Polygon - invisible but still restricts the map */}
-          </GoogleMap>
-        </LoadScript>
-        )}
-      </div>
+          </div>
+
+          <RoutePlanner 
+            startPoint={startPoint}
+            setStartPoint={setStartPoint}
+            endPoint={endPoint}
+            setEndPoint={setEndPoint}
+            wheelchairMode={wheelchairMode}
+            setWheelchairMode={setWheelchairMode}
+            mapRef={mapRef}
+            handlePlaceSelect={handlePlaceSelect}
+            handleStartPointPlaceSelect={handleStartPointPlaceSelect}
+            handleEndPointPlaceSelect={handleEndPointPlaceSelect}
+            calculateRoute={calculateRoute}
+            campusBoundary={{
+              north: 33.941486,
+              south: 33.935673,
+              east: -84.512786,
+              west: -84.524504
+            }}
+          />
+
+        </div>
       
-      <div className="map-legend">
-        <h3>Map Legend</h3>
-        <ul>
-          <li>Buildings</li>
-          <li>Parking Areas</li>
-          <li>Transportation</li>
-          <li>Reported Obstacles</li>
-          <li>Accessible Route</li>
-        </ul>
+      
+        
+        
+        <div className="map-legend">
+          <h3>Map Legend</h3>
+          <ul>
+            <li>Buildings</li>
+            <li>Parking Areas</li>
+            <li>Transportation</li>
+            <li>Reported Obstacles</li>
+            <li>Accessible Route</li>
+          </ul>
+        </div>
       </div>
-      </div>
-      <Footer />
     </div>
   );
 };

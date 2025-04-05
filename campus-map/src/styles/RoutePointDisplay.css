@@ -1,0 +1,65 @@
+/* Add to your styles file */
+.route-point-display {
+    width: 80%;
+    margin: 0 auto var(--space-md);
+  }
+  
+  .route-point-label {
+    font-weight: 600;
+    color: var(--ksu-white);
+    margin-bottom: var(--space-xs);
+  }
+  
+  .route-point-value {
+    background-color: var(--ksu-white);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    font-weight: 500;
+  }
+  
+  .route-point-value .placeholder {
+    color: var(--ksu-gray);
+    font-style: italic;
+  }
+  
+  .clear-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: var(--ksu-gray);
+    border-radius: 50%;
+    margin-left: var(--space-sm);
+  }
+  
+  .clear-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--ksu-black);
+  }
+  
+  /* High contrast mode */
+  .high-contrast .route-point-value {
+    background-color: var(--ksu-black);
+    border: 1px solid var(--ksu-gold);
+    color: var(--ksu-white);
+  }
+  
+  .high-contrast .route-point-value .placeholder {
+    color: var(--ksu-gray-light);
+  }
+  
+  .high-contrast .clear-button {
+    color: var(--ksu-gold);
+  }
+  
+  .high-contrast .clear-button:hover {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+  }

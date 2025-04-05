@@ -4,3 +4,35 @@
 .env.development
 .env.test
 .env.production
+#Campus-Map
+    
+    # dependencies
+    campus-map/node_modules
+    campus-map/.pnp
+    campus-map/.pnp.js
+
+    # testing
+    campus-map/coverage
+
+    # production
+    campus-map/build
+
+    # misc
+    campus-map/.DS_Store
+    campus-map/.env
+    campus-map/.env.local
+    campus-map/.env.development.local
+    campus-map/.env.test.local
+    campus-map/.env.production.local
+
+    campus-map/npm-debug.log*
+    campus-map/yarn-debug.log*
+    campus-map/yarn-error.log*
+
+#Flask API
+__pycache__/
+*.pyc
+#Others
+CLAUDE.md
+MobiNav.code-workspace
+campus-map/yarn.lock
