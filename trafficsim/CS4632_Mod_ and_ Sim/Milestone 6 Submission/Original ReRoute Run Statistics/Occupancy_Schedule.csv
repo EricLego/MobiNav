@@ -1,0 +1,831 @@
+Building ID,Day,Start Time,End Time,Building,Estimated Occupancy
+2,Base,0:00:00,0:59:00,Recreation and Wellness Center,0
+3,Base,0:00:00,0:59:00,Atrium,0
+4,Base,0:00:00,0:59:00,Academic Building,0
+10,Base,0:00:00,0:59:00,Engineering Lab,1
+9,Base,0:00:00,0:59:00,Jack Mack Wilson Student Center,1
+2,Base,1:00:00,1:59:00,Recreation and Wellness Center,1
+3,Base,1:00:00,1:59:00,Atrium,1
+4,Base,1:00:00,1:59:00,Academic Building,0
+10,Base,1:00:00,1:59:00,Engineering Lab,1
+9,Base,1:00:00,1:59:00,Jack Mack Wilson Student Center,0
+2,Base,2:00:00,2:59:00,Recreation and Wellness Center,0
+3,Base,2:00:00,2:59:00,Atrium,0
+4,Base,2:00:00,2:59:00,Academic Building,0
+10,Base,2:00:00,2:59:00,Engineering Lab,0
+9,Base,2:00:00,2:59:00,Jack Mack Wilson Student Center,0
+2,Base,3:00:00,3:59:00,Recreation and Wellness Center,0
+3,Base,3:00:00,3:59:00,Atrium,1
+4,Base,3:00:00,3:59:00,Academic Building,0
+10,Base,3:00:00,3:59:00,Engineering Lab,1
+9,Base,3:00:00,3:59:00,Jack Mack Wilson Student Center,0
+2,Base,4:00:00,4:59:00,Recreation and Wellness Center,0
+3,Base,4:00:00,4:59:00,Atrium,0
+4,Base,4:00:00,4:59:00,Academic Building,1
+10,Base,4:00:00,4:59:00,Engineering Lab,1
+9,Base,4:00:00,4:59:00,Jack Mack Wilson Student Center,0
+2,Base,5:00:00,5:59:00,Recreation and Wellness Center,1
+3,Base,5:00:00,5:59:00,Atrium,1
+4,Base,5:00:00,5:59:00,Academic Building,1
+10,Base,5:00:00,5:59:00,Engineering Lab,0
+9,Base,5:00:00,5:59:00,Jack Mack Wilson Student Center,0
+2,Base,6:00:00,6:59:00,Recreation and Wellness Center,1
+3,Base,6:00:00,6:59:00,Atrium,13
+4,Base,6:00:00,6:59:00,Academic Building,6
+10,Base,6:00:00,6:59:00,Engineering Lab,2
+9,Base,6:00:00,6:59:00,Jack Mack Wilson Student Center,15
+2,Base,7:00:00,7:59:00,Recreation and Wellness Center,35
+3,Base,7:00:00,7:59:00,Atrium,34
+4,Base,7:00:00,7:59:00,Academic Building,8
+10,Base,7:00:00,7:59:00,Engineering Lab,11
+9,Base,7:00:00,7:59:00,Jack Mack Wilson Student Center,36
+2,Base,8:00:00,8:59:00,Recreation and Wellness Center,26
+3,Base,8:00:00,8:59:00,Atrium,444
+4,Base,8:00:00,8:59:00,Academic Building,168
+10,Base,8:00:00,8:59:00,Engineering Lab,191
+9,Base,8:00:00,8:59:00,Jack Mack Wilson Student Center,314
+2,Base,9:00:00,9:59:00,Recreation and Wellness Center,155
+3,Base,9:00:00,9:59:00,Atrium,338
+4,Base,9:00:00,9:59:00,Academic Building,185
+10,Base,9:00:00,9:59:00,Engineering Lab,173
+9,Base,9:00:00,9:59:00,Jack Mack Wilson Student Center,565
+2,Base,10:00:00,10:59:00,Recreation and Wellness Center,308
+3,Base,10:00:00,10:59:00,Atrium,245
+4,Base,10:00:00,10:59:00,Academic Building,200
+10,Base,10:00:00,10:59:00,Engineering Lab,135
+9,Base,10:00:00,10:59:00,Jack Mack Wilson Student Center,340
+2,Base,11:00:00,11:59:00,Recreation and Wellness Center,201
+3,Base,11:00:00,11:59:00,Atrium,80
+4,Base,11:00:00,11:59:00,Academic Building,239
+10,Base,11:00:00,11:59:00,Engineering Lab,138
+9,Base,11:00:00,11:59:00,Jack Mack Wilson Student Center,186
+2,Base,12:00:00,12:59:00,Recreation and Wellness Center,442
+3,Base,12:00:00,12:59:00,Atrium,657
+4,Base,12:00:00,12:59:00,Academic Building,225
+10,Base,12:00:00,12:59:00,Engineering Lab,208
+9,Base,12:00:00,12:59:00,Jack Mack Wilson Student Center,658
+2,Base,13:00:00,13:59:00,Recreation and Wellness Center,242
+3,Base,13:00:00,13:59:00,Atrium,317
+4,Base,13:00:00,13:59:00,Academic Building,136
+10,Base,13:00:00,13:59:00,Engineering Lab,91
+9,Base,13:00:00,13:59:00,Jack Mack Wilson Student Center,480
+2,Base,14:00:00,14:59:00,Recreation and Wellness Center,101
+3,Base,14:00:00,14:59:00,Atrium,231
+4,Base,14:00:00,14:59:00,Academic Building,517
+10,Base,14:00:00,14:59:00,Engineering Lab,251
+9,Base,14:00:00,14:59:00,Jack Mack Wilson Student Center,337
+2,Base,15:00:00,15:59:00,Recreation and Wellness Center,116
+3,Base,15:00:00,15:59:00,Atrium,415
+4,Base,15:00:00,15:59:00,Academic Building,241
+10,Base,15:00:00,15:59:00,Engineering Lab,90
+9,Base,15:00:00,15:59:00,Jack Mack Wilson Student Center,269
+2,Base,16:00:00,16:59:00,Recreation and Wellness Center,224
+3,Base,16:00:00,16:59:00,Atrium,230
+4,Base,16:00:00,16:59:00,Academic Building,434
+10,Base,16:00:00,16:59:00,Engineering Lab,47
+9,Base,16:00:00,16:59:00,Jack Mack Wilson Student Center,306
+2,Base,17:00:00,17:59:00,Recreation and Wellness Center,210
+3,Base,17:00:00,17:59:00,Atrium,438
+4,Base,17:00:00,17:59:00,Academic Building,292
+10,Base,17:00:00,17:59:00,Engineering Lab,150
+9,Base,17:00:00,17:59:00,Jack Mack Wilson Student Center,570
+2,Base,18:00:00,18:59:00,Recreation and Wellness Center,250
+3,Base,18:00:00,18:59:00,Atrium,189
+4,Base,18:00:00,18:59:00,Academic Building,310
+10,Base,18:00:00,18:59:00,Engineering Lab,185
+9,Base,18:00:00,18:59:00,Jack Mack Wilson Student Center,357
+2,Base,19:00:00,19:59:00,Recreation and Wellness Center,162
+3,Base,19:00:00,19:59:00,Atrium,143
+4,Base,19:00:00,19:59:00,Academic Building,98
+10,Base,19:00:00,19:59:00,Engineering Lab,71
+9,Base,19:00:00,19:59:00,Jack Mack Wilson Student Center,129
+2,Base,20:00:00,20:59:00,Recreation and Wellness Center,110
+3,Base,20:00:00,20:59:00,Atrium,94
+4,Base,20:00:00,20:59:00,Academic Building,78
+10,Base,20:00:00,20:59:00,Engineering Lab,34
+9,Base,20:00:00,20:59:00,Jack Mack Wilson Student Center,160
+2,Base,21:00:00,21:59:00,Recreation and Wellness Center,30
+3,Base,21:00:00,21:59:00,Atrium,15
+4,Base,21:00:00,21:59:00,Academic Building,8
+10,Base,21:00:00,21:59:00,Engineering Lab,6
+9,Base,21:00:00,21:59:00,Jack Mack Wilson Student Center,23
+2,Base,22:00:00,22:59:00,Recreation and Wellness Center,1
+3,Base,22:00:00,22:59:00,Atrium,11
+4,Base,22:00:00,22:59:00,Academic Building,1
+10,Base,22:00:00,22:59:00,Engineering Lab,7
+9,Base,22:00:00,22:59:00,Jack Mack Wilson Student Center,15
+2,Base,23:00:00,23:59:00,Recreation and Wellness Center,0
+3,Base,23:00:00,23:59:00,Atrium,1
+4,Base,23:00:00,23:59:00,Academic Building,0
+10,Base,23:00:00,23:59:00,Engineering Lab,1
+9,Base,23:00:00,23:59:00,Jack Mack Wilson Student Center,1
+2,LTP,22:00:00,22:59:00,Recreation and Wellness Center,1
+3,LTP,22:00:00,22:59:00,Atrium,11
+4,LTP,22:00:00,22:59:00,Academic Building,1
+10,LTP,22:00:00,22:59:00,Engineering Lab,7
+9,LTP,22:00:00,22:59:00,Jack Mack Wilson Student Center,15
+2,LTP,23:00:00,23:59:00,Recreation and Wellness Center,0
+3,LTP,23:00:00,23:59:00,Atrium,1
+4,LTP,23:00:00,23:59:00,Academic Building,0
+10,LTP,23:00:00,23:59:00,Engineering Lab,1
+9,LTP,23:00:00,23:59:00,Jack Mack Wilson Student Center,1
+2,LTP,0:00:00,0:59:00,Recreation and Wellness Center,0
+3,LTP,0:00:00,0:59:00,Atrium,0
+4,LTP,0:00:00,0:59:00,Academic Building,0
+10,LTP,0:00:00,0:59:00,Engineering Lab,1
+9,LTP,0:00:00,0:59:00,Jack Mack Wilson Student Center,1
+2,LTP,1:00:00,1:59:00,Recreation and Wellness Center,1
+3,LTP,1:00:00,1:59:00,Atrium,1
+4,LTP,1:00:00,1:59:00,Academic Building,0
+10,LTP,1:00:00,1:59:00,Engineering Lab,1
+9,LTP,1:00:00,1:59:00,Jack Mack Wilson Student Center,0
+2,LTP,2:00:00,2:59:00,Recreation and Wellness Center,0
+3,LTP,2:00:00,2:59:00,Atrium,0
+4,LTP,2:00:00,2:59:00,Academic Building,0
+10,LTP,2:00:00,2:59:00,Engineering Lab,0
+9,LTP,2:00:00,2:59:00,Jack Mack Wilson Student Center,0
+2,LTP,3:00:00,3:59:00,Recreation and Wellness Center,0
+3,LTP,3:00:00,3:59:00,Atrium,1
+4,LTP,3:00:00,3:59:00,Academic Building,0
+10,LTP,3:00:00,3:59:00,Engineering Lab,1
+9,LTP,3:00:00,3:59:00,Jack Mack Wilson Student Center,0
+2,LTP,4:00:00,4:59:00,Recreation and Wellness Center,0
+3,LTP,4:00:00,4:59:00,Atrium,0
+4,LTP,4:00:00,4:59:00,Academic Building,1
+10,LTP,4:00:00,4:59:00,Engineering Lab,1
+9,LTP,4:00:00,4:59:00,Jack Mack Wilson Student Center,0
+2,LTP,5:00:00,5:59:00,Recreation and Wellness Center,1
+3,LTP,5:00:00,5:59:00,Atrium,1
+4,LTP,5:00:00,5:59:00,Academic Building,1
+10,LTP,5:00:00,5:59:00,Engineering Lab,0
+9,LTP,5:00:00,5:59:00,Jack Mack Wilson Student Center,0
+2,MWF,0:00:00,0:59:00,Recreation and Wellness Center,0
+3,MWF,0:00:00,0:59:00,Atrium,0
+4,MWF,0:00:00,0:59:00,Academic Building,0
+10,MWF,0:00:00,0:59:00,Engineering Lab,1
+9,MWF,0:00:00,0:59:00,Jack Mack Wilson Student Center,0
+2,MWF,1:00:00,1:59:00,Recreation and Wellness Center,1
+3,MWF,1:00:00,1:59:00,Atrium,1
+4,MWF,1:00:00,1:59:00,Academic Building,0
+10,MWF,1:00:00,1:59:00,Engineering Lab,1
+9,MWF,1:00:00,1:59:00,Jack Mack Wilson Student Center,0
+2,MWF,2:00:00,2:59:00,Recreation and Wellness Center,1
+3,MWF,2:00:00,2:59:00,Atrium,1
+4,MWF,2:00:00,2:59:00,Academic Building,1
+10,MWF,2:00:00,2:59:00,Engineering Lab,0
+9,MWF,2:00:00,2:59:00,Jack Mack Wilson Student Center,1
+2,MWF,3:00:00,3:59:00,Recreation and Wellness Center,0
+3,MWF,3:00:00,3:59:00,Atrium,1
+4,MWF,3:00:00,3:59:00,Academic Building,0
+10,MWF,3:00:00,3:59:00,Engineering Lab,1
+9,MWF,3:00:00,3:59:00,Jack Mack Wilson Student Center,1
+2,MWF,4:00:00,4:59:00,Recreation and Wellness Center,1
+3,MWF,4:00:00,4:59:00,Atrium,0
+4,MWF,4:00:00,4:59:00,Academic Building,1
+10,MWF,4:00:00,4:59:00,Engineering Lab,1
+9,MWF,4:00:00,4:59:00,Jack Mack Wilson Student Center,0
+2,MWF,5:00:00,5:59:00,Recreation and Wellness Center,0
+3,MWF,5:00:00,5:59:00,Atrium,2
+4,MWF,5:00:00,5:59:00,Academic Building,0
+10,MWF,5:00:00,5:59:00,Engineering Lab,0
+9,MWF,5:00:00,5:59:00,Jack Mack Wilson Student Center,3
+2,MWF,6:00:00,6:59:00,Recreation and Wellness Center,29
+3,MWF,6:00:00,6:59:00,Atrium,39
+4,MWF,6:00:00,6:59:00,Academic Building,23
+10,MWF,6:00:00,6:59:00,Engineering Lab,16
+9,MWF,6:00:00,6:59:00,Jack Mack Wilson Student Center,53
+2,MWF,7:00:00,7:59:00,Recreation and Wellness Center,90
+3,MWF,7:00:00,7:59:00,Atrium,95
+4,MWF,7:00:00,7:59:00,Academic Building,87
+10,MWF,7:00:00,7:59:00,Engineering Lab,45
+9,MWF,7:00:00,7:59:00,Jack Mack Wilson Student Center,152
+2,MWF,8:00:00,8:50:00,Recreation and Wellness Center,95
+3,MWF,8:00:00,8:50:00,Atrium,547
+4,MWF,8:00:00,8:50:00,Academic Building,345
+10,MWF,8:00:00,8:50:00,Engineering Lab,237
+9,MWF,8:00:00,8:50:00,Jack Mack Wilson Student Center,393
+2,MWF,9:00:00,9:50:00,Recreation and Wellness Center,286
+3,MWF,9:00:00,9:50:00,Atrium,743
+4,MWF,9:00:00,9:50:00,Academic Building,409
+10,MWF,9:00:00,9:50:00,Engineering Lab,257
+9,MWF,9:00:00,9:50:00,Jack Mack Wilson Student Center,545
+2,MWF,10:00:00,10:50:00,Recreation and Wellness Center,365
+3,MWF,10:00:00,10:50:00,Atrium,638
+4,MWF,10:00:00,10:50:00,Academic Building,466
+10,MWF,10:00:00,10:50:00,Engineering Lab,199
+9,MWF,10:00:00,10:50:00,Jack Mack Wilson Student Center,647
+2,MWF,11:00:00,11:50:00,Recreation and Wellness Center,346
+3,MWF,11:00:00,11:50:00,Atrium,583
+4,MWF,11:00:00,11:50:00,Academic Building,657
+10,MWF,11:00:00,11:50:00,Engineering Lab,252
+9,MWF,11:00:00,11:50:00,Jack Mack Wilson Student Center,512
+2,MWF,12:00:00,12:50:00,Recreation and Wellness Center,648
+3,MWF,12:00:00,12:50:00,Atrium,551
+4,MWF,12:00:00,12:50:00,Academic Building,656
+10,MWF,12:00:00,12:50:00,Engineering Lab,203
+9,MWF,12:00:00,12:50:00,Jack Mack Wilson Student Center,536
+2,MWF,13:00:00,13:50:00,Recreation and Wellness Center,547
+3,MWF,13:00:00,13:50:00,Atrium,677
+4,MWF,13:00:00,13:50:00,Academic Building,369
+10,MWF,13:00:00,13:50:00,Engineering Lab,233
+9,MWF,13:00:00,13:50:00,Jack Mack Wilson Student Center,711
+2,MWF,14:00:00,14:50:00,Recreation and Wellness Center,249
+3,MWF,14:00:00,14:50:00,Atrium,552
+4,MWF,14:00:00,14:50:00,Academic Building,496
+10,MWF,14:00:00,14:50:00,Engineering Lab,304
+9,MWF,14:00:00,14:50:00,Jack Mack Wilson Student Center,632
+2,MWF,15:00:00,15:50:00,Recreation and Wellness Center,277
+3,MWF,15:00:00,15:50:00,Atrium,620
+4,MWF,15:00:00,15:50:00,Academic Building,682
+10,MWF,15:00:00,15:50:00,Engineering Lab,219
+9,MWF,15:00:00,15:50:00,Jack Mack Wilson Student Center,481
+2,MWF,16:00:00,16:50:00,Recreation and Wellness Center,351
+3,MWF,16:00:00,16:50:00,Atrium,563
+4,MWF,16:00:00,16:50:00,Academic Building,425
+10,MWF,16:00:00,16:50:00,Engineering Lab,226
+9,MWF,16:00:00,16:50:00,Jack Mack Wilson Student Center,526
+2,MWF,17:00:00,17:50:00,Recreation and Wellness Center,493
+3,MWF,17:00:00,17:50:00,Atrium,755
+4,MWF,17:00:00,17:50:00,Academic Building,489
+10,MWF,17:00:00,17:50:00,Engineering Lab,432
+9,MWF,17:00:00,17:50:00,Jack Mack Wilson Student Center,851
+2,MWF,18:00:00,18:50:00,Recreation and Wellness Center,458
+3,MWF,18:00:00,18:50:00,Atrium,390
+4,MWF,18:00:00,18:50:00,Academic Building,314
+10,MWF,18:00:00,18:50:00,Engineering Lab,196
+9,MWF,18:00:00,18:50:00,Jack Mack Wilson Student Center,612
+2,MWF,19:00:00,19:50:00,Recreation and Wellness Center,220
+3,MWF,19:00:00,19:50:00,Atrium,265
+4,MWF,19:00:00,19:50:00,Academic Building,177
+10,MWF,19:00:00,19:50:00,Engineering Lab,92
+9,MWF,19:00:00,19:50:00,Jack Mack Wilson Student Center,431
+2,MWF,20:00:00,20:50:00,Recreation and Wellness Center,154
+3,MWF,20:00:00,20:50:00,Atrium,200
+4,MWF,20:00:00,20:50:00,Academic Building,147
+10,MWF,20:00:00,20:50:00,Engineering Lab,68
+9,MWF,20:00:00,20:50:00,Jack Mack Wilson Student Center,249
+2,MWF,21:00:00,21:50:00,Recreation and Wellness Center,68
+3,MWF,21:00:00,21:50:00,Atrium,64
+4,MWF,21:00:00,21:50:00,Academic Building,40
+10,MWF,21:00:00,21:50:00,Engineering Lab,40
+9,MWF,21:00:00,21:50:00,Jack Mack Wilson Student Center,71
+2,MWF,22:00:00,22:50:00,Recreation and Wellness Center,22
+3,MWF,22:00:00,22:50:00,Atrium,27
+4,MWF,22:00:00,22:50:00,Academic Building,22
+10,MWF,22:00:00,22:50:00,Engineering Lab,17
+9,MWF,22:00:00,22:50:00,Jack Mack Wilson Student Center,38
+2,MWF,23:00:00,23:50:00,Recreation and Wellness Center,1
+3,MWF,23:00:00,23:50:00,Atrium,2
+4,MWF,23:00:00,23:50:00,Academic Building,1
+10,MWF,23:00:00,23:50:00,Engineering Lab,0
+9,MWF,23:00:00,23:50:00,Jack Mack Wilson Student Center,3
+2,TTh,0:00:00,0:59:00,Recreation and Wellness Center,1
+3,TTh,0:00:00,0:59:00,Atrium,0
+4,TTh,0:00:00,0:59:00,Academic Building,0
+10,TTh,0:00:00,0:59:00,Engineering Lab,0
+9,TTh,0:00:00,0:59:00,Jack Mack Wilson Student Center,0
+2,TTh,1:00:00,1:59:00,Recreation and Wellness Center,1
+3,TTh,1:00:00,1:59:00,Atrium,0
+4,TTh,1:00:00,1:59:00,Academic Building,1
+10,TTh,1:00:00,1:59:00,Engineering Lab,0
+9,TTh,1:00:00,1:59:00,Jack Mack Wilson Student Center,0
+2,TTh,2:00:00,2:59:00,Recreation and Wellness Center,1
+3,TTh,2:00:00,2:59:00,Atrium,0
+4,TTh,2:00:00,2:59:00,Academic Building,1
+10,TTh,2:00:00,2:59:00,Engineering Lab,1
+9,TTh,2:00:00,2:59:00,Jack Mack Wilson Student Center,1
+2,TTh,3:00:00,3:59:00,Recreation and Wellness Center,0
+3,TTh,3:00:00,3:59:00,Atrium,1
+4,TTh,3:00:00,3:59:00,Academic Building,1
+10,TTh,3:00:00,3:59:00,Engineering Lab,0
+9,TTh,3:00:00,3:59:00,Jack Mack Wilson Student Center,1
+2,TTh,4:00:00,4:59:00,Recreation and Wellness Center,1
+3,TTh,4:00:00,4:59:00,Atrium,1
+4,TTh,4:00:00,4:59:00,Academic Building,0
+10,TTh,4:00:00,4:59:00,Engineering Lab,1
+9,TTh,4:00:00,4:59:00,Jack Mack Wilson Student Center,1
+2,TTh,5:00:00,5:59:00,Recreation and Wellness Center,2
+3,TTh,5:00:00,5:59:00,Atrium,2
+4,TTh,5:00:00,5:59:00,Academic Building,1
+10,TTh,5:00:00,5:59:00,Engineering Lab,1
+9,TTh,5:00:00,5:59:00,Jack Mack Wilson Student Center,1
+2,TTh,6:00:00,6:59:00,Recreation and Wellness Center,26
+3,TTh,6:00:00,6:59:00,Atrium,27
+4,TTh,6:00:00,6:59:00,Academic Building,23
+10,TTh,6:00:00,6:59:00,Engineering Lab,18
+9,TTh,6:00:00,6:59:00,Jack Mack Wilson Student Center,41
+2,TTh,7:00:00,7:59:00,Recreation and Wellness Center,77
+3,TTh,7:00:00,7:59:00,Atrium,89
+4,TTh,7:00:00,7:59:00,Academic Building,85
+10,TTh,7:00:00,7:59:00,Engineering Lab,45
+9,TTh,7:00:00,7:59:00,Jack Mack Wilson Student Center,104
+2,TTh,8:00:00,9:15:00,Recreation and Wellness Center,215
+3,TTh,8:00:00,9:15:00,Atrium,440
+4,TTh,8:00:00,9:15:00,Academic Building,311
+10,TTh,8:00:00,9:15:00,Engineering Lab,238
+9,TTh,8:00:00,9:15:00,Jack Mack Wilson Student Center,374
+2,TTh,9:30:00,10:45:00,Recreation and Wellness Center,320
+3,TTh,9:30:00,10:45:00,Atrium,647
+4,TTh,9:30:00,10:45:00,Academic Building,576
+10,TTh,9:30:00,10:45:00,Engineering Lab,227
+9,TTh,9:30:00,10:45:00,Jack Mack Wilson Student Center,656
+2,TTh,11:00:00,12:15:00,Recreation and Wellness Center,346
+3,TTh,11:00:00,12:15:00,Atrium,71
+4,TTh,11:00:00,12:15:00,Academic Building,67
+10,TTh,11:00:00,12:15:00,Engineering Lab,49
+9,TTh,11:00:00,12:15:00,Jack Mack Wilson Student Center,504
+2,TTh,12:30:00,13:45:00,Recreation and Wellness Center,294
+3,TTh,12:30:00,13:45:00,Atrium,657
+4,TTh,12:30:00,13:45:00,Academic Building,642
+10,TTh,12:30:00,13:45:00,Engineering Lab,210
+9,TTh,12:30:00,13:45:00,Jack Mack Wilson Student Center,523
+2,TTh,14:00:00,15:15:00,Recreation and Wellness Center,711
+3,TTh,14:00:00,15:15:00,Atrium,825
+4,TTh,14:00:00,15:15:00,Academic Building,465
+10,TTh,14:00:00,15:15:00,Engineering Lab,250
+9,TTh,14:00:00,15:15:00,Jack Mack Wilson Student Center,439
+2,TTh,15:30:00,16:45:00,Recreation and Wellness Center,472
+3,TTh,15:30:00,16:45:00,Atrium,93
+4,TTh,15:30:00,16:45:00,Academic Building,80
+10,TTh,15:30:00,16:45:00,Engineering Lab,43
+9,TTh,15:30:00,16:45:00,Jack Mack Wilson Student Center,517
+2,TTh,17:00:00,18:15:00,Recreation and Wellness Center,712
+3,TTh,17:00:00,18:15:00,Atrium,759
+4,TTh,17:00:00,18:15:00,Academic Building,448
+10,TTh,17:00:00,18:15:00,Engineering Lab,400
+9,TTh,17:00:00,18:15:00,Jack Mack Wilson Student Center,926
+2,TTh,18:30:00,19:45:00,Recreation and Wellness Center,448
+3,TTh,18:30:00,19:45:00,Atrium,475
+4,TTh,18:30:00,19:45:00,Academic Building,362
+10,TTh,18:30:00,19:45:00,Engineering Lab,200
+9,TTh,18:30:00,19:45:00,Jack Mack Wilson Student Center,479
+2,TTh,20:00:00,21:15:00,Recreation and Wellness Center,187
+3,TTh,20:00:00,21:15:00,Atrium,145
+4,TTh,20:00:00,21:15:00,Academic Building,150
+10,TTh,20:00:00,21:15:00,Engineering Lab,78
+9,TTh,20:00:00,21:15:00,Jack Mack Wilson Student Center,268
+2,TTh,21:30:00,22:45:00,Recreation and Wellness Center,60
+3,TTh,21:30:00,22:45:00,Atrium,53
+4,TTh,21:30:00,22:45:00,Academic Building,57
+10,TTh,21:30:00,22:45:00,Engineering Lab,34
+9,TTh,21:30:00,22:45:00,Jack Mack Wilson Student Center,85
+2,TTh,23:00:00,23:59:00,Recreation and Wellness Center,1
+3,TTh,23:00:00,23:59:00,Atrium,1
+4,TTh,23:00:00,23:59:00,Academic Building,1
+10,TTh,23:00:00,23:59:00,Engineering Lab,0
+9,TTh,23:00:00,23:59:00,Jack Mack Wilson Student Center,4
+2,SSu,0:00:00,0:59:00,Recreation and Wellness Center,39
+3,SSu,0:00:00,0:59:00,Atrium,24
+4,SSu,0:00:00,0:59:00,Academic Building,23
+10,SSu,0:00:00,0:59:00,Engineering Lab,12
+9,SSu,0:00:00,0:59:00,Jack Mack Wilson Student Center,91
+2,SSu,1:00:00,1:59:00,Recreation and Wellness Center,81
+3,SSu,1:00:00,1:59:00,Atrium,26
+4,SSu,1:00:00,1:59:00,Academic Building,21
+10,SSu,1:00:00,1:59:00,Engineering Lab,18
+9,SSu,1:00:00,1:59:00,Jack Mack Wilson Student Center,90
+2,SSu,2:00:00,2:59:00,Recreation and Wellness Center,86
+3,SSu,2:00:00,2:59:00,Atrium,26
+4,SSu,2:00:00,2:59:00,Academic Building,22
+10,SSu,2:00:00,2:59:00,Engineering Lab,13
+9,SSu,2:00:00,2:59:00,Jack Mack Wilson Student Center,104
+2,SSu,3:00:00,3:59:00,Recreation and Wellness Center,75
+3,SSu,3:00:00,3:59:00,Atrium,28
+4,SSu,3:00:00,3:59:00,Academic Building,15
+10,SSu,3:00:00,3:59:00,Engineering Lab,13
+9,SSu,3:00:00,3:59:00,Jack Mack Wilson Student Center,96
+2,SSu,4:00:00,4:59:00,Recreation and Wellness Center,57
+3,SSu,4:00:00,4:59:00,Atrium,28
+4,SSu,4:00:00,4:59:00,Academic Building,15
+10,SSu,4:00:00,4:59:00,Engineering Lab,14
+9,SSu,4:00:00,4:59:00,Jack Mack Wilson Student Center,63
+2,SSu,5:00:00,5:59:00,Recreation and Wellness Center,88
+3,SSu,5:00:00,5:59:00,Atrium,24
+4,SSu,5:00:00,5:59:00,Academic Building,18
+10,SSu,5:00:00,5:59:00,Engineering Lab,15
+9,SSu,5:00:00,5:59:00,Jack Mack Wilson Student Center,59
+2,SSu,6:00:00,6:59:00,Recreation and Wellness Center,155
+3,SSu,6:00:00,6:59:00,Atrium,58
+4,SSu,6:00:00,6:59:00,Academic Building,60
+10,SSu,6:00:00,6:59:00,Engineering Lab,47
+9,SSu,6:00:00,6:59:00,Jack Mack Wilson Student Center,203
+2,SSu,7:00:00,7:59:00,Recreation and Wellness Center,149
+3,SSu,7:00:00,7:59:00,Atrium,62
+4,SSu,7:00:00,7:59:00,Academic Building,58
+10,SSu,7:00:00,7:59:00,Engineering Lab,38
+9,SSu,7:00:00,7:59:00,Jack Mack Wilson Student Center,155
+2,SSu,8:00:00,8:59:00,Recreation and Wellness Center,225
+3,SSu,8:00:00,8:59:00,Atrium,85
+4,SSu,8:00:00,8:59:00,Academic Building,71
+10,SSu,8:00:00,8:59:00,Engineering Lab,38
+9,SSu,8:00:00,8:59:00,Jack Mack Wilson Student Center,445
+2,SSu,9:00:00,9:59:00,Recreation and Wellness Center,160
+3,SSu,9:00:00,9:59:00,Atrium,71
+4,SSu,9:00:00,9:59:00,Academic Building,62
+10,SSu,9:00:00,9:59:00,Engineering Lab,55
+9,SSu,9:00:00,9:59:00,Jack Mack Wilson Student Center,282
+2,SSu,10:00:00,10:59:00,Recreation and Wellness Center,243
+3,SSu,10:00:00,10:59:00,Atrium,80
+4,SSu,10:00:00,10:59:00,Academic Building,74
+10,SSu,10:00:00,10:59:00,Engineering Lab,61
+9,SSu,10:00:00,10:59:00,Jack Mack Wilson Student Center,254
+2,SSu,11:00:00,11:59:00,Recreation and Wellness Center,285
+3,SSu,11:00:00,11:59:00,Atrium,91
+4,SSu,11:00:00,11:59:00,Academic Building,65
+10,SSu,11:00:00,11:59:00,Engineering Lab,41
+9,SSu,11:00:00,11:59:00,Jack Mack Wilson Student Center,277
+2,SSu,12:00:00,12:59:00,Recreation and Wellness Center,168
+3,SSu,12:00:00,12:59:00,Atrium,84
+4,SSu,12:00:00,12:59:00,Academic Building,53
+10,SSu,12:00:00,12:59:00,Engineering Lab,54
+9,SSu,12:00:00,12:59:00,Jack Mack Wilson Student Center,289
+2,SSu,13:00:00,13:59:00,Recreation and Wellness Center,301
+3,SSu,13:00:00,13:59:00,Atrium,103
+4,SSu,13:00:00,13:59:00,Academic Building,74
+10,SSu,13:00:00,13:59:00,Engineering Lab,50
+9,SSu,13:00:00,13:59:00,Jack Mack Wilson Student Center,282
+2,SSu,14:00:00,14:59:00,Recreation and Wellness Center,236
+3,SSu,14:00:00,14:59:00,Atrium,101
+4,SSu,14:00:00,14:59:00,Academic Building,70
+10,SSu,14:00:00,14:59:00,Engineering Lab,45
+9,SSu,14:00:00,14:59:00,Jack Mack Wilson Student Center,267
+2,SSu,15:00:00,15:59:00,Recreation and Wellness Center,232
+3,SSu,15:00:00,15:59:00,Atrium,83
+4,SSu,15:00:00,15:59:00,Academic Building,75
+10,SSu,15:00:00,15:59:00,Engineering Lab,35
+9,SSu,15:00:00,15:59:00,Jack Mack Wilson Student Center,314
+2,SSu,16:00:00,16:59:00,Recreation and Wellness Center,265
+3,SSu,16:00:00,16:59:00,Atrium,102
+4,SSu,16:00:00,16:59:00,Academic Building,70
+10,SSu,16:00:00,16:59:00,Engineering Lab,59
+9,SSu,16:00:00,16:59:00,Jack Mack Wilson Student Center,302
+2,SSu,17:00:00,17:59:00,Recreation and Wellness Center,271
+3,SSu,17:00:00,17:59:00,Atrium,78
+4,SSu,17:00:00,17:59:00,Academic Building,55
+10,SSu,17:00:00,17:59:00,Engineering Lab,36
+9,SSu,17:00:00,17:59:00,Jack Mack Wilson Student Center,342
+2,SSu,18:00:00,18:59:00,Recreation and Wellness Center,269
+3,SSu,18:00:00,18:59:00,Atrium,90
+4,SSu,18:00:00,18:59:00,Academic Building,53
+10,SSu,18:00:00,18:59:00,Engineering Lab,58
+9,SSu,18:00:00,18:59:00,Jack Mack Wilson Student Center,331
+2,SSu,19:00:00,19:59:00,Recreation and Wellness Center,206
+3,SSu,19:00:00,19:59:00,Atrium,67
+4,SSu,19:00:00,19:59:00,Academic Building,88
+10,SSu,19:00:00,19:59:00,Engineering Lab,55
+9,SSu,19:00:00,19:59:00,Jack Mack Wilson Student Center,265
+2,SSu,20:00:00,20:59:00,Recreation and Wellness Center,250
+3,SSu,20:00:00,20:59:00,Atrium,97
+4,SSu,20:00:00,20:59:00,Academic Building,82
+10,SSu,20:00:00,20:59:00,Engineering Lab,69
+9,SSu,20:00:00,20:59:00,Jack Mack Wilson Student Center,265
+2,SSu,21:00:00,21:59:00,Recreation and Wellness Center,110
+3,SSu,21:00:00,21:59:00,Atrium,55
+4,SSu,21:00:00,21:59:00,Academic Building,52
+10,SSu,21:00:00,21:59:00,Engineering Lab,36
+9,SSu,21:00:00,21:59:00,Jack Mack Wilson Student Center,242
+2,SSu,22:00:00,22:59:00,Recreation and Wellness Center,183
+3,SSu,22:00:00,22:59:00,Atrium,73
+4,SSu,22:00:00,22:59:00,Academic Building,56
+10,SSu,22:00:00,22:59:00,Engineering Lab,30
+9,SSu,22:00:00,22:59:00,Jack Mack Wilson Student Center,226
+2,SSu,23:00:00,23:59:00,Recreation and Wellness Center,85
+3,SSu,23:00:00,23:59:00,Atrium,27
+4,SSu,23:00:00,23:59:00,Academic Building,21
+10,SSu,23:00:00,23:59:00,Engineering Lab,16
+9,SSu,23:00:00,23:59:00,Jack Mack Wilson Student Center,115
+2,MWF_Peak,0:00:00,0:59:00,Recreation and Wellness Center,0
+3,MWF_Peak,0:00:00,0:59:00,Atrium,1
+4,MWF_Peak,0:00:00,0:59:00,Academic Building,1
+10,MWF_Peak,0:00:00,0:59:00,Engineering Lab,1
+9,MWF_Peak,0:00:00,0:59:00,Jack Mack Wilson Student Center,0
+2,MWF_Peak,1:00:00,1:59:00,Recreation and Wellness Center,0
+3,MWF_Peak,1:00:00,1:59:00,Atrium,0
+4,MWF_Peak,1:00:00,1:59:00,Academic Building,0
+10,MWF_Peak,1:00:00,1:59:00,Engineering Lab,1
+9,MWF_Peak,1:00:00,1:59:00,Jack Mack Wilson Student Center,0
+2,MWF_Peak,2:00:00,2:59:00,Recreation and Wellness Center,1
+3,MWF_Peak,2:00:00,2:59:00,Atrium,1
+4,MWF_Peak,2:00:00,2:59:00,Academic Building,1
+10,MWF_Peak,2:00:00,2:59:00,Engineering Lab,0
+9,MWF_Peak,2:00:00,2:59:00,Jack Mack Wilson Student Center,1
+2,MWF_Peak,3:00:00,3:59:00,Recreation and Wellness Center,0
+3,MWF_Peak,3:00:00,3:59:00,Atrium,0
+4,MWF_Peak,3:00:00,3:59:00,Academic Building,0
+10,MWF_Peak,3:00:00,3:59:00,Engineering Lab,0
+9,MWF_Peak,3:00:00,3:59:00,Jack Mack Wilson Student Center,0
+2,MWF_Peak,4:00:00,4:59:00,Recreation and Wellness Center,0
+3,MWF_Peak,4:00:00,4:59:00,Atrium,1
+4,MWF_Peak,4:00:00,4:59:00,Academic Building,0
+10,MWF_Peak,4:00:00,4:59:00,Engineering Lab,0
+9,MWF_Peak,4:00:00,4:59:00,Jack Mack Wilson Student Center,0
+2,MWF_Peak,5:00:00,5:59:00,Recreation and Wellness Center,1
+3,MWF_Peak,5:00:00,5:59:00,Atrium,2
+4,MWF_Peak,5:00:00,5:59:00,Academic Building,0
+10,MWF_Peak,5:00:00,5:59:00,Engineering Lab,1
+9,MWF_Peak,5:00:00,5:59:00,Jack Mack Wilson Student Center,3
+2,MWF_Peak,6:00:00,6:59:00,Recreation and Wellness Center,27
+3,MWF_Peak,6:00:00,6:59:00,Atrium,38
+4,MWF_Peak,6:00:00,6:59:00,Academic Building,18
+10,MWF_Peak,6:00:00,6:59:00,Engineering Lab,14
+9,MWF_Peak,6:00:00,6:59:00,Jack Mack Wilson Student Center,37
+2,MWF_Peak,7:00:00,7:59:00,Recreation and Wellness Center,73
+3,MWF_Peak,7:00:00,7:59:00,Atrium,113
+4,MWF_Peak,7:00:00,7:59:00,Academic Building,65
+10,MWF_Peak,7:00:00,7:59:00,Engineering Lab,45
+9,MWF_Peak,7:00:00,7:59:00,Jack Mack Wilson Student Center,82
+2,MWF_Peak,8:00:00,8:50:00,Recreation and Wellness Center,167
+3,MWF_Peak,8:00:00,8:50:00,Atrium,714
+4,MWF_Peak,8:00:00,8:50:00,Academic Building,384
+10,MWF_Peak,8:00:00,8:50:00,Engineering Lab,293
+9,MWF_Peak,8:00:00,8:50:00,Jack Mack Wilson Student Center,548
+2,MWF_Peak,9:00:00,9:50:00,Recreation and Wellness Center,320
+3,MWF_Peak,9:00:00,9:50:00,Atrium,872
+4,MWF_Peak,9:00:00,9:50:00,Academic Building,687
+10,MWF_Peak,9:00:00,9:50:00,Engineering Lab,337
+9,MWF_Peak,9:00:00,9:50:00,Jack Mack Wilson Student Center,673
+2,MWF_Peak,10:00:00,10:50:00,Recreation and Wellness Center,320
+3,MWF_Peak,10:00:00,10:50:00,Atrium,566
+4,MWF_Peak,10:00:00,10:50:00,Academic Building,702
+10,MWF_Peak,10:00:00,10:50:00,Engineering Lab,243
+9,MWF_Peak,10:00:00,10:50:00,Jack Mack Wilson Student Center,586
+2,MWF_Peak,11:00:00,11:50:00,Recreation and Wellness Center,311
+3,MWF_Peak,11:00:00,11:50:00,Atrium,741
+4,MWF_Peak,11:00:00,11:50:00,Academic Building,480
+10,MWF_Peak,11:00:00,11:50:00,Engineering Lab,299
+9,MWF_Peak,11:00:00,11:50:00,Jack Mack Wilson Student Center,575
+2,MWF_Peak,12:00:00,12:50:00,Recreation and Wellness Center,650
+3,MWF_Peak,12:00:00,12:50:00,Atrium,753
+4,MWF_Peak,12:00:00,12:50:00,Academic Building,633
+10,MWF_Peak,12:00:00,12:50:00,Engineering Lab,256
+9,MWF_Peak,12:00:00,12:50:00,Jack Mack Wilson Student Center,486
+2,MWF_Peak,13:00:00,13:50:00,Recreation and Wellness Center,748
+3,MWF_Peak,13:00:00,13:50:00,Atrium,628
+4,MWF_Peak,13:00:00,13:50:00,Academic Building,741
+10,MWF_Peak,13:00:00,13:50:00,Engineering Lab,314
+9,MWF_Peak,13:00:00,13:50:00,Jack Mack Wilson Student Center,867
+2,MWF_Peak,14:00:00,14:50:00,Recreation and Wellness Center,276
+3,MWF_Peak,14:00:00,14:50:00,Atrium,736
+4,MWF_Peak,14:00:00,14:50:00,Academic Building,489
+10,MWF_Peak,14:00:00,14:50:00,Engineering Lab,159
+9,MWF_Peak,14:00:00,14:50:00,Jack Mack Wilson Student Center,699
+2,MWF_Peak,15:00:00,15:50:00,Recreation and Wellness Center,383
+3,MWF_Peak,15:00:00,15:50:00,Atrium,770
+4,MWF_Peak,15:00:00,15:50:00,Academic Building,437
+10,MWF_Peak,15:00:00,15:50:00,Engineering Lab,190
+9,MWF_Peak,15:00:00,15:50:00,Jack Mack Wilson Student Center,583
+2,MWF_Peak,16:00:00,16:50:00,Recreation and Wellness Center,386
+3,MWF_Peak,16:00:00,16:50:00,Atrium,647
+4,MWF_Peak,16:00:00,16:50:00,Academic Building,562
+10,MWF_Peak,16:00:00,16:50:00,Engineering Lab,235
+9,MWF_Peak,16:00:00,16:50:00,Jack Mack Wilson Student Center,642
+2,MWF_Peak,17:00:00,17:50:00,Recreation and Wellness Center,836
+3,MWF_Peak,17:00:00,17:50:00,Atrium,718
+4,MWF_Peak,17:00:00,17:50:00,Academic Building,690
+10,MWF_Peak,17:00:00,17:50:00,Engineering Lab,319
+9,MWF_Peak,17:00:00,17:50:00,Jack Mack Wilson Student Center,1170
+2,MWF_Peak,18:00:00,18:50:00,Recreation and Wellness Center,361
+3,MWF_Peak,18:00:00,18:50:00,Atrium,417
+4,MWF_Peak,18:00:00,18:50:00,Academic Building,324
+10,MWF_Peak,18:00:00,18:50:00,Engineering Lab,235
+9,MWF_Peak,18:00:00,18:50:00,Jack Mack Wilson Student Center,638
+2,MWF_Peak,19:00:00,19:50:00,Recreation and Wellness Center,257
+3,MWF_Peak,19:00:00,19:50:00,Atrium,311
+4,MWF_Peak,19:00:00,19:50:00,Academic Building,202
+10,MWF_Peak,19:00:00,19:50:00,Engineering Lab,139
+9,MWF_Peak,19:00:00,19:50:00,Jack Mack Wilson Student Center,406
+2,MWF_Peak,20:00:00,20:50:00,Recreation and Wellness Center,182
+3,MWF_Peak,20:00:00,20:50:00,Atrium,210
+4,MWF_Peak,20:00:00,20:50:00,Academic Building,146
+10,MWF_Peak,20:00:00,20:50:00,Engineering Lab,80
+9,MWF_Peak,20:00:00,20:50:00,Jack Mack Wilson Student Center,211
+2,MWF_Peak,21:00:00,21:50:00,Recreation and Wellness Center,72
+3,MWF_Peak,21:00:00,21:50:00,Atrium,62
+4,MWF_Peak,21:00:00,21:50:00,Academic Building,59
+10,MWF_Peak,21:00:00,21:50:00,Engineering Lab,35
+9,MWF_Peak,21:00:00,21:50:00,Jack Mack Wilson Student Center,72
+2,MWF_Peak,22:00:00,22:50:00,Recreation and Wellness Center,35
+3,MWF_Peak,22:00:00,22:50:00,Atrium,28
+4,MWF_Peak,22:00:00,22:50:00,Academic Building,26
+10,MWF_Peak,22:00:00,22:50:00,Engineering Lab,11
+9,MWF_Peak,22:00:00,22:50:00,Jack Mack Wilson Student Center,43
+2,MWF_Peak,23:00:00,23:50:00,Recreation and Wellness Center,2
+3,MWF_Peak,23:00:00,23:50:00,Atrium,1
+4,MWF_Peak,23:00:00,23:50:00,Academic Building,2
+10,MWF_Peak,23:00:00,23:50:00,Engineering Lab,1
+9,MWF_Peak,23:00:00,23:50:00,Jack Mack Wilson Student Center,3
+2,TTh_Peak,0:00:00,0:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,0:00:00,0:59:00,Atrium,0
+4,TTh_Peak,0:00:00,0:59:00,Academic Building,1
+10,TTh_Peak,0:00:00,0:59:00,Engineering Lab,0
+9,TTh_Peak,0:00:00,0:59:00,Jack Mack Wilson Student Center,0
+2,TTh_Peak,1:00:00,1:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,1:00:00,1:59:00,Atrium,1
+4,TTh_Peak,1:00:00,1:59:00,Academic Building,1
+10,TTh_Peak,1:00:00,1:59:00,Engineering Lab,0
+9,TTh_Peak,1:00:00,1:59:00,Jack Mack Wilson Student Center,1
+2,TTh_Peak,2:00:00,2:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,2:00:00,2:59:00,Atrium,1
+4,TTh_Peak,2:00:00,2:59:00,Academic Building,0
+10,TTh_Peak,2:00:00,2:59:00,Engineering Lab,1
+9,TTh_Peak,2:00:00,2:59:00,Jack Mack Wilson Student Center,1
+2,TTh_Peak,3:00:00,3:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,3:00:00,3:59:00,Atrium,1
+4,TTh_Peak,3:00:00,3:59:00,Academic Building,0
+10,TTh_Peak,3:00:00,3:59:00,Engineering Lab,1
+9,TTh_Peak,3:00:00,3:59:00,Jack Mack Wilson Student Center,0
+2,TTh_Peak,4:00:00,4:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,4:00:00,4:59:00,Atrium,0
+4,TTh_Peak,4:00:00,4:59:00,Academic Building,0
+10,TTh_Peak,4:00:00,4:59:00,Engineering Lab,1
+9,TTh_Peak,4:00:00,4:59:00,Jack Mack Wilson Student Center,0
+2,TTh_Peak,5:00:00,5:59:00,Recreation and Wellness Center,2
+3,TTh_Peak,5:00:00,5:59:00,Atrium,1
+4,TTh_Peak,5:00:00,5:59:00,Academic Building,2
+10,TTh_Peak,5:00:00,5:59:00,Engineering Lab,1
+9,TTh_Peak,5:00:00,5:59:00,Jack Mack Wilson Student Center,3
+2,TTh_Peak,6:00:00,6:59:00,Recreation and Wellness Center,26
+3,TTh_Peak,6:00:00,6:59:00,Atrium,26
+4,TTh_Peak,6:00:00,6:59:00,Academic Building,23
+10,TTh_Peak,6:00:00,6:59:00,Engineering Lab,14
+9,TTh_Peak,6:00:00,6:59:00,Jack Mack Wilson Student Center,32
+2,TTh_Peak,7:00:00,7:59:00,Recreation and Wellness Center,94
+3,TTh_Peak,7:00:00,7:59:00,Atrium,105
+4,TTh_Peak,7:00:00,7:59:00,Academic Building,77
+10,TTh_Peak,7:00:00,7:59:00,Engineering Lab,51
+9,TTh_Peak,7:00:00,7:59:00,Jack Mack Wilson Student Center,139
+2,TTh_Peak,8:00:00,9:15:00,Recreation and Wellness Center,160
+3,TTh_Peak,8:00:00,9:15:00,Atrium,689
+4,TTh_Peak,8:00:00,9:15:00,Academic Building,335
+10,TTh_Peak,8:00:00,9:15:00,Engineering Lab,356
+9,TTh_Peak,8:00:00,9:15:00,Jack Mack Wilson Student Center,471
+2,TTh_Peak,9:30:00,10:45:00,Recreation and Wellness Center,373
+3,TTh_Peak,9:30:00,10:45:00,Atrium,979
+4,TTh_Peak,9:30:00,10:45:00,Academic Building,537
+10,TTh_Peak,9:30:00,10:45:00,Engineering Lab,385
+9,TTh_Peak,9:30:00,10:45:00,Jack Mack Wilson Student Center,573
+2,TTh_Peak,11:00:00,12:15:00,Recreation and Wellness Center,331
+3,TTh_Peak,11:00:00,12:15:00,Atrium,84
+4,TTh_Peak,11:00:00,12:15:00,Academic Building,63
+10,TTh_Peak,11:00:00,12:15:00,Engineering Lab,50
+9,TTh_Peak,11:00:00,12:15:00,Jack Mack Wilson Student Center,515
+2,TTh_Peak,12:30:00,13:45:00,Recreation and Wellness Center,420
+3,TTh_Peak,12:30:00,13:45:00,Atrium,504
+4,TTh_Peak,12:30:00,13:45:00,Academic Building,603
+10,TTh_Peak,12:30:00,13:45:00,Engineering Lab,283
+9,TTh_Peak,12:30:00,13:45:00,Jack Mack Wilson Student Center,710
+2,TTh_Peak,14:00:00,15:15:00,Recreation and Wellness Center,563
+3,TTh_Peak,14:00:00,15:15:00,Atrium,711
+4,TTh_Peak,14:00:00,15:15:00,Academic Building,652
+10,TTh_Peak,14:00:00,15:15:00,Engineering Lab,184
+9,TTh_Peak,14:00:00,15:15:00,Jack Mack Wilson Student Center,675
+2,TTh_Peak,15:30:00,16:45:00,Recreation and Wellness Center,502
+3,TTh_Peak,15:30:00,16:45:00,Atrium,89
+4,TTh_Peak,15:30:00,16:45:00,Academic Building,74
+10,TTh_Peak,15:30:00,16:45:00,Engineering Lab,62
+9,TTh_Peak,15:30:00,16:45:00,Jack Mack Wilson Student Center,737
+2,TTh_Peak,17:00:00,18:15:00,Recreation and Wellness Center,423
+3,TTh_Peak,17:00:00,18:15:00,Atrium,665
+4,TTh_Peak,17:00:00,18:15:00,Academic Building,557
+10,TTh_Peak,17:00:00,18:15:00,Engineering Lab,262
+9,TTh_Peak,17:00:00,18:15:00,Jack Mack Wilson Student Center,734
+2,TTh_Peak,18:30:00,19:45:00,Recreation and Wellness Center,452
+3,TTh_Peak,18:30:00,19:45:00,Atrium,297
+4,TTh_Peak,18:30:00,19:45:00,Academic Building,362
+10,TTh_Peak,18:30:00,19:45:00,Engineering Lab,212
+9,TTh_Peak,18:30:00,19:45:00,Jack Mack Wilson Student Center,556
+2,TTh_Peak,20:00:00,21:15:00,Recreation and Wellness Center,161
+3,TTh_Peak,20:00:00,21:15:00,Atrium,195
+4,TTh_Peak,20:00:00,21:15:00,Academic Building,167
+10,TTh_Peak,20:00:00,21:15:00,Engineering Lab,112
+9,TTh_Peak,20:00:00,21:15:00,Jack Mack Wilson Student Center,260
+2,TTh_Peak,21:30:00,22:45:00,Recreation and Wellness Center,61
+3,TTh_Peak,21:30:00,22:45:00,Atrium,63
+4,TTh_Peak,21:30:00,22:45:00,Academic Building,51
+10,TTh_Peak,21:30:00,22:45:00,Engineering Lab,29
+9,TTh_Peak,21:30:00,22:45:00,Jack Mack Wilson Student Center,70
+2,TTh_Peak,23:00:00,23:59:00,Recreation and Wellness Center,1
+3,TTh_Peak,23:00:00,23:59:00,Atrium,2
+4,TTh_Peak,23:00:00,23:59:00,Academic Building,1
+10,TTh_Peak,23:00:00,23:59:00,Engineering Lab,1
+9,TTh_Peak,23:00:00,23:59:00,Jack Mack Wilson Student Center,1
+2,SSu_Peak,0:00:00,0:59:00,Recreation and Wellness Center,80
+3,SSu_Peak,0:00:00,0:59:00,Atrium,26
+4,SSu_Peak,0:00:00,0:59:00,Academic Building,18
+10,SSu_Peak,0:00:00,0:59:00,Engineering Lab,12
+9,SSu_Peak,0:00:00,0:59:00,Jack Mack Wilson Student Center,86
+2,SSu_Peak,1:00:00,1:59:00,Recreation and Wellness Center,78
+3,SSu_Peak,1:00:00,1:59:00,Atrium,19
+4,SSu_Peak,1:00:00,1:59:00,Academic Building,14
+10,SSu_Peak,1:00:00,1:59:00,Engineering Lab,11
+9,SSu_Peak,1:00:00,1:59:00,Jack Mack Wilson Student Center,120
+2,SSu_Peak,2:00:00,2:59:00,Recreation and Wellness Center,65
+3,SSu_Peak,2:00:00,2:59:00,Atrium,33
+4,SSu_Peak,2:00:00,2:59:00,Academic Building,15
+10,SSu_Peak,2:00:00,2:59:00,Engineering Lab,15
+9,SSu_Peak,2:00:00,2:59:00,Jack Mack Wilson Student Center,85
+2,SSu_Peak,3:00:00,3:59:00,Recreation and Wellness Center,67
+3,SSu_Peak,3:00:00,3:59:00,Atrium,20
+4,SSu_Peak,3:00:00,3:59:00,Academic Building,26
+10,SSu_Peak,3:00:00,3:59:00,Engineering Lab,15
+9,SSu_Peak,3:00:00,3:59:00,Jack Mack Wilson Student Center,116
+2,SSu_Peak,4:00:00,4:59:00,Recreation and Wellness Center,74
+3,SSu_Peak,4:00:00,4:59:00,Atrium,24
+4,SSu_Peak,4:00:00,4:59:00,Academic Building,21
+10,SSu_Peak,4:00:00,4:59:00,Engineering Lab,17
+9,SSu_Peak,4:00:00,4:59:00,Jack Mack Wilson Student Center,108
+2,SSu_Peak,5:00:00,5:59:00,Recreation and Wellness Center,78
+3,SSu_Peak,5:00:00,5:59:00,Atrium,22
+4,SSu_Peak,5:00:00,5:59:00,Academic Building,23
+10,SSu_Peak,5:00:00,5:59:00,Engineering Lab,14
+9,SSu_Peak,5:00:00,5:59:00,Jack Mack Wilson Student Center,45
+2,SSu_Peak,6:00:00,6:59:00,Recreation and Wellness Center,153
+3,SSu_Peak,6:00:00,6:59:00,Atrium,63
+4,SSu_Peak,6:00:00,6:59:00,Academic Building,51
+10,SSu_Peak,6:00:00,6:59:00,Engineering Lab,31
+9,SSu_Peak,6:00:00,6:59:00,Jack Mack Wilson Student Center,266
+2,SSu_Peak,7:00:00,7:59:00,Recreation and Wellness Center,140
+3,SSu_Peak,7:00:00,7:59:00,Atrium,58
+4,SSu_Peak,7:00:00,7:59:00,Academic Building,43
+10,SSu_Peak,7:00:00,7:59:00,Engineering Lab,24
+9,SSu_Peak,7:00:00,7:59:00,Jack Mack Wilson Student Center,207
+2,SSu_Peak,8:00:00,8:59:00,Recreation and Wellness Center,280
+3,SSu_Peak,8:00:00,8:59:00,Atrium,130
+4,SSu_Peak,8:00:00,8:59:00,Academic Building,62
+10,SSu_Peak,8:00:00,8:59:00,Engineering Lab,53
+9,SSu_Peak,8:00:00,8:59:00,Jack Mack Wilson Student Center,362
+2,SSu_Peak,9:00:00,9:59:00,Recreation and Wellness Center,305
+3,SSu_Peak,9:00:00,9:59:00,Atrium,91
+4,SSu_Peak,9:00:00,9:59:00,Academic Building,61
+10,SSu_Peak,9:00:00,9:59:00,Engineering Lab,45
+9,SSu_Peak,9:00:00,9:59:00,Jack Mack Wilson Student Center,371
+2,SSu_Peak,10:00:00,10:59:00,Recreation and Wellness Center,216
+3,SSu_Peak,10:00:00,10:59:00,Atrium,89
+4,SSu_Peak,10:00:00,10:59:00,Academic Building,106
+10,SSu_Peak,10:00:00,10:59:00,Engineering Lab,39
+9,SSu_Peak,10:00:00,10:59:00,Jack Mack Wilson Student Center,278
+2,SSu_Peak,11:00:00,11:59:00,Recreation and Wellness Center,179
+3,SSu_Peak,11:00:00,11:59:00,Atrium,105
+4,SSu_Peak,11:00:00,11:59:00,Academic Building,61
+10,SSu_Peak,11:00:00,11:59:00,Engineering Lab,41
+9,SSu_Peak,11:00:00,11:59:00,Jack Mack Wilson Student Center,306
+2,SSu_Peak,12:00:00,12:59:00,Recreation and Wellness Center,288
+3,SSu_Peak,12:00:00,12:59:00,Atrium,97
+4,SSu_Peak,12:00:00,12:59:00,Academic Building,63
+10,SSu_Peak,12:00:00,12:59:00,Engineering Lab,51
+9,SSu_Peak,12:00:00,12:59:00,Jack Mack Wilson Student Center,361
+2,SSu_Peak,13:00:00,13:59:00,Recreation and Wellness Center,252
+3,SSu_Peak,13:00:00,13:59:00,Atrium,87
+4,SSu_Peak,13:00:00,13:59:00,Academic Building,37
+10,SSu_Peak,13:00:00,13:59:00,Engineering Lab,41
+9,SSu_Peak,13:00:00,13:59:00,Jack Mack Wilson Student Center,353
+2,SSu_Peak,14:00:00,14:59:00,Recreation and Wellness Center,231
+3,SSu_Peak,14:00:00,14:59:00,Atrium,92
+4,SSu_Peak,14:00:00,14:59:00,Academic Building,88
+10,SSu_Peak,14:00:00,14:59:00,Engineering Lab,52
+9,SSu_Peak,14:00:00,14:59:00,Jack Mack Wilson Student Center,281
+2,SSu_Peak,15:00:00,15:59:00,Recreation and Wellness Center,285
+3,SSu_Peak,15:00:00,15:59:00,Atrium,83
+4,SSu_Peak,15:00:00,15:59:00,Academic Building,70
+10,SSu_Peak,15:00:00,15:59:00,Engineering Lab,53
+9,SSu_Peak,15:00:00,15:59:00,Jack Mack Wilson Student Center,319
+2,SSu_Peak,16:00:00,16:59:00,Recreation and Wellness Center,187
+3,SSu_Peak,16:00:00,16:59:00,Atrium,94
+4,SSu_Peak,16:00:00,16:59:00,Academic Building,61
+10,SSu_Peak,16:00:00,16:59:00,Engineering Lab,44
+9,SSu_Peak,16:00:00,16:59:00,Jack Mack Wilson Student Center,286
+2,SSu_Peak,17:00:00,17:59:00,Recreation and Wellness Center,183
+3,SSu_Peak,17:00:00,17:59:00,Atrium,87
+4,SSu_Peak,17:00:00,17:59:00,Academic Building,87
+10,SSu_Peak,17:00:00,17:59:00,Engineering Lab,60
+9,SSu_Peak,17:00:00,17:59:00,Jack Mack Wilson Student Center,334
+2,SSu_Peak,18:00:00,18:59:00,Recreation and Wellness Center,259
+3,SSu_Peak,18:00:00,18:59:00,Atrium,103
+4,SSu_Peak,18:00:00,18:59:00,Academic Building,71
+10,SSu_Peak,18:00:00,18:59:00,Engineering Lab,47
+9,SSu_Peak,18:00:00,18:59:00,Jack Mack Wilson Student Center,299
+2,SSu_Peak,19:00:00,19:59:00,Recreation and Wellness Center,228
+3,SSu_Peak,19:00:00,19:59:00,Atrium,64
+4,SSu_Peak,19:00:00,19:59:00,Academic Building,67
+10,SSu_Peak,19:00:00,19:59:00,Engineering Lab,47
+9,SSu_Peak,19:00:00,19:59:00,Jack Mack Wilson Student Center,289
+2,SSu_Peak,20:00:00,20:59:00,Recreation and Wellness Center,211
+3,SSu_Peak,20:00:00,20:59:00,Atrium,120
+4,SSu_Peak,20:00:00,20:59:00,Academic Building,70
+10,SSu_Peak,20:00:00,20:59:00,Engineering Lab,46
+9,SSu_Peak,20:00:00,20:59:00,Jack Mack Wilson Student Center,336
+2,SSu_Peak,21:00:00,21:59:00,Recreation and Wellness Center,173
+3,SSu_Peak,21:00:00,21:59:00,Atrium,65
+4,SSu_Peak,21:00:00,21:59:00,Academic Building,49
+10,SSu_Peak,21:00:00,21:59:00,Engineering Lab,28
+9,SSu_Peak,21:00:00,21:59:00,Jack Mack Wilson Student Center,148
+2,SSu_Peak,22:00:00,22:59:00,Recreation and Wellness Center,182
+3,SSu_Peak,22:00:00,22:59:00,Atrium,76
+4,SSu_Peak,22:00:00,22:59:00,Academic Building,44
+10,SSu_Peak,22:00:00,22:59:00,Engineering Lab,25
+9,SSu_Peak,22:00:00,22:59:00,Jack Mack Wilson Student Center,194
+2,SSu_Peak,23:00:00,23:59:00,Recreation and Wellness Center,96
+3,SSu_Peak,23:00:00,23:59:00,Atrium,29
+4,SSu_Peak,23:00:00,23:59:00,Academic Building,18
+10,SSu_Peak,23:00:00,23:59:00,Engineering Lab,17
+9,SSu_Peak,23:00:00,23:59:00,Jack Mack Wilson Student Center,83
