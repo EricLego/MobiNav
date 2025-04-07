@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
-import { AccessibilityContext } from '../App';
+import { AccessibilityContext, UserPreferencesContext } from '../App';
 import '../styles/InteractiveMap.css';
 // Import Leaflet (already in package.json) for OSRM map rendering
 import 'leaflet/dist/leaflet.css';
@@ -22,6 +22,55 @@ const InteractiveMap = () => {
   const [googleMapsError, setGoogleMapsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDualRoutes, setShowDualRoutes] = useState(false);
+  
+  // Marietta Campus Points of Interest for OSRM layer
+  const [mariettaPoiData] = useState([
+    { name: 'Wilder Communications Center', coordinates: [33.93455660617953, -84.52081934524365] },
+    { name: 'Civil Engineering Soils Lab', coordinates: [33.93540362312106, -84.52036756689206] },
+    { name: 'Civil & Environmental Engineering', coordinates: [33.93588763354318, -84.52046680862038] },
+    { name: 'Hornet Village Building 200', coordinates: [33.936719315266686, -84.52166898423492] },
+    { name: 'Hornet Village Building 100', coordinates: [33.93718839012865, -84.52204992079598] },
+    { name: 'Stingers Dining Hall', coordinates: [33.93746419390562, -84.52200353217164] },
+    { name: 'West Parking Deck', coordinates: [33.9375501438482, -84.52221082789227] },
+    { name: 'Engineering Technology Center', coordinates: [33.93817339276375, -84.52224839237287] },
+    { name: 'Engineering Technology Center 2', coordinates: [33.93863121376631, -84.52211492419309] },
+    { name: 'Design Building', coordinates: [33.93787177874704, -84.52165835034563] },
+    { name: 'Engineering Lab', coordinates: [33.93856210850054, -84.52092234083258] },
+    { name: 'Engineering Lab 2', coordinates: [33.93855988324149, -84.52116172797776] },
+    { name: 'Science Lab Annex', coordinates: [33.93871755639936, -84.5215036865333] },
+    { name: 'Crawford Lab', coordinates: [33.93930912458764, -84.52146694626319] },
+    { name: 'Crawford Lab 2', coordinates: [33.939468229063785, -84.52156283523169] },
+    { name: 'Academic Building', coordinates: [33.93870600583617, -84.5207289032058] },
+    { name: 'Academic Building 2', coordinates: [33.93849428566808, -84.52033690881781] },
+    { name: 'Atrium', coordinates: [33.9382041092832, -84.52016672888843] },
+    { name: 'Atrium 2', coordinates: [33.93763384126216, -84.52000779258384] },
+    { name: 'Atrium 3', coordinates: [33.93764511141814, -84.52040037884046] },
+    { name: 'Atrium 4', coordinates: [33.93707483964624, -84.52018710533852] },
+    { name: 'Johnson Library', coordinates: [33.93902721611566, -84.52050930501083] },
+    { name: 'Johnson Library 2', coordinates: [33.93944666172132, -84.52010719140327] },
+    { name: 'Administration', coordinates: [33.939799774802935, -84.51981560023374] },
+    { name: 'Administration 2', coordinates: [33.939637590138126, -84.51942025326288] },
+    { name: 'Norton Hall', coordinates: [33.93913602090555, -84.51929083123834] },
+    { name: 'Norton Hall 2', coordinates: [33.93889910161332, -84.51969849931776] },
+    { name: 'Norton Hall 3', coordinates: [33.93890701971558, -84.51920506939514] },
+    { name: 'Howell Hall', coordinates: [33.9379709229149, -84.51884195333234] },
+    { name: 'Howell Hall 2', coordinates: [33.93816730316157, -84.51843626924024] },
+    { name: 'Howell Hall 3', coordinates: [33.93826410232331, -84.5189505827917] },
+    { name: 'Housing Office', coordinates: [33.93828624073086, -84.5179381956037] },
+    { name: 'Resident Community Center', coordinates: [33.93825262277839, -84.51773948223924] },
+    { name: 'Architecture', coordinates: [33.93625116321012, -84.51943484429044] },
+    { name: 'W. Clair Harris Textile Center', coordinates: [33.936553978766426, -84.51984708967207] },
+    { name: 'W. Clair Harris Textile Center 2', coordinates: [33.93713680672734, -84.5198657179308] },
+    { name: 'Atrium Connector', coordinates: [33.93701015800386, -84.52021386579622] },
+    { name: 'Atrium Connector 2', coordinates: [33.93765215453384, -84.52036809280771] },
+    { name: 'Atrium Connector 3', coordinates: [33.937654379816635, -84.52002879338522] },
+    { name: 'Atrium Connector 4', coordinates: [33.938222381353945, -84.52018972591551] },
+    { name: 'Mathematics', coordinates: [33.93967114033872, -84.52099767231611] },
+    { name: 'Mathematics 2', coordinates: [33.93997043325382, -84.52051219251037] },
+    { name: 'Joe Mack Wilson Student Center', coordinates: [33.94032035064124, -84.52016703942846] },
+    { name: 'Joe Mack Wilson Student Center 2', coordinates: [33.94077262400745, -84.52022873022872] },
+    { name: 'Recreation & Wellness Center', coordinates: [33.94121750966809, -84.51783285841829] }
+  ]);
   
   // Hardcode API key directly - confirmed working in TestMap
   const API_KEY = 'AIzaSyACo9gj_wQRJBCq5iAmWcwyNmAq_x8daEg';
@@ -347,52 +396,134 @@ const InteractiveMap = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPinMode, showLocationModal]);
   
-  // Fetch obstacles from backend API
+  // Get API base URL from context
+  const { userPreferences, API_BASE_URL } = useContext(UserPreferencesContext);
+  
+  // Fetch data from backend API
   useEffect(() => {
-    const fetchObstacles = async () => {
-      try {
-        const response = await fetch('/api/obstacles');
-        const data = await response.json();
-        
-        if (data.obstacles) {
-          setBackendObstacles(data.obstacles);
+    const fetchData = async () => {
+      // Fetch buildings and locations
+      const fetchBuildings = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL || ''}/api/buildings`);
+          const data = await response.json();
+          
+          if (data.buildings && data.buildings.length > 0) {
+            // Transform backend data to match frontend data structure
+            const buildings = data.buildings.map(building => {
+              // Extract basic building info
+              const buildingData = {
+                id: building.id,
+                name: building.name,
+                lat: building.latitude,
+                lng: building.longitude,
+                type: building.building_type === 'parking' ? 'parking' : 
+                      building.building_type === 'transportation' ? 'transportation' : 'building',
+                hasElevator: building.has_elevator,
+                floors: building.floors,
+                description: building.description,
+                entrances: []
+              };
+              
+              // Add entrances if available
+              if (building.entrances && building.entrances.length > 0) {
+                buildingData.entrances = building.entrances.map(entrance => ({
+                  id: entrance.id,
+                  name: entrance.name,
+                  type: entrance.entrance_type,
+                  accessible: entrance.is_accessible,
+                  lat: entrance.latitude,
+                  lng: entrance.longitude,
+                  features: entrance.features ? 
+                    entrance.features.map(feature => feature.feature_type) : []
+                }));
+              }
+              
+              return buildingData;
+            });
+            
+            setCampusLocations(buildings);
+            console.log('Loaded buildings from API:', buildings.length);
+          }
+        } catch (error) {
+          console.error("Failed to fetch buildings:", error);
+          // Keep the existing mock data as fallback
+          console.log('Using mock building data');
         }
-      } catch (error) {
-        console.error("Failed to fetch obstacles:", error);
-        // If API fails, use mock data as fallback
-        const mockObstacles = [
-          { id: 1, location: 'Library Elevator', latitude: 33.9394, longitude: -84.5203, obstacle_type: 'elevator', description: 'Out of Service', reported_at: '2025-03-15' },
-          { id: 2, location: 'Path near Stingers', latitude: 33.9375, longitude: -84.5218, obstacle_type: 'construction', description: 'Under Construction', reported_at: '2025-03-16' },
-        ];
-        
-        setBackendObstacles(mockObstacles);
-      }
+      };
+      
+      // Fetch obstacles
+      const fetchObstacles = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL || ''}/api/obstacles`);
+          const data = await response.json();
+          
+          if (data.obstacles) {
+            setBackendObstacles(data.obstacles);
+            console.log('Loaded obstacles from API:', data.obstacles.length);
+          }
+        } catch (error) {
+          console.error("Failed to fetch obstacles:", error);
+          // If API fails, use mock data as fallback
+          const mockObstacles = [
+            { id: 1, location: 'Library Elevator', latitude: 33.9394, longitude: -84.5203, obstacle_type: 'elevator_outage', description: 'Out of Service', reported_at: '2025-03-15' },
+            { id: 2, location: 'Path near Stingers', latitude: 33.9375, longitude: -84.5218, obstacle_type: 'construction', description: 'Under Construction', reported_at: '2025-03-16' },
+          ];
+          
+          setBackendObstacles(mockObstacles);
+        }
+      };
+      
+      // Fetch accessibility features
+      const fetchAccessibilityFeatures = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL || ''}/api/accessibility_features`);
+          const data = await response.json();
+          
+          if (data.features) {
+            setAccessibilityFeatures(data.features);
+            console.log('Loaded accessibility features from API:', data.features.length);
+          }
+        } catch (error) {
+          console.error("Failed to fetch accessibility features:", error);
+          // If API fails, use mock data as fallback
+          const mockAccessibilityFeatures = [
+            { id: 1, feature_type: 'elevator', description: 'Elevator access to all levels', entrance: { latitude: 33.9376, longitude: -84.5222, building_name: 'West Deck' } },
+            { id: 2, feature_type: 'ramp', description: 'Wheelchair accessible entrance ramp', entrance: { latitude: 33.9394, longitude: -84.5205, building_name: 'Library' } },
+          ];
+          
+          setAccessibilityFeatures(mockAccessibilityFeatures);
+        }
+      };
+      
+      // Fetch traffic data
+      const fetchTrafficData = async () => {
+        if (userPreferences.avoidHighTraffic) {
+          try {
+            const response = await fetch(`${API_BASE_URL || ''}/api/traffic`);
+            const data = await response.json();
+            
+            if (data.traffic_data) {
+              console.log('Loaded traffic data from API:', data.traffic_data.length);
+              // Store traffic data if needed for routing
+            }
+          } catch (error) {
+            console.error("Failed to fetch traffic data:", error);
+          }
+        }
+      };
+      
+      // Execute all fetch operations
+      await Promise.all([
+        fetchBuildings(),
+        fetchObstacles(),
+        fetchAccessibilityFeatures(),
+        fetchTrafficData()
+      ]);
     };
     
-    // Fetch accessibility features
-    const fetchAccessibilityFeatures = async () => {
-      try {
-        const response = await fetch('/api/accessibility_features');
-        const data = await response.json();
-        
-        if (data.features) {
-          setAccessibilityFeatures(data.features);
-        }
-      } catch (error) {
-        console.error("Failed to fetch accessibility features:", error);
-        // If API fails, use mock data as fallback
-        const mockAccessibilityFeatures = [
-          { id: 1, name: 'West Deck Elevator', latitude: 33.9376, longitude: -84.5222, feature_type: 'elevator', description: 'Elevator access to all levels' },
-          { id: 2, name: 'Library Ramp', latitude: 33.9394, longitude: -84.5205, feature_type: 'ramp', description: 'Wheelchair accessible entrance ramp' },
-        ];
-        
-        setAccessibilityFeatures(mockAccessibilityFeatures);
-      }
-    };
-    
-    fetchObstacles();
-    fetchAccessibilityFeatures();
-  }, []);
+    fetchData();
+  }, [API_BASE_URL, userPreferences.avoidHighTraffic]);
 
   // Check for Google Maps API errors
   useEffect(() => {
@@ -493,13 +624,38 @@ const InteractiveMap = () => {
     let start = campusLocations.find(loc => loc.name === startPoint);
     let end = campusLocations.find(loc => loc.name === endPoint);
     
+    // Check if start or end points are OSRM POIs
+    if (!start) {
+      const osrmStart = mariettaPoiData.find(poi => poi.name === startPoint);
+      if (osrmStart) {
+        start = {
+          name: osrmStart.name,
+          lat: osrmStart.coordinates[0],
+          lng: osrmStart.coordinates[1],
+          type: 'poi'
+        };
+      }
+    }
+    
+    if (!end) {
+      const osrmEnd = mariettaPoiData.find(poi => poi.name === endPoint);
+      if (osrmEnd) {
+        end = {
+          name: osrmEnd.name,
+          lat: osrmEnd.coordinates[0],
+          lng: osrmEnd.coordinates[1],
+          type: 'poi'
+        };
+      }
+    }
+    
     if (!start || !end) {
       alert('Please select valid start and end points');
       return;
     }
     
     // If in wheelchair mode, use accessible entrances for routing
-    if (wheelchairMode) {
+    if (wheelchairMode || userPreferences.mobilityType === 'wheelchair') {
       // For start point - use accessible entrance if available
       if (start.type === 'building' && start.entrances) {
         const accessibleEntrance = start.entrances.find(e => e.accessible);
@@ -575,11 +731,33 @@ const InteractiveMap = () => {
   // Function to fetch route from specified provider
   const fetchRoute = async (start, end, provider) => {
     try {
-      // Call the backend API with wheelchair parameter and provider
-      const response = await fetch(
-        `/api/get_route?start=${start.lat},${start.lng}&end=${end.lat},${end.lng}&wheelchair=${wheelchairMode}&provider=${provider}`
-      );
+      // Build query parameters
+      const params = new URLSearchParams({
+        start: `${start.lat},${start.lng}`,
+        end: `${end.lat},${end.lng}`,
+        provider: provider,
+        wheelchair: (wheelchairMode || userPreferences.mobilityType === 'wheelchair').toString(),
+      });
       
+      // Add additional routing preferences from user preferences
+      if (userPreferences.avoidStairs) {
+        params.append('avoid_stairs', 'true');
+      }
+      
+      if (userPreferences.preferElevators) {
+        params.append('prefer_elevators', 'true');
+      }
+      
+      if (userPreferences.preferSmoothPavement) {
+        params.append('prefer_smooth_pavement', 'true');
+      }
+      
+      if (userPreferences.avoidHighTraffic) {
+        params.append('avoid_traffic', 'true');
+      }
+      
+      // Call the backend API with routing parameters
+      const response = await fetch(`${API_BASE_URL || ''}/api/route?${params.toString()}`);
       const data = await response.json();
       
       if (data.error) {
@@ -587,16 +765,26 @@ const InteractiveMap = () => {
         throw new Error(data.error);
       }
       
-      // Format the route data from the API (array of [lat, lng] tuples)
-      // to the format expected by Google Maps (array of {lat, lng} objects)
+      // Format the route data from the API
       if (Array.isArray(data.route)) {
+        // Convert route points to Google Maps format
         const formattedRoute = data.route.map(point => {
-          // Handle both formats: [lat, lng] array or {error: "..."} object
+          // Handle both formats: [lat, lng] array or {lat, lng} object
           if (Array.isArray(point)) {
             return { lat: point[0], lng: point[1] };
+          } else if (point && typeof point === 'object' && 'lat' in point && 'lng' in point) {
+            return point;
           }
           return null;
         }).filter(point => point !== null);
+        
+        // Display route information
+        if (data.distance && data.duration) {
+          console.log(`Route distance: ${(data.distance/1000).toFixed(2)} km`);
+          console.log(`Estimated duration: ${Math.round(data.duration/60)} minutes`);
+          
+          // You could also display this information in the UI
+        }
         
         // Update the appropriate route state based on provider
         if (provider === 'google') {
@@ -609,6 +797,9 @@ const InteractiveMap = () => {
           if (!showDualRoutes) {
             setRoute(formattedRoute);
           }
+        } else {
+          // 'api' provider or any other
+          setRoute(formattedRoute);
         }
         
         return formattedRoute;
@@ -743,9 +934,18 @@ const InteractiveMap = () => {
                 className="route-select"
               >
                 <option value="">Starting Point</option>
-                {campusLocations.map(location => (
-                  <option key={location.id} value={location.name}>{location.name}</option>
-                ))}
+                <optgroup label="Campus Locations">
+                  {campusLocations.map(location => (
+                    <option key={`loc-${location.id}`} value={location.name}>{location.name}</option>
+                  ))}
+                </optgroup>
+                {(routeProvider === 'osrm' || routeProvider === 'dual') && (
+                  <optgroup label="OSRM Points of Interest">
+                    {mariettaPoiData.map((poi, index) => (
+                      <option key={`poi-start-${index}`} value={poi.name}>{poi.name}</option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
               
               <select 
@@ -754,9 +954,18 @@ const InteractiveMap = () => {
                 className="route-select"
               >
                 <option value="">Destination</option>
-                {campusLocations.map(location => (
-                  <option key={location.id} value={location.name}>{location.name}</option>
-                ))}
+                <optgroup label="Campus Locations">
+                  {campusLocations.map(location => (
+                    <option key={`loc-${location.id}`} value={location.name}>{location.name}</option>
+                  ))}
+                </optgroup>
+                {(routeProvider === 'osrm' || routeProvider === 'dual') && (
+                  <optgroup label="OSRM Points of Interest">
+                    {mariettaPoiData.map((poi, index) => (
+                      <option key={`poi-end-${index}`} value={poi.name}>{poi.name}</option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </div>
             
@@ -1036,25 +1245,47 @@ const InteractiveMap = () => {
                 setGoogleMapsError(true);
               }}
             >
-              {/* Add Legend for Dual Routes */}
-              {routeProvider === 'dual' && (googleRoute.length > 0 || osrmRoute.length > 0) && (
+              {/* Add Legend for Routes and POIs */}
+              {(routeProvider === 'dual' || routeProvider === 'osrm') && (
                 <div className="route-legend" style={{
                   position: 'absolute', 
                   top: '10px', 
                   right: '10px', 
                   zIndex: 100,
+                  background: 'rgba(0,0,0,0.7)',
                   color: 'white',
                   padding: '8px',
                   borderRadius: '4px'
                 }}>
-                  <div className="legend-item">
-                    <div className="legend-color google-color"></div>
-                    <span>Google (Building-to-Building)</span>
-                  </div>
-                  <div className="legend-item">
-                    <div className="legend-color osrm-color"></div>
-                    <span>OSRM (Accessible Paths)</span>
-                  </div>
+                  {/* Show route legend for dual routes */}
+                  {routeProvider === 'dual' && (googleRoute.length > 0 || osrmRoute.length > 0) && (
+                    <>
+                      <div className="legend-item">
+                        <div className="legend-color google-color"></div>
+                        <span>Google (Building-to-Building)</span>
+                      </div>
+                      <div className="legend-item">
+                        <div className="legend-color osrm-color"></div>
+                        <span>OSRM (Accessible Paths)</span>
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Show OSRM POI legend when OSRM layer is active */}
+                  {(routeProvider === 'osrm' || routeProvider === 'dual') && (
+                    <div className="legend-item">
+                      <div className="legend-icon" style={{
+                        display: 'inline-block',
+                        width: '12px',
+                        height: '12px',
+                        background: '#4CAF50',
+                        borderRadius: '50%',
+                        border: '1px solid white',
+                        marginRight: '5px'
+                      }}></div>
+                      <span>OSRM Points of Interest ({mariettaPoiData.length})</span>
+                    </div>
+                  )}
                 </div>
               )}
               <GoogleMap
@@ -1250,6 +1481,14 @@ const InteractiveMap = () => {
                         </div>
                       )}
                       
+                      {/* OSRM POI info */}
+                      {selectedLocation.isOsrmPoi && (
+                        <div className="poi-info">
+                          <p>OSRM Point of Interest</p>
+                          <p className="coordinates">Coordinates: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}</p>
+                        </div>
+                      )}
+                      
                       <div className="info-actions">
                         <button onClick={() => handleStartPointSelect(
                           // If in wheelchair mode and this is a building with accessible entrances,
@@ -1285,6 +1524,32 @@ const InteractiveMap = () => {
                 )}
                 
                 {/* Route Polylines */}
+                {/* OSRM Points of Interest - only show when OSRM layer is active */}
+                {(routeProvider === 'osrm' || routeProvider === 'dual') && (
+                  mariettaPoiData.map((poi, index) => (
+                    <Marker
+                      key={`poi-${index}`}
+                      position={{ lat: poi.coordinates[0], lng: poi.coordinates[1] }}
+                      onClick={() => handleMarkerClick({
+                        name: poi.name,
+                        lat: poi.coordinates[0],
+                        lng: poi.coordinates[1],
+                        type: 'poi',
+                        isOsrmPoi: true
+                      })}
+                      icon={{
+                        path: "M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z",
+                        fillColor: "#4CAF50", // Green to match OSRM route color
+                        fillOpacity: 1,
+                        strokeWeight: 1,
+                        strokeColor: "#ffffff",
+                        scale: 1.2,
+                        anchor: { x: 12, y: 22 }
+                      }}
+                    />
+                  ))
+                )}
+                
                 {/* When in dual mode, show both routes */}
                 {routeProvider === 'dual' && (
                   <>

@@ -1,0 +1,285 @@
+/* AboutPage.css */
+
+.about-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--ksu-black);
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.about-header {
+  background-color: var(--ksu-black);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-header h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: var(--ksu-gold);
+}
+
+.about-description {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.primary-button, .secondary-button {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.primary-button {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  border: 2px solid var(--ksu-gold);
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: var(--ksu-gold);
+  border: 2px solid var(--ksu-gold);
+}
+
+.primary-button:hover {
+  background-color: var(--ksu-gold-dark);
+  transform: translateY(-2px);
+}
+
+.secondary-button:hover {
+  background-color: rgba(255, 198, 41, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Section Styling */
+section {
+  margin-bottom: 60px;
+}
+
+section h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: var(--ksu-black);
+  position: relative;
+  padding-bottom: 10px;
+}
+
+section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--ksu-gold);
+}
+
+.mission-section p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  max-width: 900px;
+}
+
+/* Team Section */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.profile-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.profile-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.profile-card:hover .profile-image img {
+  transform: scale(1.05);
+}
+
+.profile-info {
+  padding: 20px;
+}
+
+.profile-info h3 {
+  font-size: 1.4rem;
+  margin: 0 0 5px 0;
+  color: var(--ksu-black);
+}
+
+.profile-info .role {
+  color: var(--ksu-gold);
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.profile-info .bio {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.skill-tag {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Technology Stack Section */
+.tech-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.tech-item {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.tech-item h3 {
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--ksu-gold);
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.tech-item ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.tech-item li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-header {
+    padding: 40px 0;
+  }
+  
+  .about-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .about-description {
+    font-size: 1rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .primary-button, .secondary-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  section h2 {
+    font-size: 1.7rem;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* High Contrast Mode */
+.high-contrast .about-page {
+  background-color: var(--ksu-black);
+  color: white;
+}
+
+.high-contrast .about-header {
+  background-color: black;
+  border-bottom: 2px solid var(--ksu-gold);
+}
+
+.high-contrast .profile-card {
+  background-color: #111;
+  border: 1px solid var(--ksu-gold);
+}
+
+.high-contrast .profile-info h3 {
+  color: var(--ksu-gold);
+}
+
+.high-contrast .profile-info .bio,
+.high-contrast section h2 {
+  color: white;
+}
+
+.high-contrast .skill-tag {
+  background-color: #333;
+  color: white;
+  border: 1px solid var(--ksu-gold);
+}
+
+.high-contrast .tech-item {
+  background-color: #111;
+  border: 1px solid var(--ksu-gold);
+}
+
+.high-contrast .tech-item li {
+  color: white;
+}

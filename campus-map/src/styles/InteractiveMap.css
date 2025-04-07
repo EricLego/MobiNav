@@ -1003,3 +1003,43 @@
   background-color: var(--ksu-gold);
   color: var(--ksu-black);
 }
+
+/* OSRM Points of Interest styling */
+.poi-info {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-left: 3px solid #4CAF50;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
+.osrm-poi-marker {
+  background-color: #4CAF50;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+/* Styling for optgroups in route selects */
+.route-select optgroup {
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 4px;
+}
+
+.route-select option {
+  padding: 6px;
+}
+
+.legend-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: #4CAF50;
+  border-radius: 50%;
+  border: 1px solid white;
+  margin-right: 5px;
+}

@@ -1,16 +1,29 @@
 /* App.css - Global styles and accessibility settings */
 
 /* Base app styles */
-.app, .page-container {
+.app {
   width: 100%;
   min-height: 100vh;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.page-container main {
-  padding: var(--space-lg);
-  max-width: 1400px;
-  margin: 0 auto;
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.map-page-container {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Large Text Mode */
