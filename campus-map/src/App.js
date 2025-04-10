@@ -5,6 +5,7 @@ import InteractiveMap from './components/InteractiveMap';
 import ObstacleReports from './components/ObstacleReports';
 import RoutePlanner from './components/RoutePlanner';
 import './App.css';
+import MapEditor from './components/MapEditor';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -58,6 +59,7 @@ function App() {
             <Route path="/route" element={<InteractiveMap />} />
             <Route path="/report" element={<ObstacleReports />} />
             <Route path="*" element={<HomePage />} />
+            <Route path="/admin" element={<MapEditor />} />
           </Routes>
         </div>
       </Router>

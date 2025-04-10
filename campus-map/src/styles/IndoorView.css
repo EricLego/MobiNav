@@ -1,0 +1,149 @@
+/* Indoor View Styles */
+.indoor-view-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--ksu-white);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .indoor-view-header {
+    padding: var(--space-md);
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--ksu-gold);
+  }
+  
+  .indoor-view-header h3 {
+    margin: 0;
+    color: var(--ksu-gold);
+    font-size: 1.2rem;
+  }
+  
+  .floor-selector {
+    display: flex;
+    gap: var(--space-xs);
+  }
+  
+  .floor-selector button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--ksu-gray-light);
+    background-color: var(--ksu-gray-light);
+    color: var(--ksu-black);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+  }
+  
+  .floor-selector button.active {
+    background-color: var(--ksu-gold);
+    border-color: var(--ksu-gold);
+  }
+  
+  .close-button {
+    background-color: transparent;
+    color: var(--ksu-white);
+    border: none;
+    font-size: 1.5rem;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+  }
+  
+  .close-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .indoor-map-container {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--ksu-gray-light);
+  }
+  
+  .indoor-map-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  .indoor-view-legend {
+    padding: var(--space-md);
+    background-color: var(--ksu-white);
+    border-top: 1px solid var(--ksu-gray-light);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.9rem;
+  }
+  
+  .legend-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+  }
+  
+  .legend-icon.elevator {
+    background-color: var(--info);
+  }
+  
+  .legend-icon.stairs {
+    background-color: var(--warning);
+  }
+  
+  .legend-icon.restroom {
+    background-color: var(--success);
+  }
+  
+  .legend-icon.obstacle {
+    background-color: var(--danger);
+  }
+  
+  /* High Contrast Mode */
+  .high-contrast .indoor-view-overlay {
+    background-color: var(--ksu-black);
+    border: 2px solid var(--ksu-gold);
+  }
+  
+  .high-contrast .indoor-view-header {
+    border-bottom: 2px solid var(--ksu-gold);
+  }
+  
+  .high-contrast .floor-selector button {
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    border-color: var(--ksu-gold);
+  }
+  
+  .high-contrast .indoor-map-container {
+    background-color: var(--ksu-black);
+  }
+  
+  .high-contrast .indoor-view-legend {
+    background-color: var(--ksu-black);
+    border-top: 1px solid var(--ksu-gold);
+    color: var(--ksu-white);
+  }

@@ -1,0 +1,154 @@
+/* MapEditor.css */
+.map-editor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .editor-header h2 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+  
+  .edit-controls {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .edit-controls button {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .edit-controls button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .edit-controls button.active {
+    background-color: #FFC629;
+    color: #000;
+    border-color: #FFC629;
+  }
+  
+  .editor-main {
+    display: flex;
+    gap: 20px;
+    height: 600px;
+  }
+  
+  .map-container {
+    flex: 2;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .editor-form {
+    flex: 1;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+  }
+  
+  .editor-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .form-group textarea {
+    min-height: 100px;
+  }
+  
+  .form-group.checkbox {
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-group.checkbox input {
+    margin-right: 10px;
+  }
+  
+  .form-group.checkbox label {
+    margin-bottom: 0;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .save-btn {
+    padding: 10px 20px;
+    background-color: #FFC629;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .cancel-btn {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .editor-main {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .map-container {
+      height: 400px;
+    }
+    
+    .editor-form {
+      width: 100%;
+    }
+  }

@@ -5,6 +5,7 @@ import BuildingAutocomplete from './BuildingAutocomplete';
 import '../styles/InteractiveMap.css';
 import RoutePointDisplay from './RoutePointDisplay';
 import RoutePlanner from './RoutePlanner';
+import IndoorViewControls from './IndoorView';
 
 // Define libraries as a constant array to avoid unnecessary reloads
 const libraries = ['places'];
@@ -23,6 +24,12 @@ const InteractiveMap = () => {
   const [obstacles, setObstacles] = useState([]);
   const [wheelchairMode, setWheelchairMode] = useState(false);
   const [googleMapsError, setGoogleMapsError] = useState(false);
+  //Indoor View State Variables
+  const [indoorViewActive, setIndoorViewActive] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState(null);
+  const [currentFloor, setCurrentFloor] = useState(1);
+  const [floorOptions, setFloorOptions] = useState([]);
+  const [indoorMapImage, setIndoorMapImage] = useState(null);
   
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
   
@@ -35,8 +42,18 @@ const InteractiveMap = () => {
     lat: 33.9386, // KSU Marietta Campus (center point of the polygon)
     lng: -84.5187,
   };
-  
 
+  // Fetch building data from API or local JSON
+  const fetchBuildingData = async (buildingId) => {
+    try {
+      // In production, this would be an API call
+      const response = await fetch(`/api/buildings/${buildingId}`);
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching building data:", error);
+      return null;
+    }
+  };
 
   // Mock obstacles data - this would come from an API in production
   useEffect(() => {
@@ -282,13 +299,58 @@ const InteractiveMap = () => {
     }
   }
 
+  const handleIndoorViewSelect = async (place) => {
+    if (place) {
+      console.log("Indoor view selected:", place);
+      
+      // Get Building Data from API
+      const buildingData = await fetchBuildingData(place.id || 'building1');
+      
+      if (buildingData) {
+        // Retrieve Building Viewpoint and Floor Options
+        setSelectedBuilding(buildingData);
+        setFloorOptions(buildingData.floors || []);
+        setCurrentFloor(buildingData.floors[0] || "1");
+        
+        // Load Indoor View
+        setIndoorMapImage(`/indoor-maps/${buildingData.id}/${currentFloor}.png`);
+        setIndoorViewActive(true);
+        
+        // Center the map on the building with the appropriate zoom level
+        if (map && buildingData.viewpoint) {
+          map.setCenter(buildingData.viewpoint.center);
+          map.setZoom(buildingData.viewpoint.zoom || 20);
+          
+          // Optional: adjust tilt and heading if supported
+          if (buildingData.viewpoint.tilt) {
+            map.setTilt(buildingData.viewpoint.tilt);
+          }
+          if (buildingData.viewpoint.heading) {
+            map.setHeading(buildingData.viewpoint.heading);
+          }
+        }
+      } else {
+        alert("Indoor view not available for this building");
+      }
+    }
+  };
+
+
   const { accessibilitySettings } = useContext(AccessibilityContext);
   
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
       <div className="interactive-map">
         <div className="map-container-wrapper">
-          <div className="map-container">
+          { indoorViewActive && selectedBuilding ? (
+            <IndoorViewControls
+              building={selectedBuilding}
+              floor={currentFloor}
+              onFloorChange={setCurrentFloor}
+              onClose={() => setIndoorViewActive(false)}
+            />
+          ) : (
+            <div className="map-container">
             {googleMapsError ? (
               <div className="map-placeholder">
                 <div className="map-placeholder-content">
@@ -343,6 +405,9 @@ const InteractiveMap = () => {
                           <button onClick={() => handleStartPointPlaceSelect(selectedLocation)}>
                             Set as Start
                           </button>
+                          <button onClick={() => handleIndoorViewSelect(selectedLocation)}>
+                            🔍
+                          </button>
                           <button onClick={() => handleEndPointPlaceSelect(selectedLocation)}>
                             Set as Destination
                           </button>
@@ -354,8 +419,10 @@ const InteractiveMap = () => {
               </LoadScript>
             )}
           </div>
+          )}
 
-          <RoutePlanner 
+          {!indoorViewActive && (
+            <RoutePlanner 
             startPoint={startPoint}
             setStartPoint={setStartPoint}
             endPoint={endPoint}
@@ -374,6 +441,7 @@ const InteractiveMap = () => {
               west: -84.524504
             }}
           />
+          )}
 
         </div>
       
