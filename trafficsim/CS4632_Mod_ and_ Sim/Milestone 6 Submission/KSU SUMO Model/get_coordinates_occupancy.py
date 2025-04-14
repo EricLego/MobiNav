@@ -10,7 +10,7 @@ DB_PASSWORD = "sumouser"  # Change to your password
 DB_PORT = "5432"  # Default PostgreSQL port
 
 def get_current_day_type():
-    return "MWF_Peak"
+    return ("MWF")
 
 def connect_and_fetch():
     try:
