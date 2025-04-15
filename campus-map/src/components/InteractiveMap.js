@@ -1651,8 +1651,8 @@ const InteractiveMap = () => {
                   />
                 )}
                 
-                {/* Campus Boundary Polygon */}
-                <Polygon
+                {/* Campus Boundary Polygon - now invisible */}
+                {/* <Polygon
                   paths={campusBoundary}
                   options={{
                     strokeColor: '#FF0000',
@@ -1661,7 +1661,7 @@ const InteractiveMap = () => {
                     fillColor: '#FF0000',
                     fillOpacity: 0.1
                   }}
-                />
+                /> */}
               </GoogleMap>
             </LoadScript>
           )}

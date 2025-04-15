@@ -10,7 +10,7 @@ const AboutPage = () => {
       role: 'Front-end Developer',
       bio: 'Specializes in React development and responsive UI design.',
       skills: ['React', 'JavaScript', 'CSS', 'UI/UX Design'],
-      image: '/team/profile-placeholder.jpg' // Will be replaced with actual image
+      image: '/team/profile-placeholder.jpg'
     },
     {
       id: 2,
@@ -18,7 +18,7 @@ const AboutPage = () => {
       role: 'Full-stack Developer',
       bio: 'Experienced in both frontend and backend development with a focus on system architecture.',
       skills: ['React', 'Node.js', 'Python', 'Database Design'],
-      image: '/team/profile-placeholder.jpg' // Will be replaced with actual image
+      image: '/team/profile-placeholder.jpg'
     },
     {
       id: 3,
@@ -26,7 +26,7 @@ const AboutPage = () => {
       role: 'Back-end Developer',
       bio: 'Specializes in API development and database optimization.',
       skills: ['Python', 'Flask', 'SQL', 'API Design'],
-      image: '/team/profile-placeholder.jpg' // Will be replaced with actual image
+      image: '/team/profile-placeholder.jpg'
     }
   ];
 
@@ -49,7 +49,9 @@ const AboutPage = () => {
         <section className="mission-section">
           <h2>Our Mission</h2>
           <p>
-            We believe that campus navigation should be accessible to everyone. MobiNav is built to provide customized routing that accounts for individual mobility needs, helping users find the most accessible paths across campus.
+            We believe that campus navigation should be accessible to everyone. MobiNav is built to provide 
+            customized routing that accounts for individual mobility needs, helping users find the most 
+            accessible paths across campus.
           </p>
         </section>
 

@@ -278,7 +278,6 @@ const ObstacleReports = () => {
 
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
-      <Header />
       <div className="obstacle-reports">
         <div className="report-controls">
           <div className="filter-buttons">
