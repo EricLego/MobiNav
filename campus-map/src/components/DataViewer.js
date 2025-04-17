@@ -103,7 +103,7 @@ const DataViewer = () => {
             <p className={`severity severity-${item.severity_level}`}>
               Severity: {['Low', 'Medium', 'High'][item.severity_level - 1]}
             </p>
-            <p className={`status status-${item.status.toLowerCase().replace(/\s+/g, '-')}`}>
+            <p className={`status ${item.status ? `status-${item.status.toLowerCase().replace(/\s+/g, '-')}` : ''}`}>
               Status: {item.status}
             </p>
             <p>Reported: {item.reported_at}</p>

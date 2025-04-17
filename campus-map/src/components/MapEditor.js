@@ -441,7 +441,7 @@ function MapEditor() {
                 key={obstacle.obstacle_id}
                 position={{ lat: obstacle.latitude, lng: obstacle.longitude }}
                 icon={{
-                  url: '/icons/warning.png',
+                  url: '/icons/obstacle.png',
                   scaledSize: new window.google.maps.Size(24, 24)
                 }}
                 onClick={() => {
