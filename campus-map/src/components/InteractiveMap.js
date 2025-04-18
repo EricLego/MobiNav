@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
 import { AccessibilityContext } from '../App';
-import BuildingAutocomplete from './BuildingAutocomplete';
 import '../styles/InteractiveMap.css';
+import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
 import RoutePointDisplay from './RoutePointDisplay';
 import RoutePlanner from './RoutePlanner';
 import IndoorViewControls from './IndoorView';
@@ -13,8 +13,8 @@ const libraries = ['places'];
 const InteractiveMap = () => {
   const [map, setMap] = useState(null);
   const mapRef = useRef(null);
-  const searchRef = useRef(null);
-  const routeRef = useRef(null);
+  // const searchRef = useRef(null);
+  // const routeRef = useRef(null);
   const [campusBounds, setCampusBounds] = useState(null);
   const [mapOptions, setMapOptions] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -28,10 +28,9 @@ const InteractiveMap = () => {
   const [indoorViewActive, setIndoorViewActive] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [currentFloor, setCurrentFloor] = useState(1);
-  const [floorOptions, setFloorOptions] = useState([]);
-  const [indoorMapImage, setIndoorMapImage] = useState(null);
   
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
+  const isMobile = useIsMobile();
   
   const mapContainerStyle = {
     width: '100%',

@@ -316,3 +316,84 @@
 .high-contrast .dropdown-content {
   border: 2px solid var(--ksu-gold);
 }
+
+/* Example additions to Header.css */
+
+.mobile-search-wrapper {
+  flex-grow: 1; /* Allow search bar to take up space */
+  margin: 0 var(--space-md); /* Add some spacing */
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure header container uses flex */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Adjust as needed */
+  width: 100%;
+  height: 100%;
+}
+
+.mobile-header {
+  position: sticky; /* Makes the header stick to the top of its container */
+  top: 0;          /* Positions it at the very top */
+  left: 0;         /* Ensure it aligns to the left */
+  width: 100%;     /* Make sure it spans the full viewport width */
+  z-index: 100;    /* Keep it above other content */
+
+}
+
+/* Styles for mobile header layout */
+.mobile-header .header-container {
+  /* Example: space-between might work well */
+  justify-content: space-between;
+}
+
+/* Hide desktop nav by default on mobile */
+.mobile-header .main-nav {
+  display: none; /* Hide nav initially */
+  position: absolute;
+  top: 100%; /* Position below header */
+  left: 0;
+  right: 0;
+  background-color: var(--ksu-black); /* Or your desired background */
+  box-shadow: var(--shadow-md);
+  z-index: 100; /* Ensure it's on top */
+}
+
+/* Show mobile nav when open */
+.mobile-header .main-nav.open {
+  display: block;
+}
+
+.mobile-header .nav-links-container ul {
+  flex-direction: column;
+  padding: var(--space-md) 0;
+}
+
+.mobile-header .nav-links-container li {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid var(--ksu-gray); /* Separator */
+}
+.mobile-header .nav-links-container li:last-child {
+  border-bottom: none;
+}
+
+.mobile-header .nav-links-container a,
+.mobile-header .dropdown-button {
+  display: block;
+  padding: var(--space-lg);
+  color: var(--ksu-white); /* Adjust color for mobile menu */
+}
+
+.mobile-header .login-button {
+    margin: var(--space-md);
+    text-align: center;
+}
+
+/* Hide mobile menu button on desktop */
+.desktop-header .mobile-menu-button {
+  display: none;
+}

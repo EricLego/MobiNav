@@ -1,0 +1,91 @@
+/* src/styles/SearchBar.css */
+
+.search-bar-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Adjust as needed */
+  z-index: 10; /* Ensure it's above map elements */
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: var(--ksu-white);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden; /* Contain buttons */
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: transparent;
+}
+
+.clear-button,
+.provider-toggle-button {
+  background: none;
+  border: none;
+  padding: 0 var(--space-sm);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--ksu-gray);
+  align-self: stretch; /* Make buttons fill height */
+  display: flex;
+  align-items: center;
+}
+.clear-button:hover,
+.provider-toggle-button:hover {
+  color: var(--ksu-black);
+}
+
+.provider-toggle-button {
+    border-left: 1px solid var(--ksu-gray-light); /* Separator */
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 4px); /* Position below input */
+  left: 0;
+  right: 0;
+  background-color: var(--ksu-white);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 9; /* Below input but above map */
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  border-bottom: 1px solid var(--ksu-gray-light);
+}
+
+.search-results li:last-child {
+  border-bottom: none;
+}
+
+.search-results li:hover {
+  background-color: var(--ksu-gray-light);
+}
+
+.loading-indicator,
+.no-results {
+  padding: var(--space-sm) var(--space-md);
+  color: var(--ksu-gray-dark);
+  font-style: italic;
+}

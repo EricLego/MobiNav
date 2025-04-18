@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import InteractiveMap from './InteractiveMap';
+import GoogleMapCore from '../mobile/components/GoogleMapCore';
 import ObstacleReports from './ObstacleReports';
 import HowItWorks from './HowItWorks';
 import '../styles/HomePage.css';
+import useIsMobile from '../hooks/useIsMobile';
 
 const HomePage = () => {
+  const isMobile = useIsMobile();
+    
   return (
     <div className="page-wrapper">
       <Header />
@@ -31,11 +35,18 @@ const HomePage = () => {
       
       {/* Interactive Map Section */}
       <section className="map-section">
-        <InteractiveMap />
+        {isMobile ? (
+          <GoogleMapCore>
+            
+          </GoogleMapCore> // Mobile version of the map
+        ) : (
+          <InteractiveMap />
+        )}
       </section>
       
-      {/* Recent Obstacle Reports */}
+      {/* Obstacle Reports Section */}
       <section className="obstacles-section">
+        
         <h2>Recent Obstacle Reports</h2>
         <ObstacleReports />
       </section>
