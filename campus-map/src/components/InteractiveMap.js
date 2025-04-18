@@ -6,6 +6,7 @@ import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
 import RoutePointDisplay from './RoutePointDisplay';
 import RoutePlanner from './RoutePlanner';
 import IndoorViewControls from './IndoorView';
+import useIsMobile from '../hooks/useIsMobile';
 
 // Define libraries as a constant array to avoid unnecessary reloads
 const libraries = ['places'];
@@ -13,8 +14,8 @@ const libraries = ['places'];
 const InteractiveMap = () => {
   const [map, setMap] = useState(null);
   const mapRef = useRef(null);
-  // const searchRef = useRef(null);
-  // const routeRef = useRef(null);
+  const searchRef = useRef(null);
+  const routeRef = useRef(null);
   const [campusBounds, setCampusBounds] = useState(null);
   const [mapOptions, setMapOptions] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -308,11 +309,11 @@ const InteractiveMap = () => {
       if (buildingData) {
         // Retrieve Building Viewpoint and Floor Options
         setSelectedBuilding(buildingData);
-        setFloorOptions(buildingData.floors || []);
+        // setFloorOptions(buildingData.floors || []);
         setCurrentFloor(buildingData.floors[0] || "1");
         
         // Load Indoor View
-        setIndoorMapImage(`/indoor-maps/${buildingData.id}/${currentFloor}.png`);
+        // setIndoorMapImage(`/indoor-maps/${buildingData.id}/${currentFloor}.png`);
         setIndoorViewActive(true);
         
         // Center the map on the building with the appropriate zoom level
