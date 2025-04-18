@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { fetchBuildings, fetchObstacles, fetchEntrances, fetchPaths } from '../mobile/services/mapService';
 import '../styles/DataViewer.css';
 
 const DataViewer = () => {
@@ -15,10 +15,29 @@ const DataViewer = () => {
   const fetchData = async (type) => {
     setLoading(true);
     setError(null);
+    setData([]); // Clear previous data
     
     try {
-      const response = await axios.get(`/api/${type}s`);
-      setData(response.data);
+      let responseData;
+      switch (type) {
+        case 'building':
+          responseData = await fetchBuildings();
+          break;
+        case 'entrance':
+          responseData = await fetchEntrances();
+          break;
+        case 'path':
+          responseData = await fetchPaths();
+          break;
+        case 'obstacle':
+          responseData = await fetchObstacles();
+          break;
+        default:
+          throw new Error(`Invalid type: ${type}`);
+      }
+      if(!typeof responseData.data === 'undefined'){
+        setData(responseData.data);
+      }
     } catch (err) {
       console.error(`Error fetching ${type} data:`, err);
       setError(`Failed to load ${type} data. ${err.message}`);

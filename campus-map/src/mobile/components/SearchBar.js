@@ -1,7 +1,9 @@
 // src/components/SearchBar.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { SearchContext } from '../contexts/SearchContext';
+import { MapContext } from '../contexts/MapContext';
 import useSearch from '../hooks/useSearch'; // Import the hook to trigger search logic
+import { fetchPlaceDetails } from '../services/mapService';
 import '../styles/SearchBar.css'; // Create this CSS file
 
 const SearchBar = () => {
@@ -10,13 +12,15 @@ const SearchBar = () => {
     localResults,
     googleResults,
     isLoadingSearch,
-    selectedSearchResult,
     searchProvider,
+    searchError,
     setSearchQuery,
     clearSearch,
     setSelectedSearchResult,
     setSearchProvider,
+    setSearchError,
   } = useContext(SearchContext);
+  const { mapRef } = useContext(MapContext);
 
   // Initialize the useSearch hook to handle the search logic execution
   useSearch();
@@ -24,6 +28,7 @@ const SearchBar = () => {
   const resultsContainerRef = useRef(null);
   const inputRef = useRef(null);
   const [isResultsVisible, setIsResultsVisible] = useState(false);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false); // <-- Declare state here
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -34,12 +39,53 @@ const SearchBar = () => {
     }
   };
 
-  const handleResultClick = (result) => {
-    console.log("Selected:", result);
-    setSelectedSearchResult(result);
-    setSearchQuery(result.name); // Update input field to show selected name
-    setIsResultsVisible(false); // Hide results after selection
+  const handleResultClick = async (result) => {
+    setIsResultsVisible(false); // Hide results
+    setSearchQuery(result.name); // Update input field visually
+
+    // --- Clear previous selection immediately for better UX ---
+    // This prevents the map trying to render the old selection while details load
+    setSelectedSearchResult(null);
+    // ---------------------------------------------------------
+
+    if (result.type === 'google') {
+      // It's a Google prediction, fetch full details
+      if (!result.id) {
+        console.error("Google prediction missing place_id:", result);
+        setSearchError("Selected result is invalid.");
+        return;
+      }
+      if (!mapRef.current) {
+          console.error("Map instance not available for fetching place details.");
+          setSearchError("Map not ready for details lookup.");
+          return;
+      }
+
+      setIsLoadingDetails(true);
+      setSearchError(null); // Clear previous errors
+      try {
+        // --- Fetch details ---
+        const placeDetails = await fetchPlaceDetails(result.id, mapRef.current);
+        console.log("Fetched Place Details:", placeDetails);
+
+        // --- Update context ONLY AFTER details are fetched ---
+        setSelectedSearchResult(placeDetails);
+
+      } catch (error) {
+        console.error("Failed to fetch place details:", error);
+        setSearchError(error.message || "Failed to get location details.");
+        setSelectedSearchResult(null); // Ensure selection is cleared on error
+      } finally {
+        setIsLoadingDetails(false);
+      }
+    } else {
+      // It's a local result (building), update context directly
+      console.log("Selected Local Result:", result);
+      setSearchError(null); // Clear any previous errors
+      setSelectedSearchResult(result); // Local results already have lat/lng
+    }
   };
+
 
   const handleClear = () => {
     clearSearch();
@@ -82,6 +128,8 @@ const SearchBar = () => {
           className="search-input"
           aria-label="Search locations"
         />
+        {/* Optional: Show details loading indicator */}
+        {isLoadingDetails && <span className="details-loading"> L </span>}
         {searchQuery && (
           <button onClick={handleClear} className="clear-button" aria-label="Clear search">×</button>
         )}
@@ -95,13 +143,14 @@ const SearchBar = () => {
           </button>
       </div>
 
-      {isResultsVisible && (searchQuery || isLoadingSearch || results.length > 0) && (
+      {isResultsVisible && (isLoadingSearch || results.length > 0 || searchError) && (
         <div className="search-results">
           {isLoadingSearch && <div className="loading-indicator">Searching...</div>}
-          {!isLoadingSearch && results.length === 0 && searchQuery && (
+          {searchError && <div className="search-error">Error: {searchError}</div>}
+          {!isLoadingSearch && !searchError && results.length === 0 && searchQuery && (
             <div className="no-results">No results found.</div>
           )}
-          {!isLoadingSearch && results.length > 0 && (
+          {!isLoadingSearch && !searchError && results.length > 0 && (
             <ul>
               {results.map((result) => (
                 <li key={result.id} onClick={() => handleResultClick(result)}>

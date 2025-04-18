@@ -47,10 +47,10 @@ const GoogleMapCore = ({
     );
     setMapOptions(prevOptions => ({
       streetViewControl: false,
-      fullscreenControl: true, // Keep fullscreen
+      fullscreenControl: false, // Remove fullscreen button
       mapTypeControl: true,
       mapTypeControlOptions: {
-        // position: window.google.maps.ControlPosition.BOTTOM_LEFT // Position requires google object
+        position: window.google.maps.ControlPosition.BOTTOM_LEFT // Position requires google object
       },
       zoomControl: true,
       mapId: 'bdd7d136cc4cd64c', // Your Map ID

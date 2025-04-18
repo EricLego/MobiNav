@@ -4,10 +4,11 @@ from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
-    username = db.Column(db.String(50), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50))
     password_hash = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime)
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(150), unique=True, nullable=False)
 
 class Building(db.Model):
     __tablename__ = 'building'
@@ -54,11 +55,32 @@ class Path(db.Model):
 class Obstacle(db.Model):
     __tablename__ = 'obstacle'
     obstacle_id = db.Column(db.Integer, primary_key=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.String(50), db.ForeignKey('users.username', ondelete='CASCADE'))
     building_id = db.Column(db.Integer, db.ForeignKey('building.building_id', ondelete='CASCADE'))
     path_id = db.Column(db.Integer, db.ForeignKey('path.path_id', ondelete='CASCADE'))
     entrance_id = db.Column(db.Integer, db.ForeignKey('entrance.entrance_id', ondelete='CASCADE'))
+    obstacle_type = db.Column(db.String(50), nullable=False)  # stairs, construction, steep, etc.
     description = db.Column(db.Text)
     severity_level = db.Column(db.Integer)
     reported_at = db.Column(db.DateTime)
     status = db.Column(db.String(50))
+
+class AccessibilityFeature(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    feature_type = db.Column(db.String(50), nullable=False)  # elevator, ramp, etc.
+    description = db.Column(db.Text, nullable=True)
+    building_id = db.Column(db.String(50), nullable=True)  # Optional reference to a building
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'feature_type': self.feature_type,
+            'description': self.description,
+            'building_id': self.building_id
+        }

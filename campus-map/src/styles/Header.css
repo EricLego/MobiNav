@@ -336,12 +336,19 @@
 }
 
 .mobile-header {
-  position: sticky; /* Makes the header stick to the top of its container */
+  position: absolute; /* Makes the header stick to the top of its container */
   top: 0;          /* Positions it at the very top */
   left: 0;         /* Ensure it aligns to the left */
   width: 100%;     /* Make sure it spans the full viewport width */
   z-index: 100;    /* Keep it above other content */
 
+  /* --- Style Changes --- */
+  background-color: transparent; /* Remove solid background */
+  box-shadow: none; /* Remove shadow */
+  border-bottom: none; /* Remove any border */
+  /* Optional: Add a subtle gradient overlay if needed for text visibility */
+  /* background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent); */
+  /* --------------------- */
 }
 
 /* Styles for mobile header layout */

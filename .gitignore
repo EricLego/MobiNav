@@ -1,38 +1,37 @@
 # Environment variables
 .env
-.env.local
+.env*local
 .env.development
 .env.test
 .env.production
-#Campus-Map
-    
-    # dependencies
-    campus-map/node_modules
-    campus-map/.pnp
-    campus-map/.pnp.js
 
-    # testing
-    campus-map/coverage
-
-    # production
-    campus-map/build
-
-    # misc
-    campus-map/.DS_Store
-    campus-map/.env
-    campus-map/.env.local
-    campus-map/.env.development.local
-    campus-map/.env.test.local
-    campus-map/.env.production.local
-
-    campus-map/npm-debug.log*
-    campus-map/yarn-debug.log*
-    campus-map/yarn-error.log*
-
-#Flask API
+# Python / Flask
 __pycache__/
 *.pyc
-#Others
+venv/
+instance/ # Usually ignore Flask instance folder
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node / React App (campus-map)
+campus-map/node_modules
+campus-map/.pnp
+campus-map/.pnp.js
+campus-map/coverage
+campus-map/build
+campus-map/.DS_Store # Specific to subdirectory if needed
+campus-map/.env* # Ignore all .env files within campus-map too
+campus-map/npm-debug.log*
+campus-map/yarn-debug.log*
+campus-map/yarn-error.log*
+campus-map/yarn.lock
+campus-map/package-lock.json
+
+# Other Project Files (Optional - Add if you don't want to track these)
 CLAUDE.md
 MobiNav.code-workspace
-campus-map/yarn.lock
+current_diff.txt
+mapeditor_vs_demodev.diff

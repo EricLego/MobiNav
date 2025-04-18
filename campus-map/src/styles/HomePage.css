@@ -249,6 +249,10 @@ section h2:after {
   .hero-section {
     display: none;
   }
+
+  .map-section {
+    height: 100vh;
+  }
   
   .hero-section h1 {
     font-size: 2.2rem;
@@ -290,6 +294,17 @@ section h2:after {
   .obstacles-section,
   .how-it-works {
     display: none;
+  }
+
+  .homepage {
+    scroll-snap-type: none;
+    overflow: hidden;
+    height: 100vh;
+    top: 0;
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 
