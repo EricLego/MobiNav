@@ -6,6 +6,11 @@ import ObstacleReports from './components/ObstacleReports';
 import RoutePlanner from './components/RoutePlanner';
 import './App.css';
 import MapEditor from './components/MapEditor';
+import { SearchProvider } from './mobile/contexts/SearchContext';
+import { MapProvider } from './mobile/contexts/MapContext';
+import { RoutingProvider } from './mobile/contexts/RoutingContext';
+import { IndoorViewProvider } from './mobile/contexts/IndoorViewContext';
+import { UserLocationProvider } from './mobile/contexts/UserLocationContext';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -51,18 +56,28 @@ function App() {
   
   return (
     <AccessibilityContext.Provider value={{ accessibilitySettings, setAccessibilitySettings }}>
-      <Router>
-        <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/map" element={<InteractiveMap />} />
-            <Route path="/route" element={<InteractiveMap />} />
-            <Route path="/report" element={<ObstacleReports />} />
-            <Route path="*" element={<HomePage />} />
-            <Route path="/admin" element={<MapEditor />} />
-          </Routes>
-        </div>
-      </Router>
+      <MapProvider>
+      <SearchProvider>
+      <RoutingProvider>
+      <IndoorViewProvider>
+      <UserLocationProvider>
+        <Router>
+          <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/map" element={<InteractiveMap />} />
+              <Route path="/route" element={<InteractiveMap />} />
+              <Route path="/report" element={<ObstacleReports />} />
+              <Route path="*" element={<HomePage />} />
+              <Route path="/admin" element={<MapEditor />} />
+            </Routes>
+          </div>
+        </Router>
+      </UserLocationProvider>
+      </IndoorViewProvider>
+      </RoutingProvider>
+      </SearchProvider>
+      </MapProvider>
     </AccessibilityContext.Provider>
   );
 }

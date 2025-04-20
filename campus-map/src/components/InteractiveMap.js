@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
 import { AccessibilityContext } from '../App';
-import BuildingAutocomplete from './BuildingAutocomplete';
 import '../styles/InteractiveMap.css';
-import RoutePointDisplay from './RoutePointDisplay';
 import RoutePlanner from './RoutePlanner';
 import IndoorViewControls from './IndoorView';
+import useIsMobile from '../hooks/useIsMobile';
 
 // Define libraries as a constant array to avoid unnecessary reloads
 const libraries = ['places'];
@@ -28,10 +27,9 @@ const InteractiveMap = () => {
   const [indoorViewActive, setIndoorViewActive] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [currentFloor, setCurrentFloor] = useState(1);
-  const [floorOptions, setFloorOptions] = useState([]);
-  const [indoorMapImage, setIndoorMapImage] = useState(null);
   
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
+  const isMobile = useIsMobile();
   
   const mapContainerStyle = {
     width: '100%',
@@ -309,11 +307,11 @@ const InteractiveMap = () => {
       if (buildingData) {
         // Retrieve Building Viewpoint and Floor Options
         setSelectedBuilding(buildingData);
-        setFloorOptions(buildingData.floors || []);
+        // setFloorOptions(buildingData.floors || []);
         setCurrentFloor(buildingData.floors[0] || "1");
         
         // Load Indoor View
-        setIndoorMapImage(`/indoor-maps/${buildingData.id}/${currentFloor}.png`);
+        // setIndoorMapImage(`/indoor-maps/${buildingData.id}/${currentFloor}.png`);
         setIndoorViewActive(true);
         
         // Center the map on the building with the appropriate zoom level

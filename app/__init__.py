@@ -12,8 +12,14 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
     
+    # --- Modify CORS Initialization ---
+    # Instead of just CORS(app), configure it more explicitly:
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+    # This tells Flask-CORS: "For any route starting with /api/,
+    # allow requests that originate from http://localhost:3000"
+    # ---------------------------------
+
     app.config.from_object("app.config.Config")
 
     db.init_app(app)

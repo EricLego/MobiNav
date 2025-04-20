@@ -223,7 +223,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .site-footer {
-    padding-top: var(--space-xl);
+    display:none;
   }
   
   .footer-container {

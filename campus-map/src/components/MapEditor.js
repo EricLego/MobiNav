@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleMap, useLoadScript, Marker, InfoWindow, Polyline } from '@react-google-maps/api';
-import axios from 'axios';
 import '../styles/MapEditor.css';
 import DataViewer from './DataViewer';
+import {
+  fetchBuildings, createBuilding, deleteBuilding,
+  fetchEntrances, createEntrance, deleteEntrance,
+  fetchPaths, createPath, deletePath,
+  fetchObstacles, createObstacle, deleteObstacle
+} from '../mobile/services/mapService'; // Adjust path if needed
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -56,40 +61,54 @@ function MapEditor() {
     mapRef.current = map;
   }, []);
 
-  const options = {
+  // Update options based on state
+  const options = React.useMemo(() => ({
     disableDefaultUI: false,
     zoomControl: true,
-    mapId: '481d275839837ca8',
+    mapId: '481d275839837ca8', // Consider moving Map ID to env variable
     tilt: cameraTilt,
     heading: cameraHeading
-  };
+  }), [cameraTilt, cameraHeading]); // Recompute options when tilt/heading change
 
-  // Fetch data from API
+  // Fetch data from API using mapService
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const buildingsResponse = await axios.get('/api/buildings');
-        setBuildings(buildingsResponse.data);
-        
-        const entrancesResponse = await axios.get('/api/entrances');
-        setEntrances(entrancesResponse.data);
-        
-        const pathsResponse = await axios.get('/api/paths');
-        setPaths(pathsResponse.data);
-        
-        const obstaclesResponse = await axios.get('/api/obstacles');
-        setObstacles(obstaclesResponse.data);
-        
-        // You would need to create a new API endpoint for path nodes
-        // const pathNodesResponse = await axios.get('/api/pathnodes');
-        // setPathNodes(pathNodesResponse.data);
+        // Use Promise.all for concurrent fetching
+        const [
+          buildingsData,
+          entrancesData,
+          pathsData,
+          obstaclesData,
+          // pathNodesData // Add when API exists
+        ] = await Promise.all([
+          fetchBuildings(),
+          fetchEntrances(),
+          fetchPaths(),
+          fetchObstacles(),
+          // fetchPathNodes() // Add when API exists
+        ]);
+
+        // Assuming service functions return the array directly
+        setBuildings(buildingsData || []);
+        console.log(buildingsData);
+        setEntrances(entrancesData || []);
+        console.log(entrancesData);
+        setPaths(pathsData || []);
+        console.log(pathsData);
+        setObstacles(obstaclesData || []);
+        console.log(obstaclesData);
+        // setPathNodes(pathNodesData || []); // Add when API exists
+
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching initial data:", error);
+        // Handle error state appropriately, maybe show a message to the user
       }
     };
-    
+
     fetchData();
-  }, []);
+  }, []); // Fetch only on mount
+
 
   // Handle map clicks
   const handleMapClick = (event) => {
@@ -153,30 +172,33 @@ function MapEditor() {
     return R * c; // Distance in meters
   };
   
-  // Create a path between two nodes
+
+  // Create a path between two nodes using mapService
   const createPathBetweenNodes = async (source, target) => {
     try {
       const pathData = {
-        start_location_id: source.id,
-        end_location_id: target.id,
+        start_location_id: source.id, // Assuming path nodes have an 'id'
+        end_location_id: target.id,   // Assuming path nodes have an 'id'
         is_wheelchair_accessible: formData.is_wheelchair_accessible || false,
         has_stairs: formData.has_stairs || false,
-        had_incline: formData.had_incline || false,
+        had_incline: formData.had_incline || false, // Match backend schema if needed
         is_paved: formData.is_paved || true,
         distance: calculateDistance(
           { lat: source.latitude, lng: source.longitude },
           { lat: target.latitude, lng: target.longitude }
         )
       };
-      
-      const response = await axios.post('/api/paths', pathData);
-      setPaths([...paths, response.data]);
-      
+
+      // --- Use mapService function ---
+      const newPath = await createPath(pathData);
+      setPaths([...paths, newPath]);
+
       // Reset form data
       setFormData({});
-      
+
     } catch (error) {
       console.error("Error creating path:", error);
+      // Handle error (e.g., show message to user)
     }
   };
 
@@ -205,69 +227,103 @@ function MapEditor() {
     });
   };
 
-  // Submit form data
+  // Submit form data using mapService
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      let response;
-      
-      if (editMode === "building") {
-        response = await axios.post('/api/buildings', formData);
-        setBuildings([...buildings, response.data]);
-      } else if (editMode === "entrance") {
-        response = await axios.post('/api/entrances', formData);
-        setEntrances([...entrances, response.data]);
-      } else if (editMode === "obstacle") {
-        response = await axios.post('/api/obstacles', formData);
-        setObstacles([...obstacles, response.data]);
-      } else if (editMode === "pathNode") {
-        // You would need to create a new API endpoint for path nodes
-        // response = await axios.post('/api/pathnodes', formData);
-        // For now, just store in local state
-        const newNode = {
-          id: Date.now(), // Temporary ID
-          latitude: formData.latitude,
-          longitude: formData.longitude
-        };
-        setPathNodes([...pathNodes, newNode]);
+      let newItemData;
+
+      switch (editMode) {
+        case "building":
+          newItemData = await createBuilding(formData);
+          setBuildings([...buildings, newItemData]);
+          break;
+        case "entrance":
+          newItemData = await createEntrance(formData);
+          setEntrances([...entrances, newItemData]);
+          break;
+        case "obstacle":
+          newItemData = await createObstacle(formData);
+          setObstacles([...obstacles, newItemData]);
+          break;
+        case "pathNode":
+          // --- Use mapService function when available ---
+          // newItemData = await createPathNode(formData);
+          // setPathNodes([...pathNodes, newItemData]);
+          // --- Temporary local state update ---
+          const newNode = {
+            id: Date.now(), // Temporary ID, backend should assign real one
+            latitude: formData.latitude,
+            longitude: formData.longitude,
+            // Add other properties if needed
+          };
+          setPathNodes([...pathNodes, newNode]);
+          // --- End Temporary ---
+          break;
+        default:
+          console.warn("Unknown edit mode:", editMode);
+          return;
       }
-      
+
       // Reset form and edit mode
       setFormData({});
       setNewItem(null);
       setEditMode("view");
     } catch (error) {
-      console.error("Error saving data:", error);
+      console.error(`Error saving ${editMode}:`, error);
+      // Handle error (e.g., show message to user)
     }
   };
+
   
-  // Handle item deletion
+
+  // Handle item deletion using mapService
   const handleDelete = async () => {
     if (!selectedItem) return;
-    
+
+    // Confirm deletion
+    if (!window.confirm(`Are you sure you want to delete this ${editMode}?`)) {
+        return;
+    }
+
     try {
-      if (editMode === "building") {
-        await axios.delete(`/api/buildings/${selectedItem.building_id}`);
-        setBuildings(buildings.filter(b => b.building_id !== selectedItem.building_id));
-      } else if (editMode === "entrance") {
-        await axios.delete(`/api/entrances/${selectedItem.entrance_id}`);
-        setEntrances(entrances.filter(e => e.entrance_id !== selectedItem.entrance_id));
-      } else if (editMode === "path") {
-        await axios.delete(`/api/paths/${selectedItem.path_id}`);
-        setPaths(paths.filter(p => p.path_id !== selectedItem.path_id));
-      } else if (editMode === "obstacle") {
-        await axios.delete(`/api/obstacles/${selectedItem.obstacle_id}`);
-        setObstacles(obstacles.filter(o => o.obstacle_id !== selectedItem.obstacle_id));
-      } else if (editMode === "pathNode") {
-        // Handle path node deletion
-        // You would need to also delete any paths connected to this node
-        setPathNodes(pathNodes.filter(n => n.id !== selectedItem.id));
+      switch (editMode) {
+        case "building":
+          await deleteBuilding(selectedItem.building_id);
+          setBuildings(buildings.filter(b => b.building_id !== selectedItem.building_id));
+          break;
+        case "entrance":
+          await deleteEntrance(selectedItem.entrance_id);
+          setEntrances(entrances.filter(e => e.entrance_id !== selectedItem.entrance_id));
+          break;
+        case "path":
+          await deletePath(selectedItem.path_id);
+          setPaths(paths.filter(p => p.path_id !== selectedItem.path_id));
+          break;
+        case "obstacle":
+          await deleteObstacle(selectedItem.obstacle_id);
+          setObstacles(obstacles.filter(o => o.obstacle_id !== selectedItem.obstacle_id));
+          break;
+        case "pathNode":
+          // --- Use mapService function when available ---
+          // await deletePathNode(selectedItem.id);
+          // --- Temporary local state update ---
+          // TODO: Also delete paths connected to this node from backend/state
+          setPathNodes(pathNodes.filter(n => n.id !== selectedItem.id));
+          // --- End Temporary ---
+          break;
+        default:
+          console.warn("Unknown edit mode for deletion:", editMode);
+          return;
       }
-      
+
       setSelectedItem(null);
+      setEditMode("view"); // Go back to view mode after deletion
+      setFormData({});
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error(`Error deleting ${editMode}:`, error);
+      // Handle error (e.g., show message to user)
     }
   };
 
@@ -294,6 +350,7 @@ function MapEditor() {
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
 
+
   return (
     <div className="map-editor">
       <div className="editor-header">
@@ -314,12 +371,12 @@ function MapEditor() {
                 id="tilt-slider"
                 type="range"
                 min="0"
-                max="45"
+                max="45" // Max tilt for satellite view
                 value={cameraTilt}
                 onChange={(e) => setCameraTilt(Number(e.target.value))}
                 />
             </div>
-            
+
             <div className="control-group">
                 <label htmlFor="heading-slider">Rotation: {cameraHeading}°</label>
                 <input
@@ -331,14 +388,14 @@ function MapEditor() {
                 onChange={(e) => setCameraHeading(Number(e.target.value))}
                 />
             </div>
-            
+
             <button onClick={() => { setCameraTilt(0); setCameraHeading(0); }}>
                 Reset View
             </button>
             </div>
         </div>
       </div>
-      
+
       <div className="editor-main">
         <div className="map-container">
           <GoogleMap
@@ -348,51 +405,56 @@ function MapEditor() {
             options={options}
             onClick={handleMapClick}
             onLoad={onMapLoad}
+            mapTypeId="satellite" // Use satellite view for better context
           >
             {/* Display Buildings */}
             {buildings.map(building => (
               <Marker
-                key={building.building_id}
+                key={`bldg-${building.building_id}`}
                 position={{ lat: building.latitude, lng: building.longitude }}
-                icon={{
-                  url: '/icons/building.png',
-                  scaledSize: new window.google.maps.Size(30, 30)
-                }}
+                // icon={{ /* ... building icon ... */ }}
+                title={building.name}
                 onClick={() => {
                   setSelectedItem(building);
-                  setFormData(building);
+                  setFormData(building); // Pre-fill form for editing
                   setEditMode("building");
+                  setShowClickMenu(false); // Close click menu if open
+                  setNewItem(null); // Clear new item marker
                 }}
               />
             ))}
-            
+
             {/* Display Entrances */}
             {entrances.map(entrance => (
               <Marker
-                key={entrance.entrance_id}
+                key={`ent-${entrance.entrance_id}`}
                 position={{ lat: entrance.latitude, lng: entrance.longitude }}
-                icon={{
-                  url: entrance.wheelchair_accessible ? 
-                    '/icons/accessible_entrance.png' : 
-                    '/icons/entrance.png',
-                  scaledSize: new window.google.maps.Size(24, 24)
-                }}
+                // icon={{ /* ... entrance icon ... */ }}
+                title={entrance.entrance_name}
                 onClick={() => {
                   setSelectedItem(entrance);
+                  setFormData(entrance); // Pre-fill form
                   setEditMode("entrance");
+                  setShowClickMenu(false);
+                  setNewItem(null);
                 }}
               />
             ))}
-            
+
             {/* Display Path Nodes */}
             {pathNodes.map(node => (
               <Marker
-                key={node.id}
+                key={`node-${node.id}`} // Use node ID
                 position={{ lat: node.latitude, lng: node.longitude }}
-                icon={{
-                  url: '/icons/node.png', // You'll need this icon
-                  scaledSize: new window.google.maps.Size(16, 16)
+                icon={{ // Simple circle icon for nodes
+                    path: window.google.maps.SymbolPath.CIRCLE,
+                    scale: 5,
+                    fillColor: '#FFFF00', // Yellow
+                    fillOpacity: 1,
+                    strokeColor: '#000000',
+                    strokeWeight: 1,
                 }}
+                title={`Node ${node.id}`}
                 onClick={() => {
                   if (connectMode && sourceNode) {
                     // If in connect mode, create a connection
@@ -401,23 +463,27 @@ function MapEditor() {
                     setSourceNode(null);
                   } else {
                     setSelectedItem(node);
+                    setFormData(node); // Pre-fill form
                     setEditMode("pathNode");
+                    setShowClickMenu(false);
+                    setNewItem(null);
                   }
                 }}
               />
             ))}
-            
+
             {/* Display Paths */}
             {paths.map(path => {
               // Find the start and end nodes
+              // TODO: Need a reliable way to get node coordinates (API or local state)
               const startNode = pathNodes.find(n => n.id === path.start_location_id);
               const endNode = pathNodes.find(n => n.id === path.end_location_id);
-              
-              if (!startNode || !endNode) return null;
-              
+
+              if (!startNode || !endNode) return null; // Don't render if nodes aren't found
+
               return (
                 <Polyline
-                  key={path.path_id}
+                  key={`path-${path.path_id}`}
                   path={[
                     { lat: startNode.latitude, lng: startNode.longitude },
                     { lat: endNode.latitude, lng: endNode.longitude }
@@ -426,45 +492,53 @@ function MapEditor() {
                     strokeColor: path.is_wheelchair_accessible ? '#6C63FF' : '#FE5E41',
                     strokeOpacity: 0.8,
                     strokeWeight: 4,
+                    zIndex: 1 // Render paths below markers
                   }}
                   onClick={() => {
                     setSelectedItem(path);
+                    setFormData(path); // Pre-fill form
                     setEditMode("path");
+                    setShowClickMenu(false);
+                    setNewItem(null);
                   }}
                 />
               );
             })}
-            
+
             {/* Display Obstacles */}
             {obstacles.map(obstacle => (
-              <Marker
-                key={obstacle.obstacle_id}
-                position={{ lat: obstacle.latitude, lng: obstacle.longitude }}
-                icon={{
-                  url: '/icons/warning.png',
-                  scaledSize: new window.google.maps.Size(24, 24)
-                }}
-                onClick={() => {
-                  setSelectedItem(obstacle);
-                  setEditMode("obstacle");
-                }}
-              />
+              // Ensure obstacles have lat/lng before rendering
+              (typeof obstacle.latitude === 'number' && typeof obstacle.longitude === 'number') && (
+                <Marker
+                  key={`obs-${obstacle.obstacle_id}`}
+                  position={{ lat: obstacle.latitude, lng: obstacle.longitude }}
+                  // icon={{ /* ... obstacle icon ... */ }}
+                  title={obstacle.description}
+                  onClick={() => {
+                    setSelectedItem(obstacle);
+                    setFormData(obstacle); // Pre-fill form
+                    setEditMode("obstacle");
+                    setShowClickMenu(false);
+                    setNewItem(null);
+                  }}
+                />
+              )
             ))}
-            
+
             {/* Display new item being added */}
             {newItem && (
               <Marker
                 position={{ lat: newItem.lat, lng: newItem.lng }}
-                icon={{
-                  url: editMode === "building" ? '/icons/building.png' :
-                       editMode === "entrance" ? '/icons/entrance.png' :
-                       editMode === "pathNode" ? '/icons/node.png' :
-                       '/icons/warning.png',
-                  scaledSize: new window.google.maps.Size(24, 24)
+                // icon={{ /* ... icon based on editMode ... */ }}
+                draggable={true} // Allow dragging the new item marker
+                onDragEnd={(e) => {
+                    const newPos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    setNewItem(newPos);
+                    setFormData(prev => ({ ...prev, latitude: newPos.lat, longitude: newPos.lng }));
                 }}
               />
             )}
-            
+
             {/* Click Menu Info Window */}
             {showClickMenu && clickPosition && (
               <InfoWindow
@@ -472,7 +546,7 @@ function MapEditor() {
                 onCloseClick={() => setShowClickMenu(false)}
               >
                 <div className="click-menu">
-                  <h3>Add New Item</h3>
+                  <h3>Add New Item Here</h3>
                   <div className="click-menu-buttons">
                     <button onClick={() => handleSelectItemType("building")}>Building</button>
                     <button onClick={() => handleSelectItemType("entrance")}>Entrance</button>
@@ -482,227 +556,143 @@ function MapEditor() {
                 </div>
               </InfoWindow>
             )}
-            
+
             {/* Info Window for selected item */}
             {selectedItem && (
               <InfoWindow
-                position={{ 
-                  lat: selectedItem.latitude || selectedItem.lat, 
-                  lng: selectedItem.longitude || selectedItem.lng
+                position={{
+                  lat: selectedItem.latitude, // Assuming consistent naming now
+                  lng: selectedItem.longitude
                 }}
-                onCloseClick={() => setSelectedItem(null)}
+                onCloseClick={() => { setSelectedItem(null); setEditMode("view"); setFormData({}); }}
               >
                 <div>
-                  <h3>{selectedItem.name || "Selected Item"}</h3>
-                  
-                  {editMode === "building" && (
-                    <p>{selectedItem.address + " " + selectedItem.street}</p>
-                  )}
-                  
-                  {editMode === "entrance" && (
-                    <p>Entrance to {buildings.find(b => b.building_id === selectedItem.building_id)?.name || "Unknown Building"}</p>
-                  )}
-                  
-                  {editMode === "obstacle" && (
-                    <p>{selectedItem.description}</p>
-                  )}
-                  
-                  {editMode === "pathNode" && (
-                    <button onClick={handleStartConnect}>Connect to another node</button>
-                  )}
-                  
-                  <button onClick={handleDelete}>Delete</button>
+                  <h3>{selectedItem.name || selectedItem.entrance_name || selectedItem.description || `Item ${selectedItem.id || selectedItem.building_id || selectedItem.entrance_id || selectedItem.path_id || selectedItem.obstacle_id}`}</h3>
+
+                  {/* Display relevant details based on type */}
+                  {editMode === "building" && <p>{selectedItem.address} {selectedItem.street}</p>}
+                  {editMode === "entrance" && <p>Building ID: {selectedItem.building_id}, Accessible: {selectedItem.wheelchair_accessible ? 'Yes' : 'No'}</p>}
+                  {editMode === "path" && <p>Distance: {selectedItem.distance?.toFixed(1)}m, Accessible: {selectedItem.is_wheelchair_accessible ? 'Yes' : 'No'}</p>}
+                  {editMode === "obstacle" && <p>Severity: {selectedItem.severity_level}, Status: {selectedItem.status}</p>}
+                  {editMode === "pathNode" && <p>Node ID: {selectedItem.id}</p>}
+
+                  {/* Actions */}
+                  <div className="info-actions">
+                      {editMode === "pathNode" && !connectMode && (
+                          <button onClick={handleStartConnect}>Connect Path</button>
+                      )}
+                      <button onClick={handleDelete} style={{ backgroundColor: '#E74C3C', color: 'white' }}>Delete</button>
+                  </div>
                 </div>
               </InfoWindow>
             )}
-            
+
             {/* Source Node indicator in connect mode */}
             {connectMode && sourceNode && (
               <InfoWindow
                 position={{ lat: sourceNode.latitude, lng: sourceNode.longitude }}
+                onCloseClick={() => { setConnectMode(false); setSourceNode(null); }} // Allow closing
               >
                 <div>
-                  <p>Source Node Selected</p>
+                  <p>Connecting from Node {sourceNode.id}. Click target node.</p>
                   <button onClick={() => { setConnectMode(false); setSourceNode(null); }}>
-                    Cancel
+                    Cancel Connection
                   </button>
                 </div>
               </InfoWindow>
             )}
           </GoogleMap>
         </div>
-        
+
         <div className="editor-form">
-          {(editMode !== "view" && newItem) && (
+          {/* Form for adding/editing items */}
+          {(editMode !== "view" && (newItem || selectedItem)) && (
             <form onSubmit={handleSubmit}>
-              <h3>{editMode === "building" ? "Building Details" :
-                   editMode === "entrance" ? "Entrance Details" :
-                   editMode === "pathNode" ? "Path Node Details" :
-                   "Obstacle Details"}
+              <h3>
+                {selectedItem ? `Edit ${editMode}` : `Add New ${editMode}`}
               </h3>
-              
+
+              {/* Common Lat/Lng fields */}
+              <div className="form-group">
+                <label>Latitude</label>
+                <input type="number" step="any" name="latitude" value={formData.latitude || ''} onChange={handleInputChange} required readOnly={!newItem} />
+              </div>
+              <div className="form-group">
+                <label>Longitude</label>
+                <input type="number" step="any" name="longitude" value={formData.longitude || ''} onChange={handleInputChange} required readOnly={!newItem} />
+              </div>
+
               {/* Building Form Fields */}
               {editMode === "building" && (
                 <>
                   <div className="form-group">
                     <label htmlFor="name">Building Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name || ""}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <input type="text" id="name" name="name" value={formData.name || ""} onChange={handleInputChange} required />
                   </div>
                   <div className="form-group">
                     <label htmlFor="address">Building Number</label>
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      value={formData.address || ""}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" id="address" name="address" value={formData.address || ""} onChange={handleInputChange} />
                   </div>
                   <div className="form-group">
                     <label htmlFor="street">Street</label>
-                    <input
-                      type="text"
-                      id="street"
-                      name="street"
-                      value={formData.street || ""}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" id="street" name="street" value={formData.street || ""} onChange={handleInputChange} />
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="city">City</label>
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      value={formData.city || "Marietta"}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="state">State</label>
-                    <input
-                      type="text"
-                      id="state"
-                      name="state"
-                      value={formData.state || "GA"}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="zip_code">Zip Code</label>
-                    <input
-                      type="text"
-                      id="zip_code"
-                      name="zip_code"
-                      value={formData.zip_code || "30060"}
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                  {/* Add City, State, Zip if needed */}
                 </>
               )}
-              
+
               {/* Entrance Form Fields */}
               {editMode === "entrance" && (
                 <>
                   <div className="form-group">
                     <label htmlFor="entrance_name">Entrance Name</label>
-                    <input
-                      type="text"
-                      id="entrance_name"
-                      name="entrance_name"
-                      value={formData.entrance_name || ""}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <input type="text" id="entrance_name" name="entrance_name" value={formData.entrance_name || ""} onChange={handleInputChange} required />
                   </div>
                   <div className="form-group">
                     <label htmlFor="building_id">Building</label>
-                    <select
-                      id="building_id"
-                      name="building_id"
-                      value={formData.building_id || ""}
-                      onChange={handleInputChange}
-                      required
-                    >
+                    <select id="building_id" name="building_id" value={formData.building_id || ""} onChange={handleInputChange} required>
                       <option value="">Select a Building</option>
                       {buildings.map(building => (
                         <option key={building.building_id} value={building.building_id}>
-                          {building.name}
+                          {building.name} (ID: {building.building_id})
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className="form-group">
                     <label htmlFor="floor_level">Floor Level</label>
-                    <input
-                      type="number"
-                      id="floor_level"
-                      name="floor_level"
-                      value={formData.floor_level || 1}
-                      onChange={handleInputChange}
-                    />
+                    <input type="number" id="floor_level" name="floor_level" value={formData.floor_level || 1} onChange={handleInputChange} />
                   </div>
                   <div className="form-group checkbox">
-                    <input
-                      type="checkbox"
-                      id="wheelchair_accessible"
-                      name="wheelchair_accessible"
-                      checked={formData.wheelchair_accessible || false}
-                      onChange={handleInputChange}
-                    />
+                    <input type="checkbox" id="wheelchair_accessible" name="wheelchair_accessible" checked={formData.wheelchair_accessible || false} onChange={handleInputChange} />
                     <label htmlFor="wheelchair_accessible">Wheelchair Accessible</label>
                   </div>
                 </>
               )}
-              
+
               {/* Path Node Form Fields */}
               {editMode === "pathNode" && (
                 <>
                   <div className="form-group">
                     <label htmlFor="node_name">Node Name (Optional)</label>
-                    <input
-                      type="text"
-                      id="node_name"
-                      name="node_name"
-                      value={formData.node_name || ""}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" id="node_name" name="node_name" value={formData.node_name || ""} onChange={handleInputChange} />
                   </div>
                   <p className="form-help">
-                    After creating nodes, select one and click "Connect" to create paths between them.
+                    {selectedItem ? 'Click "Connect Path" in InfoWindow to start.' : 'Save node first, then select it to connect.'}
                   </p>
                 </>
               )}
-              
+
               {/* Obstacle Form Fields */}
               {editMode === "obstacle" && (
                 <>
                   <div className="form-group">
                     <label htmlFor="description">Description</label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description || ""}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <textarea id="description" name="description" value={formData.description || ""} onChange={handleInputChange} required />
                   </div>
                   <div className="form-group">
                     <label htmlFor="severity_level">Severity Level</label>
-                    <select
-                      id="severity_level"
-                      name="severity_level"
-                      value={formData.severity_level || ""}
-                      onChange={handleInputChange}
-                      required
-                    >
+                    <select id="severity_level" name="severity_level" value={formData.severity_level || ""} onChange={handleInputChange} required>
                       <option value="">Select Severity</option>
                       <option value="1">Low</option>
                       <option value="2">Medium</option>
@@ -711,86 +701,70 @@ function MapEditor() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="status">Status</label>
-                    <select
-                      id="status"
-                      name="status"
-                      value={formData.status || ""}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Select Status</option>
+                    <select id="status" name="status" value={formData.status || "Pending"} onChange={handleInputChange} required>
                       <option value="Pending">Pending</option>
                       <option value="Under Review">Under Review</option>
                       <option value="Resolved">Resolved</option>
                     </select>
                   </div>
+                  {/* Add fields for associating obstacle with building/path/entrance if needed */}
                 </>
               )}
-              
-              <div className="form-actions">
-                <button type="submit" className="save-btn">
-                  {selectedItem ? "Update" : "Save"}
-                </button>
-                <button type="button" className="cancel-btn" onClick={handleCancel}>
-                  Cancel
-                </button>
-              </div>
+
+              {/* Path Form Fields (Only show when connecting) */}
+              {connectMode && sourceNode && (
+                  <div className="connection-form">
+                    <h4>Path Properties (for new connection)</h4>
+                    <div className="form-group checkbox">
+                      <input type="checkbox" id="had_incline" name="had_incline" checked={formData.had_incline || false} onChange={handleInputChange} />
+                      <label htmlFor="had_incline">Has Incline</label>
+                    </div>
+                    <div className="form-group checkbox">
+                      <input type="checkbox" id="has_stairs" name="has_stairs" checked={formData.has_stairs || false} onChange={handleInputChange} />
+                      <label htmlFor="has_stairs">Has Stairs</label>
+                    </div>
+                    <div className="form-group checkbox">
+                      <input type="checkbox" id="is_wheelchair_accessible" name="is_wheelchair_accessible" checked={formData.is_wheelchair_accessible === undefined ? true : formData.is_wheelchair_accessible} onChange={handleInputChange} />
+                      <label htmlFor="is_wheelchair_accessible">Wheelchair Accessible</label>
+                    </div>
+                    <div className="form-group checkbox">
+                      <input type="checkbox" id="is_paved" name="is_paved" checked={formData.is_paved === undefined ? true : formData.is_paved} onChange={handleInputChange} />
+                      <label htmlFor="is_paved">Is Paved</label>
+                    </div>
+                    <p>Click on a target node to create the connection.</p>
+                  </div>
+              )}
+
+
+              {/* Don't show save/cancel if only connecting */}
+              {!connectMode && (
+                  <div className="form-actions">
+                    <button type="submit" className="save-btn">
+                      {selectedItem ? "Update" : "Save"} {editMode}
+                    </button>
+                    <button type="button" className="cancel-btn" onClick={handleCancel}>
+                      Cancel
+                    </button>
+                  </div>
+              )}
             </form>
           )}
-          
-          {/* Path Form (when connecting nodes) */}
-          {connectMode && sourceNode && (
-            <div className="connection-form">
-              <h3>Path Properties</h3>
-              <div className="form-group checkbox">
-                <input
-                  type="checkbox"
-                  id="had_incline"
-                  name="had_incline"
-                  checked={formData.had_incline || false}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="had_incline">Has Incline</label>
-              </div>
-              <div className="form-group checkbox">
-                <input
-                  type="checkbox"
-                  id="has_stairs"
-                  name="has_stairs"
-                  checked={formData.has_stairs || false}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="has_stairs">Has Stairs</label>
-              </div>
-              <div className="form-group checkbox">
-                <input
-                  type="checkbox"
-                  id="is_wheelchair_accessible"
-                  name="is_wheelchair_accessible"
-                  checked={formData.is_wheelchair_accessible || false}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="is_wheelchair_accessible">Wheelchair Accessible</label>
-              </div>
-              <div className="form-group checkbox">
-                <input
-                  type="checkbox"
-                  id="is_paved"
-                  name="is_paved"
-                  checked={formData.is_paved || true}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="is_paved">Is Paved</label>
-              </div>
-              <p>Click on a target node to create a connection</p>
-              <button onClick={() => { setConnectMode(false); setSourceNode(null); }}>
-                Cancel Connection
-              </button>
+
+          {/* Placeholder when not editing */}
+          {editMode === "view" && !newItem && !selectedItem && !connectMode && (
+            <div className="form-placeholder">
+              <p>Click on the map to add a new item, or click an existing item to edit.</p>
             </div>
           )}
         </div>
       </div>
-      <DataViewer />
+      {/* Optionally include DataViewer for reference */}
+      <DataViewer
+        buildings={buildings}
+        entrances={entrances}
+        paths={paths}
+        obstacles={obstacles}
+      />
     </div>
   );
 }

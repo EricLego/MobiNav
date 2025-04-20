@@ -182,9 +182,12 @@ section h2:after {
   border-top: 1px solid var(--ksu-gray-light);
   border-bottom: 1px solid var(--ksu-gray-light);
   scroll-snap-align: start;
-  padding-top: var(--space-xxl);
-  padding-bottom: var(--space-xxl);
+  /* padding-top: var(--space-xxl); */ /* Remove top padding */
+  /* padding-bottom: var(--space-xxl); */ /* Remove bottom padding */
+  padding: 0; /* Remove all padding*/
   height: calc(100vh - 72px); /* Full viewport minus header & padding */
+  position: relative; /* Ensure map fills up the section's area */
+  overflow: hidden; /* Clip the map if it goes outside*/
 }
 
 .accessibility-toggles {
@@ -244,7 +247,11 @@ section h2:after {
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-section {
-    padding: var(--space-xl) var(--space-md);
+    display: none;
+  }
+
+  .map-section {
+    height: 100vh;
   }
   
   .hero-section h1 {
@@ -282,6 +289,22 @@ section h2:after {
 
   .interactive-map {
     height: 500px;
+  }
+
+  .obstacles-section,
+  .how-it-works {
+    display: none;
+  }
+
+  .homepage {
+    scroll-snap-type: none;
+    overflow: hidden;
+    height: 100vh;
+    top: 0;
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 
