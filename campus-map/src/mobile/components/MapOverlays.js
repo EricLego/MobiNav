@@ -1,18 +1,19 @@
 // src/components/MapOverlays.js
 import React, { useState, useContext, useMemo, useEffect } from 'react';
-import { Marker, InfoWindow, Polyline } from '@react-google-maps/api';
+import { Marker, InfoWindow, Polyline, Data } from '@react-google-maps/api';
 
 // --- Import contexts for data (These will be created later) ---
 import { MapContext } from '../contexts/MapContext';
 import { SearchContext } from '../contexts/SearchContext';
-// import { RoutingContext } from '../contexts/RoutingContext';
+import { RoutingContext } from '../contexts/RoutingContext';
+import { IndoorViewContext, useIndoorView } from '../contexts/IndoorViewContext';
 // import { EventContext } from '../contexts/EventContext';
 
 // --- Import hooks for data (Alternative if not using separate contexts) ---
-import useMapViewpoint from '../hooks/useMapViewpoint';
 import useBuildings from '../hooks/useBuildings';
 import useObstacles from '../hooks/useObstacles';
-// import useRouting from '../hooks/useRouting';
+import useRouting from '../hooks/useRouting';
+import useGeolocation from '../hooks/useGeolocation';
 // import useEvents from '../hooks/useEvents';
 // import useSearch from '../hooks/useSearch';
 
@@ -40,21 +41,19 @@ const MapOverlays = () => {
     // --- Use hooks to fetch data (Uncomment when available) ---
     const { buildings, isLoading: isLoadingBuildings, error: buildingsError } = useBuildings();
     const { obstacles, isLoading: isLoadingObstacles, error: obstaclesError } = useObstacles();
+    const { setStartPoint, setEndPoint } = useRouting();
+    const { selectedBuildingId, currentFloorGeoJSON, selectBuildingForIndoorView, currentFloorLevel } = useIndoorView();
 
 
   // --- Consume Contexts (Uncomment when available) ---
-    const { mapRef, isMapLoaded } = useContext(MapContext); // Check if map is ready
+    const { mapRef, isMapLoaded, setViewpoint } = useContext(MapContext); // Check if map is ready
     const { selectedSearchResult } = useContext(SearchContext);
-  // const { startPoint, endPoint, currentRoute } = useContext(RoutingContext);
+    const { startPoint, endPoint, route, isLoadingRoute, routeError } = useContext(RoutingContext);
   // const { obstacles } = useContext(ObstacleContext); // Assuming obstacles is an array
   // const { currentEvents } = useContext(EventContext); // Assuming events is an array
 
 // --- Placeholder Data (Uncomment these!) ---
-const placeholderRoutingData = {
-    startPoint: { lat: 33.9390, lng: -84.5200, name: "Start" },
-    endPoint: { lat: 33.9370, lng: -84.5170, name: "End" },
-    currentRoute: [], // Array of { lat, lng } for polyline
-  };
+
   const placeholderEvents = [
      { id: 'evt1', type: 'event', lat: 33.9386, lng: -84.5187, name: "C-Day", description: "Capstone Day Event" },
   ];
@@ -80,7 +79,14 @@ const placeholderRoutingData = {
   }, []);
   // -----------------------------------------------------------------
 
-
+  const enterIndoorView = (marker) => {
+        if (marker && marker.building_id){
+            console.log(`Calling selectBuildingForIndoorView with ID: ${marker.building_id}`);
+            selectBuildingForIndoorView(marker.building_id);
+        }else {
+            console.error("Cannot enter indoor view: Marker data is missing building_id.", marker);
+        }
+  };
 
   // State to manage which InfoWindow is open
   const [selectedMarker, setSelectedMarker] = useState(null); // Holds the data of the selected marker
@@ -141,157 +147,251 @@ const placeholderRoutingData = {
     
     }, [selectedSearchResult]); // Re-run only when the global search selection changes
 
-    useMapViewpoint(mapRef, selectedMarker, 18); // Use the hook to pan/zoom to selected marker
+
+    // --- Effect to SET the target viewpoint in the context ---
+    useEffect(() => {
+        let targetCenter = null;
+        let targetZoom = null;
+        let targetTilt = 0; // Default tilt
+        let targetHeading = 0; // Default heading
+
+        // --- Logic to determine desired viewpoint ---
+        if (selectedBuildingId) {
+            // Indoor view active
+            targetZoom = 19; // Default indoor zoom
+            targetTilt = 45; // Example indoor tilt
+            if (currentFloorGeoJSON?.properties?.viewpoint?.center) {
+                targetCenter = currentFloorGeoJSON.properties.viewpoint.center;
+                targetZoom = currentFloorGeoJSON.properties.viewpoint.zoom || targetZoom;
+                targetTilt = currentFloorGeoJSON.properties.viewpoint.tilt || targetTilt;
+                targetHeading = currentFloorGeoJSON.properties.viewpoint.heading || targetHeading;
+            } else {
+                const building = buildings.find(b => b.building_id === selectedBuildingId);
+                if (building && typeof building.lat === 'number' && typeof building.lng === 'number') {
+                    targetCenter = { lat: building.lat, lng: building.lng };
+                    targetZoom = 18; // Zoom slightly less for building center
+                }
+            }
+        } else if (selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng) {
+            // Search result selected
+            targetCenter = { lat: selectedSearchResult.lat, lng: selectedSearchResult.lng };
+            targetZoom = 18;
+        } else if (selectedMarker && selectedMarker.lat && selectedMarker.lng) {
+            // Local marker clicked
+            targetCenter = { lat: selectedMarker.lat, lng: selectedMarker.lng };
+            targetZoom = 18;
+        } else {
+            // Default view (optional: could set to null to let user control)
+            // targetCenter = { lat: 33.9386, lng: -84.5187 };
+            // targetZoom = 16;
+            targetCenter = null; // Setting to null might stop useMapViewpoint from acting
+            targetZoom = null;
+        }
+
+        // --- Call the context setter ---
+        console.log("Requesting viewpoint update via context:", { center: targetCenter, zoom: targetZoom, tilt: targetTilt, heading: targetHeading });
+        setViewpoint({
+            center: targetCenter,
+            zoom: targetZoom,
+            tilt: targetTilt,
+            heading: targetHeading
+        });
+
+    }, [selectedBuildingId, currentFloorGeoJSON, selectedMarker, selectedSearchResult, buildings, setViewpoint]);
 
 
-  // Don't render overlays until the map instance is ready
-  if (!isMapLoaded) {
-    return null;
-  }
+    // Don't render overlays until the map instance and icons are ready
+    if (!isMapLoaded || !buildingIcon || !obstacleIcon) {
+        return null;
+    }
 
-  if (buildingsError || obstaclesError) {
-    console.error("Data loading errors:", {buildingsError, obstaclesError });
-  }
+    // Handle loading/error states
+    if (isLoadingBuildings || isLoadingObstacles) {
+        console.log("Loading map data...");
+        // Optionally return a loading indicator component
+    }
+    if (buildingsError || obstaclesError) {
+        console.error("Data loading errors:", { buildingsError, obstaclesError });
+        // Optionally return an error message component
+    }
+    if (isLoadingRoute) {
+        console.log("Calculating route...");
+        // Optionally show route loading indicator
+    }
+     if (routeError) {
+        console.error("Route calculation error:", routeError);
+        // Optionally show route error message
+    }
 
-  return (
-    <>
-      {/* Routing Markers */}
-      {placeholderRoutingData.startPoint && (
-        <Marker
-          position={{ lat: placeholderRoutingData.startPoint.lat, lng: placeholderRoutingData.startPoint.lng }}
-          label="A" // Or use a custom icon
-          onClick={() => handleMarkerClick({ ...placeholderRoutingData.startPoint, type: 'start' })}
-        />
-      )}
-      {placeholderRoutingData.endPoint && (
-        <Marker
-          position={{ lat: placeholderRoutingData.endPoint.lat, lng: placeholderRoutingData.endPoint.lng }}
-          label="B" // Or use a custom icon
-          onClick={() => handleMarkerClick({ ...placeholderRoutingData.endPoint, type: 'end' })}
-        />
-      )}
 
-      {/* Route Polyline */}
-      {placeholderRoutingData.currentRoute && placeholderRoutingData.currentRoute.length > 0 && (
-        <Polyline
-          path={placeholderRoutingData.currentRoute}
-          options={{
-            strokeColor: '#FFC629', // KSU Gold
-            strokeOpacity: 0.8,
-            strokeWeight: 6,
-            geodesic: true,
-          }}
-        />
-      )}
-
-      {/* Building Markers (Using fetched data) */}
-      {buildings.map((building) => (
-        // Check for valid coordinates before rendering
-        (typeof building.lat === 'number' && typeof building.lng === 'number') && (
-          <Marker
-            key={`bldg-${building.building_id}`} // Use a unique key
-            position={{ lat: building.lat, lng: building.lng }}
-            icon={buildingIcon}
-            title={building.name}
-            onClick={() => handleMarkerClick(building)} // Pass the whole building object
-          />
-        )
-      ))}
-
-      {/* Obstacle Markers (Using fetched data) */}
-      {obstacles.map((obstacle) => (
-        // Check for valid coordinates before rendering
-         (typeof obstacle.lat === 'number' && typeof obstacle.lng === 'number') && (
-            <Marker
-              key={`obs-${obstacle.obstacle_id}`} // Use a unique key
-              position={{ lat: obstacle.lat, lng: obstacle.lng }}
-              icon={obstacleIcon}
-              title={obstacle.description || 'Obstacle'} // Use description for title
-              onClick={() => handleMarkerClick(obstacle)} // Pass the whole obstacle object
-            />
-         )
-      ))}
-      {/* Event Markers */}
-      {placeholderEvents.map((event) => (
-        <Marker
-          key={event.id}
-          position={{ lat: event.lat, lng: event.lng }}
-          // icon={{ url: '/icons/event.png', scaledSize: new window.google.maps.Size(30, 30) }} // Example custom icon
-          title={event.name}
-          onClick={() => handleMarkerClick({ ...event, type: 'event' })}
-        />
-      ))}
-
-       {/* Selected Search Result Marker */}
-       {selectedSearchResult && (
-        <Marker
-          position={{ lat: selectedSearchResult.lat, lng: selectedSearchResult.lng }}
-          // Use a distinct icon/label for search result?
-          title={selectedSearchResult.name}
-          onClick={() => handleMarkerClick({ ...selectedSearchResult, type: 'search' })}
-          // Maybe add animation?
-          // animation={window.google.maps.Animation.DROP}
-        />
-      )}
-
-      {/* Info Window */}
-      {selectedMarker && (
-        <InfoWindow
-          position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
-          onCloseClick={handleInfoWindowClose}
-        >
-          {/* Render content based on selectedMarker.type */}
-          <div className="info-window">
-            <h3>{selectedMarker.name || selectedMarker.description || 'Selected Location'}</h3>
-
-            {/* Building Specific Info */}
-            {selectedMarker.type === 'building' && (
-              <div>
-                <p>{selectedMarker.address} {selectedMarker.street}</p>
-                {/* Add more building details */}
-              </div>
-            )}
-
-            {/* Obstacle Specific Info */}
-            {selectedMarker.type === 'obstacle' && (
-              <div className="obstacle-info">
-                 <p>Status: <span className="status">{selectedMarker.status}</span></p>
-                 <p>Severity: {selectedMarker.severity_level}</p>
-                 {selectedMarker.reported_at && <p className="reported">Reported: {new Date(selectedMarker.reported_at).toLocaleString()}</p>}
-                 {/* Add more obstacle details */}
-              </div>
-            )}
-
-            {/* Event Specific Info */}
-             {selectedMarker.type === 'event' && (
-              <div>
-                 <p>{selectedMarker.description}</p>
-                 {/* Add more event details */}
-              </div>
-            )}
-
-            {/* Search Specific Info */}
-            {selectedMarker.type === 'search' && (
-              <div>
-                 <p>{selectedMarker.formattedAddress || 'Location details'}</p>
-                 {/* Add more search result details */}
-              </div>
-            )}
+    return (
+        <>
+          {/* --- Render GeoJSON Floor Plan if Indoor View is Active --- */}
+          {selectedBuildingId && currentFloorGeoJSON && (
+              <Data
+                  // Ensure key changes when floor changes to force re-render
+                  key={`floor-${selectedBuildingId}-${currentFloorLevel}`}
+                  data={currentFloorGeoJSON}
+                  // Optional: Add styling function if needed
+                  style={(feature) => {
+                    let fillColor = 'rgba(0, 0, 255, 0.3)'; // Semi-transparent blue fill
+                    let strokeColor = '#0000FF'; // Blue outline
+                    let strokeWeight = 1;
             
-            {/* --- Actions --- */}
-            <div className="info-actions">
-              {/* Connect these buttons to context functions later */}
-              <button onClick={() => console.log('Set as Start:', selectedMarker)}>Set Start</button>
-              {selectedMarker.type === 'building' && ( // Only show for buildings
-                 <button onClick={() => console.log('Indoor View:', selectedMarker)}>Indoor View</button>
-              )}
-              <button onClick={() => console.log('Set as End:', selectedMarker)}>Set End</button>
-            </div>
-          </div>
-        </InfoWindow>
-      )}
-    </>
-  );
-};
+                    // Example: Style rooms differently
+                    if (feature.getProperty('category') === 'room') {
+                        fillColor = 'rgba(200, 200, 200, 0.5)'; // Light gray fill
+                        strokeColor = '#555555'; // Darker gray outline
+                    } else if (feature.getProperty('category') === 'elevator') {
+                        fillColor = 'rgba(0, 255, 0, 0.6)'; // Green fill
+                        strokeColor = '#008000'; // Dark green outline
+                        strokeWeight = 2;
+                    }
+            
+                    return ({
+                        fillColor: fillColor,
+                        strokeColor: strokeColor,
+                        strokeWeight: strokeWeight,
+                        clickable: false, // Optional: make features non-clickable
+                        zIndex: 1 // Optional: Render below route/markers
+                    });
+                }}
+              />
+          )}
+    
+          {/* --- Routing Markers (Render regardless of indoor view?) --- */}
+          {/* Use startPoint from RoutingContext */}
+          {startPoint && startPoint.lat && startPoint.lng && (
+              <Marker
+                  key="start-point"
+                  position={{ lat: startPoint.lat, lng: startPoint.lng }}
+                  label="A" // Or use a custom icon
+                  onClick={() => handleMarkerClick({ ...startPoint, type: 'start' })}
+              />
+          )}
+          {/* Use endPoint from RoutingContext */}
+          {endPoint && endPoint.lat && endPoint.lng && (
+              <Marker
+                  key="end-point"
+                  position={{ lat: endPoint.lat, lng: endPoint.lng }}
+                  label="B" // Or use a custom icon
+                  onClick={() => handleMarkerClick({ ...endPoint, type: 'end' })}
+              />
+          )}
+    
+          {/* --- Route Polyline (Render regardless of indoor view?) --- */}
+          {route && route.geometry && route.geometry.length > 0 && (
+              <>
+                  {console.log("Rendering Polyline with geometry:", route.geometry)}
+                  <Polyline
+                      path={route.geometry} // Assuming geometry is an array of {lat, lng}
+                      options={{
+                          strokeColor: '#FFC629', // KSU Gold
+                          strokeOpacity: 0.8,
+                          strokeWeight: 6,
+                          geodesic: true,
+                          zIndex: 1 // Ensure route is drawn above other map features if needed
+                      }}
+                  />
+              </>
+          )}
+    
+          {/* --- Render other markers ONLY if NOT in indoor view --- */}
+          {!selectedBuildingId && (
+              <>
+                  {/* Building Markers (Using fetched data) */}
+                  {buildings.map((building) => (
+                    // Check for valid coordinates before rendering
+                    (typeof building.lat === 'number' && typeof building.lng === 'number') && (
+                      <Marker
+                        key={`bldg-${building.building_id}`} // Use a unique key
+                        position={{ lat: building.lat, lng: building.lng }}
+                        icon={buildingIcon}
+                        title={building.name}
+                        onClick={() => handleMarkerClick(building)} // Pass the whole building object
+                      />
+                    )
+                  ))}
+    
+                  {/* Obstacle Markers (Using fetched data) */}
+                  {obstacles.map((obstacle) => (
+                    // Check for valid coordinates before rendering
+                     (typeof obstacle.lat === 'number' && typeof obstacle.lng === 'number') && (
+                        <Marker
+                          key={`obs-${obstacle.obstacle_id}`} // Use a unique key
+                          position={{ lat: obstacle.lat, lng: obstacle.lng }}
+                          icon={obstacleIcon}
+                          title={obstacle.description || 'Obstacle'} // Use description for title
+                          onClick={() => handleMarkerClick(obstacle)} // Pass the whole obstacle object
+                        />
+                     )
+                  ))}
+                  {/* Event Markers */}
+                  {placeholderEvents.map((event) => (
+                    <Marker
+                      key={event.id}
+                      position={{ lat: event.lat, lng: event.lng }}
+                      // icon={{ url: '/icons/event.png', scaledSize: new window.google.maps.Size(30, 30) }} // Example custom icon
+                      title={event.name}
+                      onClick={() => handleMarkerClick({ ...event, type: 'event' })}
+                    />
+                  ))}
+    
+                    {/* --- Selected Search Result Marker --- */}
+                    {selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng && (
+                        <Marker
+                            key="search-result-marker"
+                            position={{ lat: selectedSearchResult.lat, lng: selectedSearchResult.lng }}
+                            label={{ text: '📍', fontSize: '20px' }}
+                            title={selectedSearchResult.name}
+                            onClick={() => handleMarkerClick({ ...selectedSearchResult, type: 'search' })}
+                            animation={window.google.maps.Animation.DROP}
+                        />
+                    )}
+              </>
+          )}
+    
+          {/* --- Info Window (Render regardless of indoor view, but content depends) --- */}
+          {selectedMarker && selectedMarker.lat && selectedMarker.lng && ( // Added coordinate check
+              <InfoWindow
+                  position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
+                  onCloseClick={handleInfoWindowClose}
+              >
+                  <div className="info-window">
+                      <h3>{selectedMarker.name || selectedMarker.description || 'Selected Location'}</h3>
+                      {/* ... (Conditional rendering for different types remains the same) ... */}
+    
+                      {/* --- Actions --- */}
+                      <div className="info-actions">
+                          {/* Only show Set Start/End if NOT in indoor view */}
+                          {!selectedBuildingId && (
+                              <>
+                                  <button onClick={() => {
+                                      console.log('Set as Start:', selectedMarker);
+                                      setStartPoint(selectedMarker); // Update routing context
+                                      handleInfoWindowClose(); // Close window after setting
+                                  }}>Set Start</button>
+                                  <button onClick={() => {
+                                      console.log('Set as End:', selectedMarker);
+                                      setEndPoint(selectedMarker); // Update routing context
+                                      handleInfoWindowClose(); // Close window after setting
+                                  }}>Set End</button>
+                              </>
+                          )}
+                          {/* Show Indoor View button only for buildings and when NOT already inside */}
+                          {selectedMarker.type === 'building' && !selectedBuildingId && (
+                              <button onClick={() => {
+                                  enterIndoorView(selectedMarker);
+                                  handleInfoWindowClose();
+                              }}>Indoor View</button>
+                          )}
+                      </div>
+                  </div>
+              </InfoWindow>
+          )}
+        </>
+      );
+    };
+    
 
 export default MapOverlays;

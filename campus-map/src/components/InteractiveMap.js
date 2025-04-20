@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline, Polygon } from '@react-google-maps/api';
 import { AccessibilityContext } from '../App';
 import '../styles/InteractiveMap.css';
-import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
-import RoutePointDisplay from './RoutePointDisplay';
 import RoutePlanner from './RoutePlanner';
 import IndoorViewControls from './IndoorView';
 import useIsMobile from '../hooks/useIsMobile';

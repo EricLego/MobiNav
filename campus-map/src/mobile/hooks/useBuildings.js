@@ -30,7 +30,7 @@ const useBuildings = () => {
     };
 
     loadBuildings();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   return { buildings, isLoading, error };
 };

@@ -1,8 +1,8 @@
 // RoutePlanner.js
 import React, { useState, useEffect } from 'react';
-import BuildingAutocomplete from './BuildingAutocomplete';
 import RoutePointDisplay from './RoutePointDisplay';
 import '../styles/RoutePlanner.css';
+import SearchBar from '../mobile/components/SearchBar';
 
 const RoutePlanner = ({ 
   startPoint, 
@@ -57,13 +57,9 @@ const RoutePlanner = ({
     <div className="route-planner-overlay">
       {/* Search bar in top left */}
       <div className="search-overlay">
-        <BuildingAutocomplete 
-          onPlaceSelect={handlePlaceSelect} 
-          mapRef={mapRef} 
-          restrictToCampus={true} 
-          campusBoundary={campusBoundary} 
-          placeholder="Search for a location..." 
-        />
+        <SearchBar>
+          
+        </SearchBar>
       </div>
       
       {/* Route display in top right */}

@@ -1,7 +1,8 @@
 // src/components/GoogleMapCore.js
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useContext } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
+import useMapViewpoint from '../hooks/useMapViewpoint';
 import { MapContext } from '../contexts/MapContext'; // Import the context
 import MapOverlays from './MapOverlays';
 
@@ -21,7 +22,6 @@ const defaultMapContainerStyle = {
 };
 
 const GoogleMapCore = ({
-  children, // To render overlays like Markers, Polylines etc.
   mapContainerStyle = defaultMapContainerStyle,
   center = defaultCenter,
   zoom = defaultZoom,
@@ -30,15 +30,18 @@ const GoogleMapCore = ({
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
   const { isLoaded: isScriptLoaded, loadError, handleLoadSuccess, handleLoadError } = useGoogleMapLoader(apiKey, libraries);
 
-  const mapRef = useRef(null); // Ref to hold the map instance
+  const { mapRef, setLoaded } = useContext(MapContext);
   const [isMapInstanceLoaded, setIsMapInstanceLoaded] = useState(false); // Track if map instance itself is ready
   const [mapOptions, setMapOptions] = useState(initialMapOptions);
+
+  useMapViewpoint();
 
   // Callback when the GoogleMap component itself is loaded
   const onMapLoad = useCallback((mapInstance) => {
     console.log('GoogleMap component instance loaded.');
     mapRef.current = mapInstance; // Store the instance in the ref
     setIsMapInstanceLoaded(true); // Mark map instance as loaded
+    setLoaded(true);
 
     // Set default options once map is loaded (can be dynamic later)
     const campusBounds = new window.google.maps.LatLngBounds(
@@ -62,24 +65,16 @@ const GoogleMapCore = ({
       ...prevOptions, // Merge with any initial options passed via props
     }));
 
-    // Example: Fit bounds initially
-    // mapInstance.fitBounds(campusBounds);
 
-  }, []); // No dependencies needed for this basic version
+  }, [mapRef, setLoaded]); // No dependencies needed for this basic version
 
   // Callback if the map is unmounted
   const onUnmount = useCallback(() => {
     console.log('GoogleMap component unmounted.');
     mapRef.current = null;
     setIsMapInstanceLoaded(false);
-  }, []);
-
-  // Prepare the context value
-  // Use useMemo to prevent unnecessary re-renders of context consumers
-  const contextValue = useMemo(() => ({
-    mapRef,
-    isMapLoaded: isMapInstanceLoaded, // Context reflects map instance readiness
-  }), [isMapInstanceLoaded]); // Dependency: map instance load status
+    setLoaded(false);
+  }, [mapRef, setLoaded]);
 
   // --- Render Logic ---
   if (loadError) {
@@ -92,36 +87,33 @@ const GoogleMapCore = ({
   }
 
   return (
-    // Provide the context to children
-    <MapContext.Provider value={contextValue}>
-      <LoadScript
-        googleMapsApiKey={apiKey}
-        libraries={libraries}
-        onLoad={handleLoadSuccess}
-        onError={handleLoadError}
-        loadingElement={<div style={mapContainerStyle} className="map-placeholder loading">Loading Maps Script...</div>}
-      >
-        {/* Only render GoogleMap component if the script is loaded */}
-        {isScriptLoaded ? (
-          <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={center}
-            zoom={zoom}
-            options={mapOptions} // Pass the dynamic options state
-            onLoad={onMapLoad}
-            onUnmount={onUnmount}
-            // Add other event handlers as needed (onClick, onBoundsChanged, etc.)
-          >
-            {/* Render children (like MapOverlays) only when map instance is ready */}
-            {isMapInstanceLoaded && <MapOverlays />}
-          </GoogleMap>
-        ) : (
-          // Render a placeholder while LoadScript is working but before isScriptLoaded is true
-          // This might be brief if loadingElement is used effectively.
-          <div style={mapContainerStyle} className="map-placeholder waiting">Waiting for script...</div>
-        )}
-      </LoadScript>
-    </MapContext.Provider>
+    <LoadScript
+      googleMapsApiKey={apiKey}
+      libraries={libraries}
+      onLoad={handleLoadSuccess}
+      onError={handleLoadError}
+      loadingElement={<div style={mapContainerStyle} className="map-placeholder loading">Loading Maps Script...</div>}
+    >
+      {/* Only render GoogleMap component if the script is loaded */}
+      {isScriptLoaded ? (
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={center}
+          zoom={zoom}
+          options={mapOptions} // Pass the dynamic options state
+          onLoad={onMapLoad}
+          onUnmount={onUnmount}
+          // Add other event handlers as needed (onClick, onBoundsChanged, etc.)
+        >
+          {/* Render children (like MapOverlays) only when map instance is ready */}
+          {isMapInstanceLoaded && <MapOverlays />}
+        </GoogleMap>
+      ) : (
+        // Render a placeholder while LoadScript is working but before isScriptLoaded is true
+        // This might be brief if loadingElement is used effectively.
+        <div style={mapContainerStyle} className="map-placeholder waiting">Waiting for script...</div>
+      )}
+    </LoadScript>
   );
 };
 

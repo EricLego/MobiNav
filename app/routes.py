@@ -2,9 +2,16 @@ from flask import Blueprint, jsonify, request
 from app.models import Building, Entrance, Path, Obstacle
 from app import db
 from datetime import datetime
+import requests
+import os
 
 # Create Blueprint
 main = Blueprint('main', __name__)
+
+# --- Get OSRM URL from environment variable ---
+# Example: OSRM_URL=http://localhost:5000 in your .env file
+OSRM_URL = os.getenv("OSRM_URL", "http://10.96.33.120:5002") # Default to public server if not set
+
 
 #-------------------------------------------------------------------------
 # Building Methods
@@ -115,6 +122,112 @@ def delete_building(building_id):
     db.session.delete(building)
     db.session.commit()
     return jsonify({'message': f'Building {building_id} deleted'}), 200
+
+
+#-------------------------------------------------------------------------
+# Indoor View Methods
+#-------------------------------------------------------------------------
+
+# GET indoor details (floor list) for a specific building
+@main.route('/api/buildings/<int:building_id>/indoor', methods=['GET'])
+def get_building_indoor_data(building_id):
+    building = Building.query.get_or_404(building_id)
+
+    # --- Mock Floor Data (Replace with actual data retrieval later) ---
+    # This data should ideally come from your database or a configuration file
+    mock_floors = []
+    if building_id == 1: # Example: Howell Hall
+        mock_floors = [
+            {'level': 0, 'name': 'Ground Floor', 'isDefault': True},
+            {'level': 1, 'name': 'First Floor'},
+            {'level': 2, 'name': 'Second Floor'},
+        ]
+    elif building_id == 2: # Example: Recreation Center
+         mock_floors = [
+            {'level': 1, 'name': 'Main Level', 'isDefault': True},
+            {'level': 2, 'name': 'Upper Level'},
+        ]
+    elif building_id == 3: # Example: Engineering Building (Q)
+        mock_floors = [
+            {'level': 1, 'name': 'First Floor', 'isDefault': True},
+            {'level': 2, 'name': 'Second Floor'},
+            {'level': 3, 'name': 'Third Floor'},
+        ]
+    else:
+        # Default or empty if no specific mock data exists for the building
+        mock_floors = [{'level': 1, 'name': 'Main Floor', 'isDefault': True}]
+    # --- End Mock Floor Data ---
+
+    result = {
+        'building_id': building.building_id,
+        'name': building.name,
+        'floors': mock_floors
+        # You could add other indoor-specific details here if needed
+        # 'defaultViewpoint': { 'lat': ..., 'lng': ..., 'zoom': ... }
+    }
+    return jsonify(result)
+
+# GET GeoJSON floor plan for a specific floor level
+@main.route('/api/buildings/<int:building_id>/floors/<floor_level>', methods=['GET'])
+def get_floor_plan(building_id, floor_level):
+    # Check if the building exists
+    building = Building.query.get_or_404(building_id)
+
+    # --- Mock GeoJSON Data (Replace with actual data retrieval later) ---
+    # In a real application, you would load this from a file, database,
+    # or generate it based on stored geometry.
+    # The structure should be a valid GeoJSON FeatureCollection or Feature.
+    mock_geojson = {
+        "type": "FeatureCollection",
+        "properties": {
+            "building_id": building_id,
+            "level": floor_level,
+            # Optional: Add viewpoint specific to this floor
+            "viewpoint": {
+                 "center": {"lat": float(building.latitude or 33.9386), "lng": float(building.longitude or -84.5187)},
+                 "zoom": 19 # Default zoom for floor plan
+            }
+        },
+        "features": [
+            # Example Feature 1: A Room (Polygon)
+            {
+                "type": "Feature",
+                "properties": { "category": "room", "name": f"Room {floor_level}01", "ref": f"{floor_level}01" },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        # Example coordinates (replace with real ones)
+                        [float(building.longitude or -84.5187) - 0.0001, float(building.latitude or 33.9386) + 0.0001],
+                        [float(building.longitude or -84.5187) + 0.0001, float(building.latitude or 33.9386) + 0.0001],
+                        [float(building.longitude or -84.5187) + 0.0001, float(building.latitude or 33.9386) - 0.0001],
+                        [float(building.longitude or -84.5187) - 0.0001, float(building.latitude or 33.9386) - 0.0001],
+                        [float(building.longitude or -84.5187) - 0.0001, float(building.latitude or 33.9386) + 0.0001]
+                    ]]
+                }
+            },
+            # Example Feature 2: An Elevator (Point)
+            {
+                "type": "Feature",
+                "properties": { "category": "elevator", "ref": "EL1", "wheelchair": "yes" },
+                "geometry": {
+                    "type": "Point",
+                    # Example coordinates (replace with real ones)
+                    "coordinates": [float(building.longitude or -84.5187), float(building.latitude or 33.9386)]
+                }
+            }
+            # Add more features like walls, doors, stairs, amenities etc.
+        ]
+    }
+    # --- End Mock GeoJSON Data ---
+
+    # Basic check if the requested floor level exists in mock data (optional)
+    # You might want more robust checking against the result from the /indoor endpoint
+    # if not any(f['level'] == int(floor_level) for f in get_building_indoor_data(building_id).get_json().get('floors', [])):
+    #     return jsonify({"error": f"Floor level {floor_level} not found for building {building_id}"}), 404
+
+    # Return the mock GeoJSON
+    return jsonify(mock_geojson)
+
 
 #-------------------------------------------------------------------------
 # Entrance Methods
@@ -450,6 +563,85 @@ def delete_obstacle(obstacle_id):
     db.session.commit()
     return jsonify({'message': f'Obstacle {obstacle_id} deleted'}), 200
 
+
+
+#-------------------------------------------------------------------------
+# Helper Methods
+#-------------------------------------------------------------------------
+
+# --- Helper function to call OSRM ---
+def get_osrm_route(start_coords, end_coords, accessibility_params):
+    """
+    Fetches route from OSRM service.
+    start_coords: tuple (lat, lng)
+    end_coords: tuple (lat, lng)
+    accessibility_params: dict containing preferences like 'avoidStairs'
+    """
+    # Determine which OSRM profile to use based on accessibility
+    # Example: Use 'foot-accessible' profile if avoidStairs is true
+    profile = "foot-accessible" if accessibility_params.get("avoidStairs", False) else "foot"
+    # Construct OSRM API request URL
+    # Format: {osrm_url}/route/v1/{profile}/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson&steps=true
+    url = (
+        f"{OSRM_URL}/route/v1/{profile}/"
+        f"{start_coords[1]},{start_coords[0]};{end_coords[1]},{end_coords[0]}"
+        f"?overview=full&geometries=geojson&steps=true" # Request full geometry as GeoJSON and steps
+    )
+
+    try:
+        print(f"Requesting OSRM URL: {url}") # Log the request URL
+        response = requests.get(url, timeout=10) # Add timeout
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        data = response.json()
+        print(f"OSRM Response: {data}") # Log the response
+
+        if data.get("code") == "Ok" and data.get("routes"):
+            route = data["routes"][0]
+            # Extract relevant information
+            geometry = route["geometry"]["coordinates"] # GeoJSON format [lng, lat]
+            # Convert GeoJSON [lng, lat] to {lat, lng} for frontend
+            formatted_geometry = [{"lat": coord[1], "lng": coord[0]} for coord in geometry]
+
+            # Extract steps/instructions if needed
+            instructions = []
+            if route.get("legs"):
+                for leg in route["legs"]:
+                    if leg.get("steps"):
+                        for step in leg["steps"]:
+                            # --- Use .get() for potentially missing keys ---
+                            maneuver_data = step.get("maneuver", {}) # Get maneuver safely
+                            instructions.append({
+                                "maneuver": maneuver_data.get("type", "unknown"), # Get type safely
+                                "instruction": maneuver_data.get("instruction", ""), # Get instruction safely, default to ""
+                                "distance": step.get("distance", 0), # Get distance safely
+                                "duration": step.get("duration", 0), # Get duration safely
+                                "name": step.get("name", "")
+                            })
+
+            # Extract summary
+            summary = {
+                "distance": route.get("distance"), # meters
+                "duration": route.get("duration") # seconds
+            }
+
+            return {
+                "geometry": formatted_geometry,
+                "instructions": instructions,
+                "summary": summary,
+                "warnings": [] # TODO: Add logic for warnings based on route properties/obstacles
+            }
+        else:
+            raise Exception(f"OSRM API Error: {data.get('code')} - {data.get('message', 'No route found')}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to OSRM: {e}")
+        raise Exception(f"Could not connect to routing service: {e}")
+    except Exception as e:
+        print(f"Error processing OSRM response: {e}")
+        raise Exception(f"Error getting route from service: {e}")
+
+
+
 #-------------------------------------------------------------------------
 # Route API Methods
 #-------------------------------------------------------------------------
@@ -460,25 +652,45 @@ def get_route():
     """
     API endpoint to get an optimized walking route.
     Requires 'start' and 'end' parameters in 'lat,lng' format.
-    Example request: /api/get_route?start=34.0395,-84.5836&end=34.0365,-84.5822
+    Optional accessibility parameters: 'avoidStairs=true', etc.
+    Example: /api/get_route?start=33.9,-84.5&end=33.91,-84.51&avoidStairs=true
     """
     start = request.args.get("start")
     end = request.args.get("end")
-    provider = request.args.get("provider", "google")  # Default to Google API
+
+    # --- Parse Accessibility Params ---
+    accessibility_params = {
+        "avoidStairs": request.args.get("avoidStairs", "false").lower() == "true",
+        # Add other params as needed (e.g., maxIncline, preferRamps)
+        # "maxIncline": request.args.get("maxIncline", type=int),
+    }
+    # ---------------------------------
+
 
     if not start or not end:
         return jsonify({"error": "Missing 'start' or 'end' parameters"}), 400
 
     try:
-        start = tuple(map(float, start.split(",")))
-        end = tuple(map(float, end.split(",")))
+        # Parse coordinates
+        start_coords = tuple(map(float, start.split(",")))
+        end_coords = tuple(map(float, end.split(",")))
 
-        if provider == "google":
-            route = get_google_route(start, end)
-        else:
-            route = get_osrm_route(start, end)
+        if len(start_coords) != 2 or len(end_coords) != 2:
+             raise ValueError("Coordinates must be in 'lat,lng' format")
 
-        return jsonify({"route": route})
+        # --- Call the OSRM helper ---
+        # Note: We removed the 'provider' logic for now, assuming OSRM
+        route_data = get_osrm_route(start_coords, end_coords, accessibility_params)
+        # ----------------------------
 
+        return jsonify(route_data) # Return the structured route data
+
+    except ValueError as ve:
+         print(f"Value Error: {ve}")
+         return jsonify({"error": f"Invalid coordinate format: {ve}"}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Routing Error: {e}") # Log the specific error on the server
+        # Return a generic error to the client
+        return jsonify({"error": f"Failed to calculate route. {str(e)}"}), 500
+
+

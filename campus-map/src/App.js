@@ -7,6 +7,9 @@ import RoutePlanner from './components/RoutePlanner';
 import './App.css';
 import MapEditor from './components/MapEditor';
 import { SearchProvider } from './mobile/contexts/SearchContext';
+import { MapProvider } from './mobile/contexts/MapContext';
+import { RoutingProvider } from './mobile/contexts/RoutingContext';
+import { IndoorViewProvider } from './mobile/contexts/IndoorViewContext';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -52,7 +55,10 @@ function App() {
   
   return (
     <AccessibilityContext.Provider value={{ accessibilitySettings, setAccessibilitySettings }}>
+      <MapProvider>
       <SearchProvider>
+      <RoutingProvider>
+      <IndoorViewProvider>
         <Router>
           <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
             <Routes>
@@ -65,7 +71,10 @@ function App() {
             </Routes>
           </div>
         </Router>
+      </IndoorViewProvider>
+      </RoutingProvider>
       </SearchProvider>
+      </MapProvider>
     </AccessibilityContext.Provider>
   );
 }

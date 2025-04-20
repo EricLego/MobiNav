@@ -1,0 +1,186 @@
+/* src/styles/RouteDisplay.css */
+
+.route-display {
+  background-color: var(--ksu-white);
+  padding: var(--space-md);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--space-md);
+  max-height: 40vh; /* Limit height and allow scrolling */
+  overflow-y: auto;
+  border: 1px solid var(--ksu-gray-light);
+  font-size: 0.95rem;
+}
+
+.route-display.loading,
+.route-display.error {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--ksu-gray-dark);
+}
+
+.route-display.error p {
+    color: var(--danger);
+    margin-bottom: var(--space-md);
+}
+
+.route-summary {
+  border-bottom: 1px solid var(--ksu-gray-light);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-md);
+  position: relative; /* For positioning the clear button */
+}
+
+.route-summary h3 {
+  margin-top: 0;
+  margin-bottom: var(--space-sm);
+  font-size: 1.1rem;
+  color: var(--ksu-black);
+}
+
+.route-summary p {
+  margin: 0;
+  line-height: 1.4;
+  color: var(--ksu-gray-dark);
+}
+
+.route-summary strong {
+    color: var(--ksu-black);
+    font-weight: 600;
+}
+
+.clear-route-button {
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--ksu-gray-light);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  color: var(--ksu-black);
+  margin-top: var(--space-sm); /* Add some space in error view */
+}
+
+.clear-route-button.small {
+    position: absolute;
+    top: 0; /* Adjust as needed */
+    right: 0; /* Adjust as needed */
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.8rem;
+    margin-top: 0;
+}
+
+
+.clear-route-button:hover {
+  background-color: var(--ksu-gray);
+}
+
+
+.route-instructions h3 {
+  margin-top: 0;
+  margin-bottom: var(--space-md);
+  font-size: 1.1rem;
+  color: var(--ksu-black);
+}
+
+.route-instructions ol {
+  list-style: none; /* Use custom counters or icons */
+  padding: 0;
+  margin: 0;
+  counter-reset: step-counter;
+}
+
+.route-instructions li {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px dashed var(--ksu-gray-light);
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  gap: var(--space-sm);
+  line-height: 1.5;
+}
+
+.route-instructions li:last-child {
+  border-bottom: none;
+}
+
+/* Optional: Add step numbers */
+/* .route-instructions li::before {
+  content: counter(step-counter);
+  counter-increment: step-counter;
+  font-weight: bold;
+  color: var(--ksu-gold);
+  background-color: var(--ksu-black);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+  font-size: 0.85rem;
+} */
+
+.maneuver-icon {
+    font-size: 1.2rem;
+    color: var(--ksu-black);
+    width: 20px; /* Ensure consistent width */
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px; /* Align better with text */
+}
+
+.instruction-text {
+  flex-grow: 1;
+  color: var(--ksu-gray-darker);
+}
+
+.step-distance {
+  color: var(--ksu-gray);
+  font-size: 0.85rem;
+  white-space: nowrap; /* Prevent wrapping */
+  margin-left: var(--space-sm);
+}
+
+/* High Contrast Adjustments */
+.high-contrast .route-display {
+    background-color: var(--ksu-black);
+    border-color: var(--ksu-gold);
+    color: var(--ksu-white);
+}
+
+.high-contrast .route-summary,
+.high-contrast .route-instructions li {
+    border-color: var(--ksu-gold-dark);
+}
+
+.high-contrast .route-summary h3,
+.high-contrast .route-instructions h3,
+.high-contrast .route-summary strong,
+.high-contrast .maneuver-icon {
+    color: var(--ksu-gold);
+}
+
+.high-contrast .route-summary p,
+.high-contrast .instruction-text {
+    color: var(--ksu-white);
+}
+
+.high-contrast .step-distance {
+    color: var(--ksu-gray-light);
+}
+
+.high-contrast .clear-route-button {
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    border-color: var(--ksu-gold);
+}
+.high-contrast .clear-route-button:hover {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+}
+
+.high-contrast .route-display.error p {
+    color: #ff8a80; /* Lighter red for high contrast */
+}

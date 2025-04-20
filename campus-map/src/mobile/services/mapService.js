@@ -403,3 +403,39 @@ export const fetchGooglePlacesSuggestions = async (query, bounds = null) => {
           });
       });
   };
+
+// --- Indoor View Specific Services ---
+
+/**
+ * Fetches indoor view details for a specific building, including its available floors.
+ * @param {string|number} buildingId - The ID of the building.
+ * @returns {Promise<Object>} A promise resolving to the building's indoor details (e.g., { buildingId, name, floors: [{level, name, isDefault}, ...] }).
+ */
+export const fetchIndoorBuildingData = async (buildingId) => {
+  try {
+    // Assuming an endpoint like /api/buildings/{buildingId}/indoor exists
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/indoor`);
+    return handleResponse(response);
+  } catch (error) {
+    console.error(`Error fetching indoor data for building ${buildingId}:`, error);
+    throw error;
+  }
+};
+
+/**
+* Fetches the GeoJSON floor plan for a specific floor level of a building.
+* @param {string|number} buildingId - The ID of the building.
+* @param {string|number} floorLevel - The level identifier of the floor.
+* @returns {Promise<Object>} A promise resolving to the GeoJSON object for the floor plan.
+*/
+export const fetchFloorPlan = async (buildingId, floorLevel) => {
+  try {
+    // Assuming an endpoint like /api/buildings/{buildingId}/floors/{floorLevel} exists
+    // Or potentially /api/floorplans/{buildingId}/{floorLevel}
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/floors/${floorLevel}`);
+    return handleResponse(response); // Expects the response body to be the GeoJSON
+  } catch (error) {
+    console.error(`Error fetching floor plan for building ${buildingId}, level ${floorLevel}:`, error);
+    throw error;
+  }
+};
