@@ -10,6 +10,7 @@ import { SearchProvider } from './mobile/contexts/SearchContext';
 import { MapProvider } from './mobile/contexts/MapContext';
 import { RoutingProvider } from './mobile/contexts/RoutingContext';
 import { IndoorViewProvider } from './mobile/contexts/IndoorViewContext';
+import { UserLocationProvider } from './mobile/contexts/UserLocationContext';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -59,6 +60,7 @@ function App() {
       <SearchProvider>
       <RoutingProvider>
       <IndoorViewProvider>
+      <UserLocationProvider>
         <Router>
           <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
             <Routes>
@@ -71,6 +73,7 @@ function App() {
             </Routes>
           </div>
         </Router>
+      </UserLocationProvider>
       </IndoorViewProvider>
       </RoutingProvider>
       </SearchProvider>

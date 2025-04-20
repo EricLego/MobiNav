@@ -10,7 +10,7 @@ import MapOverlays from './MapOverlays';
 const libraries = ['places'];
 
 // Default map settings (can be overridden by props)
-const defaultCenter = {
+export const defaultCenter = {
   lat: 33.9386, // KSU Marietta Campus
   lng: -84.5187,
 };

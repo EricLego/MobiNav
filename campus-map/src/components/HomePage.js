@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react'; // Import useState, useEffect, useContext
 import { Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -8,13 +8,35 @@ import ObstacleReports from './ObstacleReports';
 import HowItWorks from './HowItWorks';
 import '../styles/HomePage.css';
 import useIsMobile from '../hooks/useIsMobile';
+import { useUserLocation } from '../mobile/contexts/UserLocationContext';
+import ParkingMenu from './ParkingMenu';
 
 const HomePage = () => {
   const isMobile = useIsMobile();
+  // Get location status from context
+  const { isOnCampus, isLocating, locationError } = useUserLocation();
+  // State to control parking menu visibility
+  const [showParkingMenu, setShowParkingMenu] = useState(false);
+
+  // Effect to automatically show the parking menu when off-campus
+  useEffect(() => {
+    // Show if NOT on campus, NOT currently locating, and NO location error
+    if (!isOnCampus && !isLocating && !locationError) {
+      console.log("User is off-campus, showing parking menu.");
+      setShowParkingMenu(true);
+    } else {
+      // Optionally hide if user location changes to on-campus later
+      // setShowParkingMenu(false);
+    }
+    // Dependencies: Run when these states change
+  }, [isOnCampus, isLocating, locationError]);
+
+
     
   return (
     <div className="page-wrapper">
       <Header />
+
       <div className="homepage">
       
       {/* Hero Section */}
@@ -33,16 +55,18 @@ const HomePage = () => {
         </div>
       </section>
       
-      {/* Interactive Map Section */}
-      <section className="map-section">
-        {isMobile ? (
-          <GoogleMapCore>
-            
-          </GoogleMapCore> // Mobile version of the map
-        ) : (
-          <InteractiveMap />
-        )}
-      </section>
+        {/* Add position: relative to the map section */}
+        <section className="map-section" style={{ position: 'relative' }}>
+          {/* Conditionally render ParkingMenu INSIDE the map section */}
+          {/* Pass isOpen prop */}
+          <ParkingMenu isOpen={showParkingMenu} onClose={() => setShowParkingMenu(false)} />
+
+          {isMobile ? (
+            <GoogleMapCore />
+          ) : (
+            <InteractiveMap />
+          )}
+        </section>
       
       {/* Obstacle Reports Section */}
       <section className="obstacles-section">

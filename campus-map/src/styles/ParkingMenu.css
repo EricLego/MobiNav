@@ -1,0 +1,210 @@
+/* src/styles/ParkingMenu.css */
+
+.parking-menu-panel { /* Changed class name */
+    position: absolute; /* Position relative to the map container */
+    top: 0;
+    right: 0;
+    width: 350px; /* Adjust width as needed */
+    max-width: 40%; /* Max width relative to container */
+    height: 100%; /* Full height of the map container */
+    background-color: var(--ksu-white);
+    box-shadow: -4px 0px 15px rgba(0, 0, 0, 0.2); /* Shadow on the left */
+    z-index: 1010; /* Above map, below header maybe */
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%); /* Start off-screen */
+    transition: transform var(--transition-medium) ease-in-out;
+    overflow: hidden;
+}
+
+
+.parking-menu-panel.open {
+    transform: translateX(0); /* Slide in */
+}
+
+.parking-menu-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.parking-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--ksu-black);
+  color: var(--ksu-gold);
+  border-bottom: 3px solid var(--ksu-gold);
+}
+
+.parking-menu-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.close-parking-menu {
+  background: none;
+  border: none;
+  color: var(--ksu-white);
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: 0 var(--space-xs);
+  cursor: pointer;
+  opacity: 0.8;
+}
+.close-parking-menu:hover {
+  opacity: 1;
+  color: var(--ksu-gold);
+}
+
+.parking-filters {
+  display: flex;
+  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--ksu-gray-light);
+  background-color: var(--ksu-gray-light);
+}
+
+.filter-button {
+  flex: 1;
+  padding: var(--space-sm) var(--space-xs); /* Smaller padding */
+  font-size: 0.9rem;
+  border: 1px solid var(--ksu-gray);
+  background-color: var(--ksu-white);
+  color: var(--ksu-gray-dark);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+.filter-button:hover {
+  border-color: var(--ksu-black);
+  background-color: #f0f0f0;
+}
+.filter-button.active {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  border-color: var(--ksu-gold-dark);
+  font-weight: 700;
+}
+
+.parking-list {
+  padding: var(--space-md) var(--space-lg);
+  overflow-y: auto; /* Allow scrolling */
+  flex-grow: 1; /* Take remaining space */
+}
+
+.parking-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) 0;
+  border-bottom: 1px dashed var(--ksu-gray-light);
+}
+.parking-list-item:last-child {
+  border-bottom: none;
+}
+
+.parking-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.parking-name {
+  font-weight: 600;
+  color: var(--ksu-black);
+}
+
+.parking-type {
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: var(--border-radius-sm);
+  color: var(--ksu-white);
+  text-transform: uppercase;
+  font-weight: 600;
+  display: inline-block; /* Fit content */
+}
+
+.type-student { background-color: var(--ksu-black); }
+.type-visitor { background-color: var(--info); }
+.type-faculty { background-color: var(--success); }
+
+
+.parking-item-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.parking-item-actions button {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.85rem;
+  background-color: var(--ksu-gray-light);
+  border: 1px solid var(--ksu-gray);
+  color: var(--ksu-black);
+}
+.parking-item-actions button:hover {
+  background-color: var(--ksu-gold-light);
+  border-color: var(--ksu-gold);
+}
+
+.error-text {
+    color: var(--danger);
+}
+
+/* High Contrast */
+.high-contrast .parking-menu-content {
+    background-color: var(--ksu-black);
+    border: 2px solid var(--ksu-gold);
+}
+.high-contrast .parking-menu-header {
+    border-bottom-color: var(--ksu-gold);
+}
+.high-contrast .close-parking-menu {
+    color: var(--ksu-white);
+}
+.high-contrast .close-parking-menu:hover {
+    color: var(--ksu-gold);
+}
+.high-contrast .parking-filters {
+    background-color: var(--ksu-black);
+    border-bottom-color: var(--ksu-gold);
+}
+.high-contrast .filter-button {
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    border-color: var(--ksu-gold);
+}
+.high-contrast .filter-button.active {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+}
+.high-contrast .parking-list {
+    border-top: 1px solid var(--ksu-gold); /* Add separator */
+}
+.high-contrast .parking-list-item {
+    border-bottom-color: var(--ksu-gold-dark);
+}
+.high-contrast .parking-name {
+    color: var(--ksu-white);
+}
+.high-contrast .parking-type {
+    color: var(--ksu-black); /* Ensure visibility on colored backgrounds */
+}
+.high-contrast .type-student { background-color: var(--ksu-white); }
+.high-contrast .type-visitor { background-color: #81d4fa; } /* Lighter blue */
+.high-contrast .type-faculty { background-color: #a5d6a7; } /* Lighter green */
+
+.high-contrast .parking-item-actions button {
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    border-color: var(--ksu-gold);
+}
+.high-contrast .parking-item-actions button:hover {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+}
+.high-contrast .error-text {
+    color: #ff8a80; /* Lighter red */
+}

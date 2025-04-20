@@ -6,14 +6,14 @@ import { Marker, InfoWindow, Polyline, Data } from '@react-google-maps/api';
 import { MapContext } from '../contexts/MapContext';
 import { SearchContext } from '../contexts/SearchContext';
 import { RoutingContext } from '../contexts/RoutingContext';
-import { IndoorViewContext, useIndoorView } from '../contexts/IndoorViewContext';
+import { useIndoorView } from '../contexts/IndoorViewContext';
 // import { EventContext } from '../contexts/EventContext';
 
 // --- Import hooks for data (Alternative if not using separate contexts) ---
 import useBuildings from '../hooks/useBuildings';
 import useObstacles from '../hooks/useObstacles';
 import useRouting from '../hooks/useRouting';
-import useGeolocation from '../hooks/useGeolocation';
+import { useUserLocation } from '../contexts/UserLocationContext';
 // import useEvents from '../hooks/useEvents';
 // import useSearch from '../hooks/useSearch';
 
@@ -43,14 +43,20 @@ const MapOverlays = () => {
     const { obstacles, isLoading: isLoadingObstacles, error: obstaclesError } = useObstacles();
     const { setStartPoint, setEndPoint } = useRouting();
     const { selectedBuildingId, currentFloorGeoJSON, selectBuildingForIndoorView, currentFloorLevel } = useIndoorView();
+    const { userCoords } = useUserLocation();
 
 
   // --- Consume Contexts (Uncomment when available) ---
-    const { mapRef, isMapLoaded, setViewpoint } = useContext(MapContext); // Check if map is ready
+    const { mapRef, isMapLoaded } = useContext(MapContext); // Check if map is ready
     const { selectedSearchResult } = useContext(SearchContext);
     const { startPoint, endPoint, route, isLoadingRoute, routeError } = useContext(RoutingContext);
   // const { obstacles } = useContext(ObstacleContext); // Assuming obstacles is an array
   // const { currentEvents } = useContext(EventContext); // Assuming events is an array
+
+
+  // State to manage which InfoWindow is open
+  const [selectedMarker, setSelectedMarker] = useState(null); // Holds the data of the selected marker
+  const [previousCoords, setPreviousCoords] = useState(null);
 
 // --- Placeholder Data (Uncomment these!) ---
 
@@ -77,6 +83,19 @@ const MapOverlays = () => {
       anchor: new window.google.maps.Point(12, 12)
     };
   }, []);
+
+  // ... inside the component, define a user location icon (optional) ...
+const userLocationIcon = useMemo(() => {
+    if (!window.google || !window.google.maps) return null;
+    return {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        fillColor: '#4285F4', // Google Blue
+        fillOpacity: 1,
+        strokeColor: '#FFFFFF', // White outline
+        strokeWeight: 2,
+        scale: 8, // Adjust size as needed
+    };
+}, []);
   // -----------------------------------------------------------------
 
   const enterIndoorView = (marker) => {
@@ -88,8 +107,6 @@ const MapOverlays = () => {
         }
   };
 
-  // State to manage which InfoWindow is open
-  const [selectedMarker, setSelectedMarker] = useState(null); // Holds the data of the selected marker
 
   const handleMarkerClick = (markerData) => {
     if(typeof markerData.lat === 'number' && typeof markerData.lng === 'number') {
@@ -129,7 +146,7 @@ const MapOverlays = () => {
         clickListener.remove();
       }
     };
-  }, [mapRef.current]); // Dependency array includes mapRef.current
+  }, [mapRef]);
   // --- End Effect ---
 
     // Effect to sync local selectedMarker with the global selectedSearchResult
@@ -147,57 +164,6 @@ const MapOverlays = () => {
     
     }, [selectedSearchResult]); // Re-run only when the global search selection changes
 
-
-    // --- Effect to SET the target viewpoint in the context ---
-    useEffect(() => {
-        let targetCenter = null;
-        let targetZoom = null;
-        let targetTilt = 0; // Default tilt
-        let targetHeading = 0; // Default heading
-
-        // --- Logic to determine desired viewpoint ---
-        if (selectedBuildingId) {
-            // Indoor view active
-            targetZoom = 19; // Default indoor zoom
-            targetTilt = 45; // Example indoor tilt
-            if (currentFloorGeoJSON?.properties?.viewpoint?.center) {
-                targetCenter = currentFloorGeoJSON.properties.viewpoint.center;
-                targetZoom = currentFloorGeoJSON.properties.viewpoint.zoom || targetZoom;
-                targetTilt = currentFloorGeoJSON.properties.viewpoint.tilt || targetTilt;
-                targetHeading = currentFloorGeoJSON.properties.viewpoint.heading || targetHeading;
-            } else {
-                const building = buildings.find(b => b.building_id === selectedBuildingId);
-                if (building && typeof building.lat === 'number' && typeof building.lng === 'number') {
-                    targetCenter = { lat: building.lat, lng: building.lng };
-                    targetZoom = 18; // Zoom slightly less for building center
-                }
-            }
-        } else if (selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng) {
-            // Search result selected
-            targetCenter = { lat: selectedSearchResult.lat, lng: selectedSearchResult.lng };
-            targetZoom = 18;
-        } else if (selectedMarker && selectedMarker.lat && selectedMarker.lng) {
-            // Local marker clicked
-            targetCenter = { lat: selectedMarker.lat, lng: selectedMarker.lng };
-            targetZoom = 18;
-        } else {
-            // Default view (optional: could set to null to let user control)
-            // targetCenter = { lat: 33.9386, lng: -84.5187 };
-            // targetZoom = 16;
-            targetCenter = null; // Setting to null might stop useMapViewpoint from acting
-            targetZoom = null;
-        }
-
-        // --- Call the context setter ---
-        console.log("Requesting viewpoint update via context:", { center: targetCenter, zoom: targetZoom, tilt: targetTilt, heading: targetHeading });
-        setViewpoint({
-            center: targetCenter,
-            zoom: targetZoom,
-            tilt: targetTilt,
-            heading: targetHeading
-        });
-
-    }, [selectedBuildingId, currentFloorGeoJSON, selectedMarker, selectedSearchResult, buildings, setViewpoint]);
 
 
     // Don't render overlays until the map instance and icons are ready
@@ -295,6 +261,21 @@ const MapOverlays = () => {
                   />
               </>
           )}
+
+
+        {/* --- User Location Marker --- */}
+        {userCoords && (
+            <Marker
+                key="user-location"
+                position={{ lat: userCoords.lat, lng: userCoords.lng }}
+                icon={userLocationIcon} // Use the custom icon
+                title="Your Location"
+                zIndex={2} // Optionally render above route/GeoJSON
+                // Prevent InfoWindow from opening on click?
+                // onClick={() => console.log("Clicked user location marker")}
+            />
+        )}
+
     
           {/* --- Render other markers ONLY if NOT in indoor view --- */}
           {!selectedBuildingId && (
