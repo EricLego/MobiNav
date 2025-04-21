@@ -11,7 +11,7 @@ import { useIndoorView } from '../../indoor/IndoorViewContext';
 
 // --- Import hooks for data (Alternative if not using separate contexts) ---
 import useBuildings from '../../data/hooks/useBuildings';
-import useObstacles from '../../data/hooks/useObstacles';
+import useObstacles from '../../obstacles/hooks/useObstacles';
 import useRouting from '../../routing/hooks/useRouting';
 import { useUserLocation } from '../../location/UserLocationContext';
 // import useEvents from '../hooks/useEvents';

@@ -1,66 +1,24 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { AccessibilityContext } from '../../../App';
+import { useObstacleContext } from '../contexts/ObstacleContext';
 import './ObstacleReports.css';
 
-const ObstacleReports = () => {
-  const [reports, setReports] = useState([]);
-  const [filter, setFilter] = useState('all'); // 'all', 'pending', 'resolved'
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'severity'
-  
-  // Mock data - in a real app, this would come from your API
-  useEffect(() => {
-    const mockReports = [
-      {
-        id: 1,
-        location: 'Engineering Building',
-        details: 'Elevator out of service on 2nd floor',
-        reportedBy: 'Student',
-        reportedAt: '2025-03-15',
-        status: 'Under Review',
-        severity: 'High',
-        updatedAt: '2025-03-16',
-        votes: 12,
-      },
-      {
-        id: 2,
-        location: 'Path near Student Center',
-        details: 'Construction blocking wheelchair access',
-        reportedBy: 'Faculty',
-        reportedAt: '2025-03-16',
-        status: 'Pending',
-        severity: 'High',
-        updatedAt: null,
-        votes: 5,
-      },
-      {
-        id: 3,
-        location: 'Library',
-        details: 'Automatic door not functioning',
-        reportedBy: 'Staff',
-        reportedAt: '2025-03-14',
-        status: 'Resolved',
-        severity: 'Medium',
-        updatedAt: '2025-03-17',
-        votes: 3,
-      },
-      {
-        id: 4,
-        location: 'Parking Deck A',
-        details: 'Handicap parking spaces blocked',
-        reportedBy: 'Student',
-        reportedAt: '2025-03-17',
-        status: 'Under Review',
-        severity: 'Medium',
-        updatedAt: null,
-        votes: 7,
-      },
-    ];
-    
-    setReports(mockReports);
-  }, []);
+const ObstacleReports = ({ onClose, onStartReporting }) => {
+  const {
+    obstacles, // Use obstacles from context
+    isLoadingObstacles, // Use loading state from context
+    obstacleError, // Use error state from context
+    filter, // Use filter state from context
+    sortBy, // Use sort state from context
+    setFilter, // Use setter from context
+    setSortBy, // Use setter from context
+  } = useObstacleContext();
+
+  const { accessibilitySettings } = useContext(AccessibilityContext);
+
   
   // Function to filter reports
-  const filteredReports = reports.filter(report => {
+  const filteredReports = obstacles.filter(report => {
     if (filter === 'all') return true;
     if (filter === 'pending') return report.status !== 'Resolved';
     if (filter === 'resolved') return report.status === 'Resolved';
@@ -109,14 +67,41 @@ const ObstacleReports = () => {
         return '';
     }
   };
-  
-  const { accessibilitySettings } = useContext(AccessibilityContext);
+
+  // --- Render Logic ---
+  if (isLoadingObstacles) {
+    return <div>Loading obstacles...</div>; // Or a spinner component
+  }
+
+  if (obstacleError) {
+    return <div>Error loading obstacles: {obstacleError.message}</div>;
+  }
 
   return (
     <div className={`page-container ${accessibilitySettings.highContrast ? 'high-contrast' : ''} ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
       
+      {/* Close Button */}
+      {onClose && (
+        <button onClick={onClose} className="modal-close-button" aria-label="Close obstacle reports">
+          &times;
+          {/* <XIcon className="close-icon" /> */}
+        </button>
+      )}
+
       <div className="obstacle-reports">
+        <div className="report-cta">
+          {/* --- Updated onClick handler --- */}
+          <button className="report-btn" onClick={onStartReporting}>
+            Report a New Obstacle
+          </button>
+          <p className="report-info">
+            Help others by reporting accessibility obstacles on campus!
+          </p>
+        </div>
+        
+        {/* --- Controls Section --- */}        
         <div className="report-controls">
+
         <div className="filter-buttons">
           <button 
             className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
@@ -153,6 +138,7 @@ const ObstacleReports = () => {
         </div>
       </div>
       
+      {/* --- List Section --- */}      
       <div className="reports-list">
         {sortedReports.length > 0 ? (
           sortedReports.map(report => (
@@ -194,14 +180,7 @@ const ObstacleReports = () => {
         )}
       </div>
       
-      <div className="report-cta">
-        <button className="report-btn">
-          Report a New Obstacle
-        </button>
-        <p className="report-info">
-          Help others by reporting accessibility obstacles on campus!
-        </p>
-      </div>
+
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, createContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainMapInterface from './pages/MainMapInterface';
-import ObstacleReports from './features/data/components/ObstacleReports';
+import ObstacleReports from './features/obstacles/components/ObstacleReports';
 import './App.css';
 import MapEditor from './features/admin/components/MapEditor';
 import { SearchProvider } from './features/search/contexts/SearchContext';
@@ -9,6 +9,7 @@ import { MapProvider } from './features/map/contexts/MapContext';
 import { RoutingProvider } from './features/routing/context/RoutingContext';
 import { IndoorViewProvider } from './features/indoor/IndoorViewContext';
 import { UserLocationProvider } from './features/location/UserLocationContext';
+import { ObstacleProvider } from './features/obstacles/contexts/ObstacleContext';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -52,14 +53,18 @@ function App() {
     localStorage.setItem('screenReader', accessibilitySettings.screenReader);
   }, [accessibilitySettings]);
   
+  // Define the future flags
+  const future = { v7_startTransition: true, v7_relativeSplatPath: true };
+
   return (
     <AccessibilityContext.Provider value={{ accessibilitySettings, setAccessibilitySettings }}>
       <MapProvider>
+      <ObstacleProvider>
       <SearchProvider>
       <RoutingProvider>
       <IndoorViewProvider>
       <UserLocationProvider>
-        <Router>
+        <Router future={future}>
           <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
             <Routes>
               <Route path="/" element={<MainMapInterface />} />
@@ -73,6 +78,7 @@ function App() {
       </IndoorViewProvider>
       </RoutingProvider>
       </SearchProvider>
+      </ObstacleProvider>
       </MapProvider>
     </AccessibilityContext.Provider>
   );

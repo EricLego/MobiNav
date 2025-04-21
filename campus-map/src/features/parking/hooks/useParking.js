@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
-// Assuming a service exists to fetch data
-// import parkingService from '../../services/parkingService';
-// Potentially interact with other contexts
-// import { MapContext } from '../map/MapContext';
-// import { RoutingContext } from '../routing/context/RoutingContext';
-// import { UserLocationContext } from '../location/UserLocationContext';
+// src/features/parking/hooks/useParking.js
+import { useState, useEffect, useCallback } from 'react';
+// Import the actual service
+import { fetchParkingLots } from '../../../services/parkingService'; // Adjust path if needed
+// Potentially interact with other contexts (keep commented for now)
+// import { MapContext } from '../../map/contexts/MapContext';
+// import { RoutingContext } from '../../routing/context/RoutingContext';
+// import { UserLocationContext } from '../../location/UserLocationContext';
 
 const useParking = () => {
   const [allLots, setAllLots] = useState([]);
@@ -18,23 +19,33 @@ const useParking = () => {
   // const { setDestination } = useContext(RoutingContext);
   // const { userLocation } = useContext(UserLocationContext);
 
-  // Fetch initial data
+  // Fetch initial data from the backend
   const fetchParkingData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // const data = await parkingService.getParkingLots();
-      // Placeholder data:
-      const data = [
-        { id: 'p1', name: 'East Deck', coords: { lat: 34.037, lng: -84.584 }, permits: ['Student', 'Visitor'], capacity: 500 },
-        { id: 'p2', name: 'Central Deck', coords: { lat: 34.036, lng: -84.581 }, permits: ['Faculty/Staff'], capacity: 300 },
-        // ... more lots
-      ];
-      setAllLots(data);
-      setFilteredLots(data); // Show all initially
+      // Fetch from the service
+      const data = await fetchParkingLots();
+
+      // Map backend data structure to the structure expected by the hook/components
+      const mappedData = data.map(lot => ({
+        id: lot.lot_id, // Use lot_id from backend as id
+        name: lot.name,
+        coords: {
+          lat: lot.latitude, // Map latitude to coords.lat
+          lng: lot.longitude // Map longitude to coords.lng
+        },
+        permits: lot.permits || [], // Ensure permits is always an array
+        capacity: lot.capacity,
+        // Include other fields if needed
+      }));
+
+      setAllLots(mappedData);
+      setFilteredLots(mappedData); // Show all initially
     } catch (err) {
       console.error("Failed to fetch parking data:", err);
-      setError('Could not load parking information.');
+      // Use the error message from the service if available
+      setError(err.message || 'Could not load parking information.');
       setAllLots([]);
       setFilteredLots([]);
     } finally {
@@ -46,19 +57,25 @@ const useParking = () => {
     fetchParkingData();
   }, [fetchParkingData]);
 
-  // Filter logic
+  // Filter logic (should work as is with the 'permits' array)
   const filterByPermit = useCallback((permitType) => {
-    if (!permitType || permitType === 'All') {
+    // Normalize permit types for comparison (optional but safer)
+    const normalizedPermitType = permitType.toLowerCase();
+
+    if (!permitType || normalizedPermitType === 'all') {
       setFilteredLots(allLots);
     } else {
       setFilteredLots(
-        allLots.filter(lot => lot.permits.includes(permitType))
+        allLots.filter(lot =>
+          // Check if any permit in the lot's array matches (case-insensitive)
+          lot.permits.some(p => p.toLowerCase() === normalizedPermitType)
+        )
       );
     }
     setSelectedLot(null); // Reset selection when filter changes
   }, [allLots]);
 
-  // Selection logic
+  // Selection logic (uses the mapped 'id' and 'coords')
   const selectLot = useCallback((lotId) => {
     const lot = allLots.find(l => l.id === lotId) || null;
     setSelectedLot(lot);
@@ -72,6 +89,7 @@ const useParking = () => {
   // Function to potentially set a lot as a routing destination
   const setLotAsDestination = useCallback(() => {
     // if (selectedLot && setDestination) {
+    //   // Ensure you pass the correct structure expected by setDestination
     //   setDestination({ name: selectedLot.name, location: selectedLot.coords });
     // }
   }, [selectedLot /*, setDestination */]);
@@ -82,7 +100,7 @@ const useParking = () => {
     selectedLot,
     isLoading,
     error,
-    filterByPermit,
+    filterByPermit, // Pass the filtering function
     selectLot,
     setLotAsDestination, // Expose action
     fetchParkingData, // Allow manual refresh

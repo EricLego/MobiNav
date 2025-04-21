@@ -1,31 +1,6 @@
-// src/mobile/services/mapService.js
+import { handleResponse } from '../utils/utils';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
-// Helper function for handling fetch responses and errors
-const handleResponse = async (response) => {
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      // Try to parse error details from the response body
-      errorData = await response.json();
-    } catch (e) {
-      // Ignore if response body is not JSON or empty
-    }
-    console.error("API Error Response:", response.status, errorData);
-    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || response.statusText}`);
-  }
-  // Handle cases where the response might be empty (e.g., DELETE returning 200/204 OK with no body)
-  const contentType = response.headers.get("content-type");
-  if (response.status === 204) { // No Content
-    return {}; // Or return null, depending on how you want to handle it
-  }
-  if (contentType && contentType.includes("application/json")) {
-    return response.json();
-  }
-  // If response is OK but not JSON (e.g., simple text message)
-  return response.text().then(text => ({ message: text }));
-};
 
 // --- Building CRUD ---
 export const fetchBuildings = async () => {
@@ -230,6 +205,10 @@ export const fetchObstacle = async (obstacleId) => {
     throw error;
   }
 };
+
+export const submitObstacleReport = async (obstacleData) => {
+  return createObstacle(obstacleData);
+}
 
 export const createObstacle = async (obstacleData) => {
   try {
@@ -436,6 +415,94 @@ export const fetchFloorPlan = async (buildingId, floorLevel) => {
     return handleResponse(response); // Expects the response body to be the GeoJSON
   } catch (error) {
     console.error(`Error fetching floor plan for building ${buildingId}, level ${floorLevel}:`, error);
+    throw error;
+  }
+};
+
+// --- Accessibility Feature CRUD ---
+
+/**
+ * Fetches all accessibility features from the API.
+ * @returns {Promise<Array<Object>>} A promise resolving to an array of accessibility feature objects.
+ */
+export const fetchAccessibilityFeatures = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/accessibility_features`); // Assuming this endpoint
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error fetching accessibility features:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches a specific accessibility feature by its ID.
+ * @param {number|string} featureId - The ID of the feature to fetch.
+ * @returns {Promise<Object>} A promise resolving to the accessibility feature object.
+ */
+export const fetchAccessibilityFeature = async (featureId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/accessibility_features/${featureId}`); // Assuming this endpoint
+    return handleResponse(response);
+  } catch (error) {
+    console.error(`Error fetching accessibility feature ${featureId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Creates a new accessibility feature.
+ * @param {Object} featureData - The data for the new feature.
+ * Expected fields: latitude, longitude, feature_type, description (optional), building_id (optional), etc.
+ * @returns {Promise<Object>} A promise resolving to the newly created feature object.
+ */
+export const createAccessibilityFeature = async (featureData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/accessibility_features`, { // Assuming this endpoint
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(featureData),
+    });
+    return handleResponse(response); // Expects 201 Created
+  } catch (error) {
+    console.error("Error creating accessibility feature:", error);
+    throw error;
+  }
+};
+
+/**
+ * Updates an existing accessibility feature.
+ * @param {number|string} featureId - The ID of the feature to update.
+ * @param {Object} featureData - The updated data for the feature.
+ * @returns {Promise<Object>} A promise resolving to the updated feature object.
+ */
+export const updateAccessibilityFeature = async (featureId, featureData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/accessibility_features/${featureId}`, { // Assuming this endpoint
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(featureData),
+    });
+    return handleResponse(response); // Expects 200 OK
+  } catch (error) {
+    console.error(`Error updating accessibility feature ${featureId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes an accessibility feature.
+ * @param {number|string} featureId - The ID of the feature to delete.
+ * @returns {Promise<Object>} A promise resolving to an object, potentially with a success message.
+ */
+export const deleteAccessibilityFeature = async (featureId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/accessibility_features/${featureId}`, { // Assuming this endpoint
+      method: 'DELETE',
+    });
+    return handleResponse(response); // Expects 200 OK or 204 No Content
+  } catch (error) {
+    console.error(`Error deleting accessibility feature ${featureId}:`, error);
     throw error;
   }
 };

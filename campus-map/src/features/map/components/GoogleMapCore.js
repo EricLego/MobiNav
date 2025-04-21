@@ -1,5 +1,5 @@
 // src/components/GoogleMapCore.js
-import React, { useState, useRef, useCallback, useMemo, useContext } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useContext } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
 import useMapViewpoint from '../hooks/useMapViewpoint';
@@ -26,6 +26,9 @@ const GoogleMapCore = ({
   center = defaultCenter,
   zoom = defaultZoom,
   mapOptions: initialMapOptions = {}, // Allow passing initial options
+  isMarkerPlacementActive = false,
+  onMapClickForMarker,
+
 }) => {
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
   const { isLoaded: isScriptLoaded, loadError, handleLoadSuccess, handleLoadError } = useGoogleMapLoader(apiKey, libraries);
@@ -33,6 +36,7 @@ const GoogleMapCore = ({
   const { mapRef, setLoaded } = useContext(MapContext);
   const [isMapInstanceLoaded, setIsMapInstanceLoaded] = useState(false); // Track if map instance itself is ready
   const [mapOptions, setMapOptions] = useState(initialMapOptions);
+  const clickListenerRef = useRef(null);
 
   useMapViewpoint();
 
@@ -45,8 +49,8 @@ const GoogleMapCore = ({
 
     // Set default options once map is loaded (can be dynamic later)
     const campusBounds = new window.google.maps.LatLngBounds(
-      new window.google.maps.LatLng(33.935673, -84.524504), // SW
-      new window.google.maps.LatLng(33.941486, -84.512786)  // NE
+      new window.google.maps.LatLng(33.932673, -84.529504), // SW
+      new window.google.maps.LatLng(33.946486, -84.512786)  // NE
     );
     setMapOptions(prevOptions => ({
       streetViewControl: false,
@@ -75,6 +79,74 @@ const GoogleMapCore = ({
     setIsMapInstanceLoaded(false);
     setLoaded(false);
   }, [mapRef, setLoaded]);
+
+
+
+  // --- Effect to handle map click listener and options for reporting ---
+  useEffect(() => {
+    // Ensure map instance is ready and google object is available
+    if (!isMapInstanceLoaded || !mapRef.current || !window.google || !window.google.maps) {
+      console.log("Map not ready for reporting listener/options setup.");
+      return;
+    }
+
+    const map = mapRef.current;
+
+    // --- Clean up previous listener ---
+    if (clickListenerRef.current) {
+      window.google.maps.event.removeListener(clickListenerRef.current);
+      clickListenerRef.current = null;
+      console.log("Previous map click listener removed.");
+    }
+
+    // --- Apply reporting mode settings ---
+    if (isMarkerPlacementActive) {
+      console.log("Adding map click listener and setting options for obstacle placement.");
+      // Add new listener
+      clickListenerRef.current = map.addListener('click', (e) => {
+        if (onMapClickForMarker) {
+          const coords = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          };
+          onMapClickForMarker(coords);
+        }
+      });
+
+      // Update map options for reporting mode
+      map.setOptions({
+          draggableCursor: 'crosshair',
+          clickableIcons: false // Disable clicking POIs
+      });
+
+    } else {
+      console.log("Marker placement not active, ensuring default options.");
+      // Reset map options to default when not in reporting mode
+      map.setOptions({
+          draggableCursor: null, // Reset cursor
+          clickableIcons: true // Re-enable clicking POIs
+      });
+    }
+
+    // --- Cleanup function for when effect re-runs or component unmounts ---
+    return () => {
+      if (clickListenerRef.current) {
+        window.google.maps.event.removeListener(clickListenerRef.current);
+        clickListenerRef.current = null;
+        console.log("Map click listener removed on effect cleanup.");
+      }
+       // Reset options on cleanup as well, just in case
+       if (mapRef.current) {
+           mapRef.current.setOptions({
+               draggableCursor: null,
+               clickableIcons: true
+           });
+       }
+    };
+    // Depend on the activation state, the callback, and map readiness
+  }, [isMarkerPlacementActive, onMapClickForMarker, isMapInstanceLoaded, mapRef]);
+
+
 
   // --- Render Logic ---
   if (loadError) {

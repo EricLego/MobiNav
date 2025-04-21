@@ -252,3 +252,135 @@
      /* flex-direction: row; */
   }
 }
+
+/* --- Reporting Mode Styles --- */
+
+.reporting-active {
+    /* Optional: Slightly dim the map? */
+    /* filter: brightness(0.9); */
+  }
+  
+  .caution-border {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 10px solid transparent; /* Keep the border width */
+    pointer-events: none; /* Allow clicks through */
+    z-index: 40; /* Below modals, above map controls */
+    box-sizing: border-box;
+  
+    /* Apply the gradient to the border image */
+    border-image-source: repeating-linear-gradient(
+      45deg,
+      var(--ksu-gold),
+      var(--ksu-gold) 15px, /* Stripe width */
+      var(--ksu-black) 15px,
+      var(--ksu-black) 30px /* Stripe width */
+    );
+    border-image-slice: 1; /* Use the entire gradient for the border */
+    /* background: none; */ /* Ensure no background is set, or set to transparent if needed */
+  }
+  
+  .reporting-controls {
+    position: absolute;
+    bottom: 0; /* Position at bottom */
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark translucent background */
+    padding: var(--space-md);
+    z-index: 45; /* Above caution border, below modals */
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    align-items: center; /* Center items horizontally */
+    gap: var(--space-md);
+    border-top: 2px solid var(--ksu-gold);
+  }
+  
+  .reporting-prompt {
+      color: var(--ksu-white);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      text-align: center;
+  }
+  
+  .reporting-controls button {
+    /* Base styles for reporting buttons */
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--ksu-gold);
+    border-radius: var(--border-radius-md);
+    background-color: var(--ksu-black);
+    color: var(--ksu-white);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 80%; /* Make buttons wider */
+    max-width: 300px; /* Limit max width */
+    text-align: center;
+  }
+  
+  .reporting-controls button:hover:not(:disabled) {
+    background-color: var(--ksu-gold);
+    color: var(--ksu-black);
+  }
+  
+  .reporting-controls button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    border-color: var(--ksu-gray);
+  }
+  
+  .reporting-controls .cancel-reporting-btn {
+    background-color: transparent;
+    border-color: var(--ksu-gray-light);
+    color: var(--ksu-gray-light);
+  }
+  
+  .reporting-controls .cancel-reporting-btn:hover {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: var(--ksu-white);
+  }
+  
+  .reporting-error-banner {
+      background-color: var(--danger);
+      color: white;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--border-radius-sm);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      font-size: 0.9rem;
+  }
+  
+  
+  /* --- Web/Desktop Overrides --- */
+  @media (min-width: 768px) {
+    /* ... (existing media query styles) ... */
+  
+    .reporting-controls {
+      flex-direction: row; /* Arrange horizontally on web */
+      justify-content: center; /* Center buttons */
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto; /* Let content determine width */
+      max-width: 80%;
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; /* Rounded top corners */
+      border-top: 2px solid var(--ksu-gold);
+      border-left: 2px solid var(--ksu-gold);
+      border-right: 2px solid var(--ksu-gold);
+    }
+  
+    .reporting-controls button {
+       width: auto; /* Reset width */
+       max-width: none; /* Reset max-width */
+       padding: var(--space-sm) var(--space-lg); /* Adjust padding */
+    }
+  
+    .reporting-prompt {
+        margin-right: var(--space-lg); /* Add space between prompt and buttons */
+    }
+  }

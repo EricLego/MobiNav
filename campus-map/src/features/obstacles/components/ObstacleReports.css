@@ -1,10 +1,48 @@
 /* ObstacleReports.css */
 
+.obstacle-reports-container {
+  position: relative; /* For positioning the close button */
+  width: 100%;
+  height: 100%; /* Fill the modal-placeholder */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--ksu-white); /* Match background */
+}
+
+.modal-close-button {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: var(--space-xs);
+  cursor: pointer;
+  color: var(--ksu-gray-dark);
+  z-index: 10; /* Above content */
+}
+
+.modal-close-button:hover {
+  color: var(--ksu-black);
+}
+
 .obstacle-reports {
-  padding: var(--space-lg);
-  background-color: var(--ksu-white);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
+  padding: 0 var(--space-lg) var(--space-lg); /* Adjust padding as needed */
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column; /* Keep content flow */
+}
+
+/* Move CTA to the top */
+.report-cta {
+  order: -1; /* Move CTA section visually above controls/list */
+  margin-bottom: var(--space-lg); /* Add space below CTA */
+  margin-top: var(--space-lg); /* Add space above CTA */
+  padding-bottom: var(--space-lg); /* Add space below CTA content */
+  border-bottom: 1px solid var(--ksu-gray-light); /* Separator */
+  border-top: none; /* Remove original top border */
 }
 
 .report-controls {
@@ -345,6 +383,21 @@
 }
 
 /* High Contrast Mode */
+
+.high-contrast .obstacle-reports-container {
+  background-color: var(--ksu-black);
+}
+
+.high-contrast .modal-close-button {
+  color: var(--ksu-white);
+}
+.high-contrast .modal-close-button:hover {
+  color: var(--ksu-gold);
+}
+.high-contrast .report-cta {
+   border-bottom-color: var(--ksu-gold);
+}
+
 .high-contrast .obstacle-reports {
   background-color: var(--ksu-black);
   border: 2px solid var(--ksu-gold);

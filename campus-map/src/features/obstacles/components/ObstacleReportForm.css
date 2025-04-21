@@ -1,0 +1,163 @@
+/* src/features/obstacles/components/ObstacleReportForm.css */
+
+.obstacle-report-form-container {
+  padding: var(--space-lg);
+  background-color: var(--ksu-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px; /* Limit form width */
+  margin: auto; /* Center within its container if needed */
+  border: 2px solid var(--ksu-gold); /* Highlight form */
+}
+
+.obstacle-report-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-title {
+  text-align: center;
+  color: var(--ksu-black);
+  margin-bottom: var(--space-sm);
+}
+
+.form-location-info {
+  font-size: 0.9rem;
+  color: var(--ksu-gray-dark);
+  text-align: center;
+  margin-bottom: var(--space-md);
+  background-color: var(--ksu-gray-light);
+  padding: var(--space-sm);
+  border-radius: var(--border-radius-sm);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--ksu-gray-dark);
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--ksu-gray);
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--ksu-gold);
+  box-shadow: 0 0 0 2px rgba(255, 198, 41, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.form-actions button {
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  flex-grow: 1; /* Make buttons share space */
+}
+
+.cancel-btn {
+  background-color: var(--ksu-gray-light);
+  color: var(--ksu-gray-dark);
+}
+
+.cancel-btn:hover {
+  background-color: var(--ksu-gray);
+}
+
+.submit-btn {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+}
+
+.submit-btn:hover {
+  background-color: var(--ksu-gold-dark);
+}
+
+.submit-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-error {
+    color: var(--danger);
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid var(--danger);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    margin-bottom: var(--space-md);
+}
+
+
+/* High Contrast */
+.high-contrast .obstacle-report-form-container {
+  background-color: var(--ksu-black);
+  border-color: var(--ksu-gold);
+}
+
+.high-contrast .form-title {
+  color: var(--ksu-gold);
+}
+
+.high-contrast .form-location-info {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--ksu-white);
+}
+
+.high-contrast .form-group label {
+  color: var(--ksu-white);
+}
+
+.high-contrast .form-group input[type="text"],
+.high-contrast .form-group textarea,
+.high-contrast .form-group select {
+  background-color: var(--ksu-black);
+  color: var(--ksu-white);
+  border-color: var(--ksu-gold);
+}
+
+.high-contrast .cancel-btn {
+  background-color: var(--ksu-black);
+  color: var(--ksu-white);
+  border: 1px solid var(--ksu-gold);
+}
+
+.high-contrast .submit-btn {
+  background-color: var(--ksu-gold);
+  color: var(--ksu-black);
+  border: 1px solid var(--ksu-white);
+}
+
+.high-contrast .form-error {
+    color: var(--ksu-white);
+    background-color: var(--danger);
+    border-color: var(--ksu-white);
+}

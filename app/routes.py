@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.models import Building, Entrance, Path, Obstacle
+from app.models import Building, Entrance, Path, Obstacle, ParkingLot, AccessibilityFeature
 from app import db
 from datetime import datetime
 import requests
@@ -119,9 +119,45 @@ def update_building(building_id):
 @main.route('/api/buildings/<int:building_id>', methods=['DELETE'])
 def delete_building(building_id):
     building = Building.query.get_or_404(building_id)
-    db.session.delete(building)
-    db.session.commit()
-    return jsonify({'message': f'Building {building_id} deleted'}), 200
+
+    # --- Check for related items and get their IDs ---
+    conflicting_features = AccessibilityFeature.query.filter_by(building_id=building_id).all()
+    conflicting_entrances = Entrance.query.filter_by(building_id=building_id).all() # Also check entrances
+
+    has_conflicts = False
+    related_items_details = []
+
+    if conflicting_features:
+        has_conflicts = True
+        feature_ids = [f.feature_id for f in conflicting_features] # Assuming primary key is feature_id
+        related_items_details.append(f"Accessibility Features (IDs: {', '.join(map(str, feature_ids))})")
+
+    if conflicting_entrances:
+        has_conflicts = True
+        entrance_ids = [e.entrance_id for e in conflicting_entrances]
+        related_items_details.append(f"Entrances (IDs: {', '.join(map(str, entrance_ids))})")
+
+    if has_conflicts:
+        error_message = (
+            f"Cannot delete building {building_id} ({building.name}). "
+            f"It is still referenced by: {'; '.join(related_items_details)}."
+        )
+        return jsonify({"error": error_message}), 409 # 409 Conflict
+
+    # --- Proceed with deletion if no related items found ---
+    try:
+        db.session.delete(building)
+        db.session.commit()
+        return jsonify({'message': f'Building {building_id} ({building.name}) deleted'}), 200
+    except IntegrityError as ie: # Catch specific IntegrityError first
+        db.session.rollback()
+        # This is a fallback in case the initial check missed something (less likely now)
+        print(f"IntegrityError during building deletion commit: {ie}")
+        return jsonify({"error": f"Cannot delete building {building_id} due to a database constraint. Please check related items."}), 409
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error during building deletion commit: {e}") # Log other unexpected errors
+        return jsonify({"error": f"Failed to delete building {building_id}. An unexpected error occurred."}), 500
 
 
 #-------------------------------------------------------------------------
@@ -469,6 +505,8 @@ def get_obstacles():
     for obstacle in obstacles:
         result.append({
             'obstacle_id': obstacle.obstacle_id,
+            'latitude': float(obstacle.latitude) if obstacle.latitude else None,
+            'longitude': float(obstacle.longitude) if obstacle.longitude else None,
             'user_id': obstacle.user_id,
             'building_id': obstacle.building_id,
             'path_id': obstacle.path_id,
@@ -486,6 +524,8 @@ def get_obstacle(obstacle_id):
     obstacle = Obstacle.query.get_or_404(obstacle_id)
     result = {
         'obstacle_id': obstacle.obstacle_id,
+        'latitude': float(obstacle.latitude) if obstacle.latitude else None,
+        'longitude': float(obstacle.longitude) if obstacle.longitude else None,
         'user_id': obstacle.user_id,
         'building_id': obstacle.building_id,
         'path_id': obstacle.path_id,
@@ -504,6 +544,8 @@ def create_obstacle():
     
     new_obstacle = Obstacle(
         user_id=data.get('user_id'),
+        latitude=data.get('latitude'),
+        longitude=data.get('longitude'),
         building_id=data.get('building_id'),
         path_id=data.get('path_id'),
         entrance_id=data.get('entrance_id'),
@@ -517,6 +559,8 @@ def create_obstacle():
     
     return jsonify({
         'obstacle_id': new_obstacle.obstacle_id,
+        'latitude': float(new_obstacle.latitude) if new_obstacle.latitude else None,
+        'longitude': float(new_obstacle.longitude) if new_obstacle.longitude else None,
         'user_id': new_obstacle.user_id,
         'building_id': new_obstacle.building_id,
         'path_id': new_obstacle.path_id,
@@ -694,3 +738,107 @@ def get_route():
         return jsonify({"error": f"Failed to calculate route. {str(e)}"}), 500
 
 
+# Add ParkingLot to your imports at the top of routes.py
+# from app.models import Building, Entrance, Path, Obstacle, ParkingLot # Add ParkingLot here
+# ... other imports ...
+
+#-------------------------------------------------------------------------
+# Parking Lot Methods
+#-------------------------------------------------------------------------
+
+# GET all parking lots
+@main.route('/api/parking_lots', methods=['GET'])
+def get_parking_lots():
+    try:
+        lots = ParkingLot.query.order_by(ParkingLot.name).all() # Order by name for consistency
+        return jsonify([lot.to_dict() for lot in lots])
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error fetching parking lots: {e}")
+        return jsonify({"error": "Failed to retrieve parking lots"}), 500
+
+# GET a specific parking lot
+@main.route('/api/parking_lots/<int:lot_id>', methods=['GET'])
+def get_parking_lot(lot_id):
+    try:
+        lot = ParkingLot.query.get_or_404(lot_id)
+        return jsonify(lot.to_dict())
+    except Exception as e:
+        print(f"Error fetching parking lot {lot_id}: {e}")
+        # get_or_404 handles the Not Found case, this catches other potential errors
+        return jsonify({"error": f"Failed to retrieve parking lot {lot_id}"}), 500
+
+# POST a new parking lot
+@main.route('/api/parking_lots', methods=['POST'])
+def create_parking_lot():
+    data = request.json
+    if not data or not data.get('name') or data.get('latitude') is None or data.get('longitude') is None:
+        return jsonify({"error": "Missing required fields: name, latitude, longitude"}), 400
+
+    try:
+        new_lot = ParkingLot(
+            name=data['name'],
+            latitude=data['latitude'], # Keep as numeric/string, DB handles conversion
+            longitude=data['longitude'],
+            # Ensure permits is a list, default to empty if not provided
+            permits=data.get('permits', []),
+            capacity=data.get('capacity') # Optional
+        )
+        db.session.add(new_lot)
+        db.session.commit()
+        return jsonify(new_lot.to_dict()), 201
+    except Exception as e:
+        db.session.rollback() # Rollback in case of error during commit
+        print(f"Error creating parking lot: {e}")
+        # Check for unique constraint violation (e.g., duplicate name)
+        if 'unique constraint' in str(e).lower():
+             return jsonify({"error": f"Parking lot with name '{data.get('name')}' already exists."}), 409 # Conflict
+        return jsonify({"error": "Failed to create parking lot"}), 500
+
+# PUT (update) a parking lot
+@main.route('/api/parking_lots/<int:lot_id>', methods=['PUT'])
+def update_parking_lot(lot_id):
+    lot = ParkingLot.query.get_or_404(lot_id)
+    data = request.json
+    if not data:
+        return jsonify({"error": "No update data provided"}), 400
+
+    try:
+        # Update fields if they are present in the request data
+        lot.name = data.get('name', lot.name)
+        lot.latitude = data.get('latitude', lot.latitude)
+        lot.longitude = data.get('longitude', lot.longitude)
+        # Use .get to handle case where 'permits' might not be in update data
+        if 'permits' in data:
+            lot.permits = data.get('permits', lot.permits) # Allow updating permits
+        lot.capacity = data.get('capacity', lot.capacity)
+        # updated_at is handled automatically by the trigger/onupdate
+
+        db.session.commit()
+        return jsonify(lot.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating parking lot {lot_id}: {e}")
+        if 'unique constraint' in str(e).lower():
+             return jsonify({"error": f"Parking lot name '{data.get('name')}' might already be in use by another lot."}), 409
+        return jsonify({"error": f"Failed to update parking lot {lot_id}"}), 500
+
+# DELETE a parking lot
+@main.route('/api/parking_lots/<int:lot_id>', methods=['DELETE'])
+def delete_parking_lot(lot_id):
+    lot = ParkingLot.query.get_or_404(lot_id)
+    try:
+        db.session.delete(lot)
+        db.session.commit()
+        return jsonify({'message': f'Parking lot {lot_id} ({lot.name}) deleted'}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting parking lot {lot_id}: {e}")
+        # Handle potential foreign key constraints if lots are linked elsewhere
+        if 'foreign key constraint' in str(e).lower():
+            return jsonify({"error": f"Cannot delete parking lot {lot_id} as it might be referenced elsewhere."}), 409
+        return jsonify({"error": f"Failed to delete parking lot {lot_id}"}), 500
+
+#-------------------------------------------------------------------------
+# End Parking Lot Methods
+#-------------------------------------------------------------------------
