@@ -1,16 +1,14 @@
 import React, { useState, createContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import InteractiveMap from './components/InteractiveMap';
-import ObstacleReports from './components/ObstacleReports';
-import RoutePlanner from './components/RoutePlanner';
+import HomePage from './pages/HomePage';
+import ObstacleReports from './features/data/components/ObstacleReports';
 import './App.css';
-import MapEditor from './components/MapEditor';
-import { SearchProvider } from './mobile/contexts/SearchContext';
-import { MapProvider } from './mobile/contexts/MapContext';
-import { RoutingProvider } from './mobile/contexts/RoutingContext';
-import { IndoorViewProvider } from './mobile/contexts/IndoorViewContext';
-import { UserLocationProvider } from './mobile/contexts/UserLocationContext';
+import MapEditor from './features/admin/components/MapEditor';
+import { SearchProvider } from './features/search/SearchContext';
+import { MapProvider } from './features/map/MapContext';
+import { RoutingProvider } from './features/routing/context/RoutingContext';
+import { IndoorViewProvider } from './features/indoor/IndoorViewContext';
+import { UserLocationProvider } from './features/location/UserLocationContext';
 
 // Create context for accessibility settings
 export const AccessibilityContext = createContext();
@@ -65,8 +63,6 @@ function App() {
           <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/map" element={<InteractiveMap />} />
-              <Route path="/route" element={<InteractiveMap />} />
               <Route path="/report" element={<ObstacleReports />} />
               <Route path="*" element={<HomePage />} />
               <Route path="/admin" element={<MapEditor />} />
