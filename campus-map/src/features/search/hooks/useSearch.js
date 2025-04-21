@@ -1,8 +1,8 @@
 // src/hooks/useSearch.js
 import { useContext, useEffect, useCallback } from 'react';
-import { SearchContext } from './SearchContext';
-import { fetchGooglePlacesSuggestions } from '../../services/mapService';
-import useBuildings from '../data/hooks/useBuildings';
+import { SearchContext } from '../contexts/SearchContext';
+import { fetchGooglePlacesSuggestions } from '../../../services/mapService';
+import useBuildings from '../../data/hooks/useBuildings';
 
 // Debounce utility (simple version)
 const debounce = (func, delay) => {

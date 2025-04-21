@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'; // Import useState, useEffec
 import { Link } from 'react-router-dom';
 import Header from '../features/layout/Header';
 import Footer from '../features/layout/Footer';
-import GoogleMapCore from '../features/map/GoogleMapCore';
+import GoogleMapCore from '../features/map/components/GoogleMapCore';
 import ObstacleReports from '../features/data/components/ObstacleReports';
 import HowItWorks from '../features/layout/HowItWorks';
 import './HomePage.css';

@@ -1,0 +1,254 @@
+/* src/pages/MainMapInterface.css */
+
+/* --- Base Mobile Styles (Mobile First) --- */
+.map-view-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Use 100dvh for better mobile viewport handling if needed */
+  width: 100%;
+  overflow: hidden; /* Prevent scrolling the whole page */
+  position: relative; /* Establish stacking context */
+}
+
+.map-header-area {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.map-header-area .search-bar-container { /* Target SearchBar within header */
+    background-color: var(--background-color, white);
+    border-radius: var(--border-radius-lg); /* Example: Rounded corners */
+    box-shadow: var(--shadow-md); /* Add shadow for floating effect */
+    /* Padding is likely handled within SearchBar.css already */
+ }
+  
+
+.category-carousel-web {
+  display: flex; /* Hidden on mobile */
+}
+
+.map-content-area {
+  flex-grow: 1; /* Takes remaining vertical space */
+  position: relative; /* For positioning children like ParkingMenu and map wrapper */
+  overflow: hidden; /* Important for map */
+}
+
+.map-core-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Below header and menus */
+}
+
+/* ParkingMenu - Mobile (Bottom Sheet) */
+/* Note: Assuming ParkingMenu.css handles its internal structure */
+/* These styles target the main container rendered by ParkingMenu */
+/* If ParkingMenu itself adds 'parking-menu-panel', adjust accordingly */
+/* Let's assume ParkingMenu.js root element has .parking-menu-panel */
+.parking-menu-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 60vh; /* Example max height */
+  background-color: var(--background-color, white);
+  border-top-left-radius: var(--border-radius-lg);
+  border-top-right-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(100%); /* Hidden below */
+  transition: transform 0.3s ease-in-out;
+  z-index: 20; /* Above map, below modals */
+  overflow-y: auto; /* Allow scrolling within the menu */
+  visibility: hidden; /* Hide when transformed away */
+}
+
+.parking-menu-panel.open {
+  transform: translateY(0); /* Slide up */
+  visibility: visible;
+}
+
+/* Modals/Drawers - Base (Hidden) */
+.modal-overlay, .drawer-container {
+  display: flex; /* Use flex to help center content */
+  align-items: center;
+  justify-content: center;
+  position: fixed; /* Cover viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+  z-index: 50; /* Highest layer */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s; /* Fade transition */
+}
+
+.modal-overlay.open, .drawer-container.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+/* Basic styles for the placeholder content inside modals/drawers */
+.modal-placeholder, .drawer-placeholder {
+  background-color: var(--background-color, white);
+  padding: var(--space-lg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-xl);
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  color: var(--text-color); /* Ensure text color is set */
+}
+
+/* Specific styling might be needed for drawer appearance (e.g., slide from side/bottom) */
+.drawer-container.open .drawer-placeholder {
+  /* Example: Slide in from right on mobile? Or just appear like modal? */
+  /* Adjust as needed */
+}
+
+
+.map-floating-controls {
+  position: absolute;
+  bottom: var(--space-md); /* Adjust as needed */
+  right: var(--space-md);
+  z-index: 15; /* Above map, below parking menu when open */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.map-floating-controls button {
+  /* Use styles from App.css or define specific ones */
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--background-color, white);
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: var(--border-radius-round); /* Make them round */
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  font-size: 1.2rem; /* Adjust icon size */
+  line-height: 1;
+  width: 44px; /* Ensure decent tap target size */
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-floating-controls button:hover {
+  background-color: var(--background-color-light, #f8f8f8);
+}
+
+
+/* --- Web/Desktop Overrides --- */
+@media (min-width: 768px) { /* Your chosen breakpoint for web */
+
+  .map-header-area {
+     /* Adjust if needed, maybe add max-width and center? */
+     padding: var(--space-sm) var(--space-md); /* Adjust padding */
+  }
+
+  .category-carousel-web {
+    display: flex; /* Show the carousel */
+    /* Add styles for layout below search bar */
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--border-color-light, #eee);
+    border-bottom: 1px solid var(--border-color-light, #eee);
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    gap: var(--space-sm);
+  }
+
+  /* ParkingMenu - Web (Side Panel - RIGHT SIDE) */
+  .parking-menu-panel {
+    /* Override mobile styles */
+    position: absolute;
+    top: var(--space-md);      /* Add top padding */
+    right: var(--space-md);     /* Position from right with padding */
+    bottom: var(--space-md);    /* Add bottom padding */
+    left: auto;               /* Reset left */
+    width: 320px;             /* Example width */
+    height: calc(100% - (var(--space-md) * 2)); /* Adjust height for padding */
+    max-height: none;         /* Reset max-height */
+    border-radius: var(--border-radius-lg); /* Add rounded corners */
+    border: 1px solid var(--border-color, #ccc); /* Add border all around */
+    transform: translateX(100%); /* Hidden off-screen right */
+    transition: transform 0.3s ease-in-out, visibility 0s 0.3s;
+    visibility: hidden;
+    background-color: var(--background-color, white); /* Ensure background */
+    box-shadow: var(--shadow-lg); /* Add shadow for floating effect */
+  }
+
+  .parking-menu-panel.open {
+    transform: translateX(0); /* Slide in from left */
+    visibility: visible;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* Optional: Push map content over when side panel is open */
+  /* This requires adjusting the map-core-wrapper */
+  /* .map-core-wrapper {
+      transition: margin-left 0.3s ease-in-out;
+      margin-left: 0;
+  }
+  .parking-menu-panel.open ~ .map-core-wrapper {
+      margin-left: 320px; // Push map over by the width of the panel
+  } */
+  /* Alternatively, just let the panel overlay the map */
+
+
+  /* Modals/Drawers - Web */
+  /* The overlay itself still covers the screen */
+  .modal-overlay.open {
+     /* Ensure centering works */
+     align-items: center;
+     justify-content: center;
+  }
+
+  /* Style the actual modal content box for web */
+  .modal-placeholder { /* Example */
+      width: 80%;
+      max-width: 600px; /* Limit width on larger screens */
+      max-height: 80vh; /* Limit height */
+      /* Add any other web-specific modal styles */
+  }
+
+  /* Style drawers differently if needed on web */
+  .drawer-container.open .drawer-placeholder {
+    /* Example: Maybe make it a wider side panel on web? */
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 400px; /* Example width */
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border-left: 1px solid var(--border-color, #ccc);
+    /* Add animation for sliding in from right */
+    transform: translateX(100%);
+    animation: slideInRight 0.3s forwards ease-out;
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+
+  .map-floating-controls {
+     /* Maybe move buttons or change layout */
+     bottom: var(--space-lg);
+     right: var(--space-lg);
+     /* Could change to row if preferred */
+     /* flex-direction: row; */
+  }
+}

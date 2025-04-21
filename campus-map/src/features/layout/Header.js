@@ -2,7 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AccessibilityContext } from '../../App';
 import useIsMobile from '../../hooks/useIsMobile'; // Import the hook
-import SearchBar from '../search/SearchBar';
+import SearchBar from '../search/components/SearchBar';
 import './Header.css';
 
 const Header = () => {

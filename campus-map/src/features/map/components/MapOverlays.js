@@ -3,17 +3,17 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Marker, InfoWindow, Polyline, Data } from '@react-google-maps/api';
 
 // --- Import contexts for data (These will be created later) ---
-import { MapContext } from './MapContext';
-import { SearchContext } from '../search/SearchContext';
-import { RoutingContext } from '../routing/context/RoutingContext';
-import { useIndoorView } from '../indoor/IndoorViewContext';
+import { MapContext } from '../contexts/MapContext';
+import { SearchContext } from '../../search/contexts/SearchContext';
+import { RoutingContext } from '../../routing/context/RoutingContext';
+import { useIndoorView } from '../../indoor/IndoorViewContext';
 // import { EventContext } from '../contexts/EventContext';
 
 // --- Import hooks for data (Alternative if not using separate contexts) ---
-import useBuildings from '../data/hooks/useBuildings';
-import useObstacles from '../data/hooks/useObstacles';
-import useRouting from '../routing/hooks/useRouting';
-import { useUserLocation } from '../location/UserLocationContext';
+import useBuildings from '../../data/hooks/useBuildings';
+import useObstacles from '../../data/hooks/useObstacles';
+import useRouting from '../../routing/hooks/useRouting';
+import { useUserLocation } from '../../location/UserLocationContext';
 // import useEvents from '../hooks/useEvents';
 // import useSearch from '../hooks/useSearch';
 

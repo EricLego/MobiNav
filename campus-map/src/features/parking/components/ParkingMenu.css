@@ -1,26 +1,5 @@
 /* src/styles/ParkingMenu.css */
 
-.parking-menu-panel { /* Changed class name */
-    position: absolute; /* Position relative to the map container */
-    top: 0;
-    right: 0;
-    width: 350px; /* Adjust width as needed */
-    max-width: 40%; /* Max width relative to container */
-    height: 100%; /* Full height of the map container */
-    background-color: var(--ksu-white);
-    box-shadow: -4px 0px 15px rgba(0, 0, 0, 0.2); /* Shadow on the left */
-    z-index: 1010; /* Above map, below header maybe */
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform var(--transition-medium) ease-in-out;
-    overflow: hidden;
-}
-
-
-.parking-menu-panel.open {
-    transform: translateX(0); /* Slide in */
-}
 
 .parking-menu-content {
     width: 100%;
@@ -43,6 +22,7 @@
 .parking-menu-header h2 {
   margin: 0;
   font-size: 1.3rem;
+  color: var(--ksu-gold);
 }
 
 .close-parking-menu {

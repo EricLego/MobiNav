@@ -1,9 +1,9 @@
 // src/components/SearchBar.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { SearchContext } from './SearchContext';
-import { MapContext } from '../map/MapContext';
-import useSearch from './useSearch'; // Import the hook to trigger search logic
-import { fetchPlaceDetails } from '../../services/mapService';
+import { SearchContext } from '../contexts/SearchContext';
+import { MapContext } from '../../map/contexts/MapContext';
+import useSearch from '../hooks/useSearch'; // Import the hook to trigger search logic
+import { fetchPlaceDetails } from '../../../services/mapService';
 import './SearchBar.css'; // Create this CSS file
 
 const SearchBar = () => {

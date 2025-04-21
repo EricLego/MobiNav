@@ -1,9 +1,9 @@
 // src/components/GoogleMapCore.js
 import React, { useState, useRef, useCallback, useMemo, useContext } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import useGoogleMapLoader from './useGoogleMapLoader';
-import useMapViewpoint from './useMapViewpoint';
-import { MapContext } from './MapContext'; // Import the context
+import useGoogleMapLoader from '../hooks/useGoogleMapLoader';
+import useMapViewpoint from '../hooks/useMapViewpoint';
+import { MapContext } from '../contexts/MapContext'; // Import the context
 import MapOverlays from './MapOverlays';
 
 // Define libraries as a constant array

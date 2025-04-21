@@ -1,12 +1,12 @@
 // src/mobile/hooks/useMapViewpoint.js
 import { useEffect, useContext, useState } from 'react';
-import { MapContext } from './MapContext'; // Get mapRef, isMapLoaded
-import { UserLocationContext } from '../location/UserLocationContext'; // Get user location status
-import { IndoorViewContext } from '../indoor/IndoorViewContext'; // Check if indoor view is active
-import { SearchContext } from '../search/SearchContext'; // Check if a search result is selected
+import { MapContext } from '../contexts/MapContext'; // Get mapRef, isMapLoaded
+import { UserLocationContext } from '../../location/UserLocationContext'; // Get user location status
+import { IndoorViewContext } from '../../indoor/IndoorViewContext'; // Check if indoor view is active
+import { SearchContext } from '../../search/contexts/SearchContext'; // Check if a search result is selected
 
 // Import or define helpers and constants
-import { defaultCenter } from './GoogleMapCore';
+import { defaultCenter } from '../components/GoogleMapCore';
 
 // --- Define calculateDistance (or import if defined elsewhere) ---
 const calculateDistance = (point1, point2) => {

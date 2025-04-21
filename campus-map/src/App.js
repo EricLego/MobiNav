@@ -1,11 +1,11 @@
 import React, { useState, createContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import MainMapInterface from './pages/MainMapInterface';
 import ObstacleReports from './features/data/components/ObstacleReports';
 import './App.css';
 import MapEditor from './features/admin/components/MapEditor';
-import { SearchProvider } from './features/search/SearchContext';
-import { MapProvider } from './features/map/MapContext';
+import { SearchProvider } from './features/search/contexts/SearchContext';
+import { MapProvider } from './features/map/contexts/MapContext';
 import { RoutingProvider } from './features/routing/context/RoutingContext';
 import { IndoorViewProvider } from './features/indoor/IndoorViewContext';
 import { UserLocationProvider } from './features/location/UserLocationContext';
@@ -62,9 +62,9 @@ function App() {
         <Router>
           <div className={`app ${accessibilitySettings.largeText ? 'large-text' : ''}`}>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<MainMapInterface />} />
               <Route path="/report" element={<ObstacleReports />} />
-              <Route path="*" element={<HomePage />} />
+              <Route path="*" element={<MainMapInterface />} />
               <Route path="/admin" element={<MapEditor />} />
             </Routes>
           </div>

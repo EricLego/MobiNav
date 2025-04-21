@@ -1,7 +1,7 @@
 // src/components/ParkingMenu.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useUserLocation } from '../../location/UserLocationContext';
-import { MapContext } from '../../map/MapContext';
+import { MapContext } from '../../map/contexts/MapContext';
 // Import a parking hook later: import useParking from '../hooks/useParking';
 import './ParkingMenu.css'; // We'll create this CSS file
 

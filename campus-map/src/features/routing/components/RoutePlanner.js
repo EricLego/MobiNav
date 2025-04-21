@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import RoutePointDisplay from './RoutePointDisplay';
 import './RoutePlanner.css';
-import SearchBar from '../../search/SearchBar';
+import SearchBar from '../../search/components/SearchBar';
 
 const RoutePlanner = ({ 
   startPoint, 
