@@ -1,5 +1,5 @@
 // src/components/MapOverlays.js
-import React, { useState, useContext, useMemo, useEffect } from 'react';
+import React, { useState, useContext, useMemo, useEffect, useCallback } from 'react';
 import { Marker, InfoWindow, Polyline, Data } from '@react-google-maps/api';
 
 // --- Import contexts for data (These will be created later) ---
@@ -14,88 +14,49 @@ import useBuildings from '../../data/hooks/useBuildings';
 import useObstacles from '../../obstacles/hooks/useObstacles';
 import useRouting from '../../routing/hooks/useRouting';
 import { useUserLocation } from '../../location/UserLocationContext';
+import useEntrances  from '../../data/hooks/useEntrances';
+import { getMapIcon } from '../../../components/icons/mapIcons';
 // import useEvents from '../hooks/useEvents';
 // import useSearch from '../hooks/useSearch';
 
-const buildingIconProps = {
-    path: "M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z",
-    fillColor: '#0033a0',
-    fillOpacity: 1,
-    strokeWeight: 0,
-    rotation: 0,
-    scale: 1.1,
-  };
-  
-  const obstacleIconProps = {
-    path: "M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM12 17.3c-.72 0-1.3-.58-1.3-1.3s.58-1.3 1.3-1.3 1.3.58 1.3 1.3-.58 1.3-1.3 1.3zm0-4.3c-.72 0-1.3-.58-1.3-1.3V8c0-.72.58-1.3 1.3-1.3s1.3.58 1.3 1.3v3.7c0 .72-.58 1.3-1.3 1.3z",
-    fillColor: '#DB4437',
-    fillOpacity: 1,
-    strokeWeight: 0,
-    rotation: 0,
-    scale: 1.0,
-  };
 
 
 const MapOverlays = () => {
 
-    // --- Use hooks to fetch data (Uncomment when available) ---
+    // --- Use hooks to fetch data ---
     const { buildings, isLoading: isLoadingBuildings, error: buildingsError } = useBuildings();
     const { obstacles, isLoading: isLoadingObstacles, error: obstaclesError } = useObstacles();
-    const { setStartPoint, setEndPoint } = useRouting();
+    const { entrances, isLoading: isLoadingEntrances, error: entrancesError } = useEntrances();
+    const { startSelect, endSelect } = useRouting();
     const { selectedBuildingId, currentFloorGeoJSON, selectBuildingForIndoorView, currentFloorLevel } = useIndoorView();
     const { userCoords } = useUserLocation();
 
 
   // --- Consume Contexts (Uncomment when available) ---
-    const { mapRef, isMapLoaded } = useContext(MapContext); // Check if map is ready
+    const { mapRef, isMapLoaded, selectedCategory } = useContext(MapContext); // Check if map is ready
     const { selectedSearchResult } = useContext(SearchContext);
-    const { startPoint, endPoint, route, isLoadingRoute, routeError } = useContext(RoutingContext);
+    const { startPoint, endPoint, route, isLoadingRoute, routeError,
+            selectingEntranceFor, selectedBuildingForEntrance,
+            setStartPoint, setEndPoint, cancelEntranceSelection
+     } = useContext(RoutingContext);
   // const { obstacles } = useContext(ObstacleContext); // Assuming obstacles is an array
   // const { currentEvents } = useContext(EventContext); // Assuming events is an array
 
 
   // State to manage which InfoWindow is open
   const [selectedMarker, setSelectedMarker] = useState(null); // Holds the data of the selected marker
-
-// --- Placeholder Data (Uncomment these!) ---
-
-  const placeholderEvents = [
-     { id: 'evt1', type: 'event', lat: 33.9386, lng: -84.5187, name: "C-Day", description: "Capstone Day Event" },
-  ];
-  // --- End Placeholder Data ---
+  const [currentZoom, setCurrentZoom] = useState(null);
 
 
-  // --- Create full icon objects *inside* the component using useMemo ---
-  // This ensures window.google is available before creating the Point
-  const buildingIcon = useMemo(() => {
-    if (!window.google || !window.google.maps) return null; // Guard clause
-    return {
-      ...buildingIconProps,
-      anchor: new window.google.maps.Point(12, 12)
-    };
-  }, []); // Empty dependency array means it runs once when component mounts (after script load)
+    // --- Filter Entrances for Selection ---
+    const entrancesForSelectedBuilding = useMemo(() => {
+      if (!selectingEntranceFor || !selectedBuildingForEntrance || !entrances) {
+          return [];
+      }
+      return entrances.filter(e => e.building_id === selectedBuildingForEntrance.building_id);
+  }, [selectingEntranceFor, selectedBuildingForEntrance, entrances]);
 
-  const obstacleIcon = useMemo(() => {
-    if (!window.google || !window.google.maps) return null; // Guard clause
-    return {
-      ...obstacleIconProps,
-      anchor: new window.google.maps.Point(12, 12)
-    };
-  }, []);
 
-  // ... inside the component, define a user location icon (optional) ...
-const userLocationIcon = useMemo(() => {
-    if (!window.google || !window.google.maps) return null;
-    return {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        fillColor: '#4285F4', // Google Blue
-        fillOpacity: 1,
-        strokeColor: '#FFFFFF', // White outline
-        strokeWeight: 2,
-        scale: 8, // Adjust size as needed
-    };
-}, []);
-  // -----------------------------------------------------------------
 
   const enterIndoorView = (marker) => {
         if (marker && marker.building_id){
@@ -105,7 +66,6 @@ const userLocationIcon = useMemo(() => {
             console.error("Cannot enter indoor view: Marker data is missing building_id.", marker);
         }
   };
-
 
   const handleMarkerClick = (markerData) => {
     if(typeof markerData.lat === 'number' && typeof markerData.lng === 'number') {
@@ -120,73 +80,150 @@ const userLocationIcon = useMemo(() => {
     setSelectedMarker(null);
   };
 
-  // --- Effect to close InfoWindow on map click ---
-  useEffect(() => {
-    // Check if map instance exists
-    if (!mapRef.current) {
-      return; // Exit if map is not ready
-    }
-
-    // Define the listener function
-    const handleMapClickToClose = (event) => {
-      // Check if the click was directly on the map (not on a marker which might stop propagation)
-      // You might not strictly need this check if marker clicks behave as expected.
-      // console.log("Map clicked", event);
-      setSelectedMarker(null); // Close any open InfoWindow
-    };
-
-    // Add the event listener to the map instance
-    const clickListener = mapRef.current.addListener('click', handleMapClickToClose);
-
-    // Cleanup function: remove the listener when the component unmounts
-    // or if mapRef.current changes (though it shouldn't change often)
-    return () => {
-      if (clickListener) {
-        clickListener.remove();
+    // --- NEW: Handler for clicking an ENTRANCE marker ---
+    const handleEntranceClick = (entranceData) => {
+      if (selectingEntranceFor === 'start') {
+          console.log("Setting START point to entrance:", entranceData);
+          setStartPoint({ // Use the original setter from RoutingContext
+              lat: entranceData.latitude,
+              lng: entranceData.longitude,
+              name: entranceData.name || `Entrance ${entranceData.entrance_id}`,
+              type: 'entrance',
+              id: entranceData.entrance_id,
+          });
+          // setStartPoint automatically calls cancelEntranceSelection now
+      } else if (selectingEntranceFor === 'end') {
+          console.log("Setting END point to entrance:", entranceData);
+          setEndPoint({ // Use the original setter from RoutingContext
+              lat: entranceData.latitude,
+              lng: entranceData.longitude,
+              name: entranceData.name || `Entrance ${entranceData.entrance_id}`,
+              type: 'entrance',
+              id: entranceData.entrance_id,
+          });
+          // setEndPoint automatically calls cancelEntranceSelection now
+      } else {
+          // If not in selection mode, just open the info window
+           handleMarkerClick(entranceData, 'entrance');
       }
-    };
-  }, [mapRef]);
-  // --- End Effect ---
+      // Close info window after selection? Optional.
+      // handleInfoWindowClose();
+  };
+
+    // --- Callback to update zoom state when map zoom changes ---
+    const handleZoomChanged = useCallback(() => {
+      if (mapRef.current) {
+          const newZoom = mapRef.current.getZoom();
+          // console.log("Zoom changed:", newZoom); // For debugging
+          setCurrentZoom(newZoom);
+      }
+  }, [mapRef]); // Dependency on mapRef
+
+      // --- Effect to get initial zoom and attach listener ---
+      useEffect(() => {
+        if (isMapLoaded && mapRef.current) {
+            // Get initial zoom
+            setCurrentZoom(mapRef.current.getZoom());
+
+            // Add listener for zoom changes
+            const listener = mapRef.current.addListener('zoom_changed', handleZoomChanged);
+
+            // Cleanup listener on component unmount
+            return () => {
+                listener?.remove();
+            };
+        }
+    }, [isMapLoaded, mapRef, handleZoomChanged]); // Add dependencies
+
+    // --- Effect to close InfoWindow and Cancel Entrance Selection on map click ---
+    useEffect(() => {
+      if (!mapRef.current) return;
+
+      const handleMapClick = (event) => {
+          // Check if click was on a marker (these often stop propagation)
+          // A simple way is to check if the event has a `latLng` property directly
+          if (event.latLng) {
+               setSelectedMarker(null); // Close InfoWindow
+               if (selectingEntranceFor) {
+                  console.log("Map clicked, cancelling entrance selection.");
+                  cancelEntranceSelection(); // Cancel selection mode
+               }
+          }
+      };
+
+      const clickListener = mapRef.current.addListener('click', handleMapClick);
+      return () => clickListener?.remove();
+
+  }, [mapRef, cancelEntranceSelection, selectingEntranceFor]); // Add dependencies
 
     // Effect to sync local selectedMarker with the global selectedSearchResult
     useEffect(() => {
-        // When a search result is selected globally (and has coordinates),
-        // update the local state to show its InfoWindow.
         if (selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng) {
         setSelectedMarker(selectedSearchResult);
-        // The other effect that pans/zooms will also trigger
         }
-        // If selectedSearchResult becomes null (e.g., search cleared),
-        // this effect doesn't need to do anything, as the user might still
-        // have an InfoWindow open from clicking a marker directly.
-        // Closing is handled by handleInfoWindowClose or map click effect.
     
     }, [selectedSearchResult]); // Re-run only when the global search selection changes
 
+    // --- NEW: Memoize Filtered Markers based on selectedCategory ---
+    const filteredMarkers = useMemo(() => {
+      const markers = {
+          buildings: [],
+          obstacles: [],
+          // Add other types if needed
+      };
+
+      // Ensure data is loaded before filtering
+      if (isLoadingBuildings || isLoadingObstacles || !buildings || !obstacles) {
+          return markers;
+      }
+
+      // Filter Buildings
+      markers.buildings = buildings.filter(b => {
+          // Always show if 'all' or 'buildings' category is selected
+          if (selectedCategory === 'all' || selectedCategory === 'buildings') return true;
+
+          // Check based on building category property (case-insensitive)
+          // Adjust 'b.category' based on your actual data structure
+          const buildingCategory = b.category?.toLowerCase() || '';
+          if (selectedCategory === 'parking' && buildingCategory.includes('parking')) return true;
+          if (selectedCategory === 'dining' && buildingCategory.includes('dining')) return true;
+          if (selectedCategory === 'services' && buildingCategory.includes('service')) return true;
+
+          // Add more specific checks if needed
+
+          return false; // Don't show if no category matches
+      });
+
+      // Filter Obstacles (Example: only show for 'all' category)
+      if (selectedCategory === 'all') {
+          markers.obstacles = obstacles;
+      }
+      // Example: If you add an 'obstacles' category in the carousel:
+      // else if (selectedCategory === 'obstacles') {
+      //     markers.obstacles = obstacles;
+      // }
+
+      console.log(`Filtered for '${selectedCategory}': ${markers.buildings.length} buildings, ${markers.obstacles.length} obstacles`); // Debug log
+      return markers;
+
+  }, [selectedCategory, buildings, obstacles, isLoadingBuildings, isLoadingObstacles]); // Add dependencies
+
+  const googleMapsReady = useMemo(() => !!(window.google && window.google.maps), []);
+  const canRenderMarkers = isMapLoaded && googleMapsReady && currentZoom !== null;
+
+  if (!canRenderMarkers) {
+      return null; // Or a loading indicator
+  }
+  
+
+    // --- Loading / Error / Ready Checks ---
+    if (!isMapLoaded) return null; // Added entranceIcon check
+    if (isLoadingBuildings || isLoadingObstacles || isLoadingEntrances) console.log("Loading map data..."); // Added entrance loading
+    if (buildingsError || obstaclesError || entrancesError) console.error("Data loading errors:", { buildingsError, obstaclesError, entrancesError }); // Added entrance error
+    if (isLoadingRoute) console.log("Calculating route...");
+    if (routeError) console.error("Route calculation error:", routeError);
 
 
-    // Don't render overlays until the map instance and icons are ready
-    if (!isMapLoaded || !buildingIcon || !obstacleIcon) {
-        return null;
-    }
-
-    // Handle loading/error states
-    if (isLoadingBuildings || isLoadingObstacles) {
-        console.log("Loading map data...");
-        // Optionally return a loading indicator component
-    }
-    if (buildingsError || obstaclesError) {
-        console.error("Data loading errors:", { buildingsError, obstaclesError });
-        // Optionally return an error message component
-    }
-    if (isLoadingRoute) {
-        console.log("Calculating route...");
-        // Optionally show route loading indicator
-    }
-     if (routeError) {
-        console.error("Route calculation error:", routeError);
-        // Optionally show route error message
-    }
 
 
     return (
@@ -267,7 +304,7 @@ const userLocationIcon = useMemo(() => {
             <Marker
                 key="user-location"
                 position={{ lat: userCoords.lat, lng: userCoords.lng }}
-                icon={userLocationIcon} // Use the custom icon
+                icon={getMapIcon('user')} // Use the custom icon
                 title="Your Location"
                 zIndex={2} // Optionally render above route/GeoJSON
                 // Prevent InfoWindow from opening on click?
@@ -276,38 +313,72 @@ const userLocationIcon = useMemo(() => {
         )}
 
     
-          {/* --- Render other markers ONLY if NOT in indoor view --- */}
-          {!selectedBuildingId && (
-              <>
-                  {/* Building Markers (Using fetched data) */}
-                  {buildings.map((building) => (
-                    // Check for valid coordinates before rendering
-                    (typeof building.lat === 'number' && typeof building.lng === 'number') && (
-                      <Marker
-                        key={`bldg-${building.building_id}`} // Use a unique key
-                        position={{ lat: building.lat, lng: building.lng }}
-                        icon={buildingIcon}
-                        title={building.name}
-                        onClick={() => handleMarkerClick(building)} // Pass the whole building object
-                      />
-                    )
+            {/* --- Conditional Marker Rendering --- */}
+
+            {/* MODE 1: Selecting an Entrance */}
+            {selectingEntranceFor && selectedBuildingForEntrance && (
+                <>
+                    {/* Optional: Highlight the selected building somehow? (e.g., different marker or overlay) */}
+                    <Marker
+                        key={`bldg-select-${selectedBuildingForEntrance.building_id}`}
+                        position={{ lat: selectedBuildingForEntrance.lat, lng: selectedBuildingForEntrance.lng }}
+                        icon={getMapIcon('building')} 
+                        visible={currentZoom >= 16}
+                        title={`Select an entrance for ${selectedBuildingForEntrance.name}`}
+                        zIndex={5} 
+                    />
+                    {/* Render ONLY entrances for the selected building */}
+                    {entrancesForSelectedBuilding.map((entrance) => (
+                         (typeof entrance.latitude === 'number' && typeof entrance.longitude === 'number') && (
+                            <Marker
+                                key={`ent-${entrance.entrance_id}`}
+                                position={{ lat: entrance.latitude, lng: entrance.longitude }}
+                                icon={getMapIcon('entrance')}
+                                visible={currentZoom >= 16}
+                                title={entrance.name || `Entrance ${entrance.entrance_id}`}
+                                onClick={() => handleEntranceClick(entrance)} // <<--- Use specific handler
+                                zIndex={10} // Ensure entrances are clickable
+                            />
+                         )
+                    ))}
+                </>
+            )}
+
+            {/* MODE 2: Normal View (Not selecting entrance, Not in indoor view) */}
+            {!selectingEntranceFor && !selectedBuildingId && (
+                <>
+                  {/* Building Markers (Use filtered list) */}
+                  {filteredMarkers.buildings.map((building) => (
+                      (typeof building.lat === 'number' && typeof building.lng === 'number') && (
+                          <Marker
+                              key={`bldg-${building.building_id}`}
+                              position={{ lat: building.lat, lng: building.lng }}
+                              icon={getMapIcon('building')}
+                              visible={currentZoom >= 16}
+                              title={building.name}
+                              // Pass 'building' type to handler
+                              onClick={() => handleMarkerClick(building, 'building')}
+                          />
+                      )
                   ))}
+
     
                   {/* Obstacle Markers (Using fetched data) */}
-                  {obstacles.map((obstacle) => (
-                    // Check for valid coordinates before rendering
-                     (typeof obstacle.lat === 'number' && typeof obstacle.lng === 'number') && (
-                        <Marker
-                          key={`obs-${obstacle.obstacle_id}`} // Use a unique key
-                          position={{ lat: obstacle.lat, lng: obstacle.lng }}
-                          icon={obstacleIcon}
-                          title={obstacle.description || 'Obstacle'} // Use description for title
-                          onClick={() => handleMarkerClick(obstacle)} // Pass the whole obstacle object
-                        />
-                     )
+                  {filteredMarkers.obstacles.map((obstacle) => (
+                      (typeof obstacle.lat === 'number' && typeof obstacle.lng === 'number') && (
+                          <Marker
+                              key={`obs-${obstacle.obstacle_id}`}
+                              position={{ lat: obstacle.lat, lng: obstacle.lng }}
+                              icon={getMapIcon('obstacle')}
+                              visible={currentZoom >= 16}
+                              title={obstacle.description || 'Obstacle'}
+                              // Pass 'obstacle' type to handler
+                              onClick={() => handleMarkerClick(obstacle, 'obstacle')}
+                          />
+                      )
                   ))}
                   {/* Event Markers */}
-                  {placeholderEvents.map((event) => (
+                  {/* {placeholderEvents.map((event) => (
                     <Marker
                       key={event.id}
                       position={{ lat: event.lat, lng: event.lng }}
@@ -315,7 +386,7 @@ const userLocationIcon = useMemo(() => {
                       title={event.name}
                       onClick={() => handleMarkerClick({ ...event, type: 'event' })}
                     />
-                  ))}
+                  ))} */}
     
                     {/* --- Selected Search Result Marker --- */}
                     {selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng && (
@@ -348,12 +419,12 @@ const userLocationIcon = useMemo(() => {
                               <>
                                   <button onClick={() => {
                                       console.log('Set as Start:', selectedMarker);
-                                      setStartPoint(selectedMarker); // Update routing context
+                                      startSelect(selectedMarker); // Update routing context
                                       handleInfoWindowClose(); // Close window after setting
                                   }}>Set Start</button>
                                   <button onClick={() => {
                                       console.log('Set as End:', selectedMarker);
-                                      setEndPoint(selectedMarker); // Update routing context
+                                      endSelect(selectedMarker); // Update routing context
                                       handleInfoWindowClose(); // Close window after setting
                                   }}>Set End</button>
                               </>

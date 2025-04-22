@@ -2,6 +2,7 @@
 import { useContext, useCallback, useEffect } from 'react';
 import { RoutingContext } from '../context/RoutingContext';
 import { fetchRoute } from '../../../services/mapService'; // Import the API call function
+import { MapContext } from '../../map/contexts/MapContext';
 // Import AccessibilityContext later when needed
 // import { AccessibilityContext } from '../../App';
 
@@ -16,11 +17,64 @@ const useRouting = () => {
     setStartPoint, // Expose setters if needed directly
     setEndPoint,   // Expose setters if needed directly
     clearRoute,    // Expose clear function
-    // ... other state from context if needed ...
+    setSelectingEntranceFor,
+    setSelectedBuildingForEntrance,
   } = useContext(RoutingContext);
+
+  const { mapRef } = useContext(MapContext);
 
   // Get accessibility settings later
   // const { accessibilitySettings } = useContext(AccessibilityContext);
+  const startSelect = useCallback((buildingMarker) => {
+    if (!mapRef.current) {
+        console.warn("Map not ready for panning.");
+        return;
+    }
+    if (!buildingMarker || typeof buildingMarker.lat !== 'number' || typeof buildingMarker.lng !== 'number') {
+        console.warn("Invalid building marker data for startSelect:", buildingMarker);
+        return;
+    }
+
+    console.log("Initiating START entrance selection for:", buildingMarker.name);
+    // 1. Pan map to the building
+    mapRef.current.panTo({ lat: buildingMarker.lat, lng: buildingMarker.lng });
+    // Optional: Zoom in closer?
+    // mapRef.current.setZoom(18); // Adjust zoom level as needed
+
+    // 2. Set the state to indicate we are selecting an ENTRANCE for the START point
+    setSelectedBuildingForEntrance(buildingMarker); // Store the building info
+    setSelectingEntranceFor('start'); // Set the mode
+
+    // Clear any existing start point *without* triggering route calculation yet
+    // Use the internal state setter directly if needed, or adjust context logic
+    // For now, setting the mode implies the user needs to pick a new point.
+    // If a start point already exists, setting selectingEntranceFor='start' should
+    // signal that it will be replaced.
+
+  }, [mapRef, setSelectingEntranceFor, setSelectedBuildingForEntrance]); // Add dependencies
+
+  // --- NEW: endSelect Implementation ---
+  const endSelect = useCallback((buildingMarker) => {
+    if (!mapRef.current) {
+        console.warn("Map not ready for panning.");
+        return;
+    }
+     if (!buildingMarker || typeof buildingMarker.lat !== 'number' || typeof buildingMarker.lng !== 'number') {
+        console.warn("Invalid building marker data for endSelect:", buildingMarker);
+        return;
+    }
+
+    console.log("Initiating END entrance selection for:", buildingMarker.name);
+    // 1. Pan map to the building
+    mapRef.current.panTo({ lat: buildingMarker.lat, lng: buildingMarker.lng });
+    // Optional: Zoom in closer?
+    // mapRef.current.setZoom(18);
+
+    // 2. Set the state to indicate we are selecting an ENTRANCE for the END point
+    setSelectedBuildingForEntrance(buildingMarker); // Store the building info
+    setSelectingEntranceFor('end'); // Set the mode
+
+  }, [mapRef, setSelectingEntranceFor, setSelectedBuildingForEntrance]); // Add dependencies
 
   
   const executeRouteCalculation = useCallback(async () => {
@@ -84,8 +138,8 @@ const useRouting = () => {
   return {
     startPoint,
     endPoint,
-    setStartPoint, // Direct setter from context
-    setEndPoint,   // Direct setter from context
+    startSelect,
+    endSelect, 
     calculateRoute: executeRouteCalculation, // Function to trigger calculation
     clearRoute,     // Function to clear points and route
     // Expose route, isLoadingRoute, routeError if components need them directly

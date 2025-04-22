@@ -1,50 +1,51 @@
-import React, { useState } from 'react';
-import './CategoryCarousel.css'; // We'll create this CSS file next
+import React, { useContext } from 'react'; // Import useContext
+import { MapContext } from '../contexts/MapContext'; // Import MapContext
+import './CategoryCarousel.css';
 
 // Define categories - feel free to adjust these
+// Ensure category IDs match expected values in MapOverlays filtering logic
 const categories = [
-  { id: 'all', name: 'All', icon: '🌐' }, // 'All' or 'Clear Filter' option
-  { id: 'buildings', name: 'Buildings', icon: '🏢' },
-  { id: 'parking', name: 'Parking', icon: '🅿️' },
-  { id: 'dining', name: 'Dining', icon: '🍔' },
-  { id: 'services', name: 'Services', icon: 'ℹ️' },
+  { id: 'all', name: 'All', icon: '🌐' },
+  { id: 'buildings', name: 'Buildings', icon: '🏢' }, // General buildings
+  { id: 'parking', name: 'Parking', icon: '🅿️' },   // Assumes data has 'parking' category/type
+  { id: 'dining', name: 'Dining', icon: '🍔' },     // Assumes data has 'dining' category/type
+  { id: 'services', name: 'Services', icon: 'ℹ️' }, // Assumes data has 'service' category/type
   // Add 'Events' if you have event markers with a specific category
   // { id: 'events', name: 'Events', icon: '🎉' },
+  // Consider adding an 'Obstacles' category if needed
+  // { id: 'obstacles', name: 'Obstacles', icon: '🚧' },
 ];
 
 /**
  * A horizontal carousel component displaying location category filters.
- * Intended primarily for the web/desktop view.
+ * Uses MapContext to manage the selected category state.
  *
  * @param {object} props - Component props.
- * @param {function} props.onSelectCategory - Callback function triggered when a category is selected. Receives the category ID as an argument.
  * @param {string} [props.className] - Optional additional CSS class names for the container.
  */
-const CategoryCarousel = ({ onSelectCategory, className }) => {
-  // State to track the currently active category button
-  const [activeCategory, setActiveCategory] = useState('all'); // Default to 'all'
+const CategoryCarousel = ({ className }) => {
+  // Consume selectedCategory and setSelectedCategory from MapContext
+  const { selectedCategory, setSelectedCategory } = useContext(MapContext);
+
+  // No local state needed anymore for activeCategory
 
   const handleCategoryClick = (categoryId) => {
-    setActiveCategory(categoryId);
-    // Call the callback function passed from the parent component
-    if (onSelectCategory) {
-      onSelectCategory(categoryId);
-    }
+    // Call the context function to update the global state
+    setSelectedCategory(categoryId);
   };
 
   return (
-    // Apply the className passed from the parent (e.g., 'category-carousel-web')
-    // This className is used in MainMapInterface.css to hide/show the component based on screen size
     <div className={`category-carousel-container ${className || ''}`}>
       {categories.map((category) => (
         <button
           key={category.id}
-          className={`category-button ${activeCategory === category.id ? 'active' : ''}`}
+          // Use selectedCategory from context to determine active state
+          className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
           onClick={() => handleCategoryClick(category.id)}
           title={`Filter by ${category.name}`}
-          aria-pressed={activeCategory === category.id} // Accessibility: indicate pressed state
+          // Use selectedCategory from context for aria-pressed
+          aria-pressed={selectedCategory === category.id}
         >
-          {/* You can use actual icons (<img> or icon font) instead of emojis */}
           <span className="category-icon" aria-hidden="true">{category.icon}</span>
           <span className="category-name">{category.name}</span>
         </button>
