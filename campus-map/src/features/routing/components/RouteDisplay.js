@@ -1,7 +1,7 @@
 // src/components/RouteDisplay.js
 import React, { useContext } from 'react';
-import { RoutingContext } from '../mobile/contexts/RoutingContext'; // Adjust path if needed
-import '../styles/RouteDisplay.css'; // We'll create this CSS file next
+import { RoutingContext } from '../context/RoutingContext';
+import './RouteDisplay.css'; // We'll create this CSS file next
 
 // Helper function to format duration (seconds to minutes/hours)
 const formatDuration = (seconds) => {

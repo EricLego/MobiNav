@@ -70,7 +70,7 @@ const useMapViewpoint = () => {
     if (selectedBuildingId) {
         // 1. Indoor View Active
         viewpointSource = 'indoor';
-        targetZoom = 19;
+        targetZoom = 21;
         targetTilt = 45;
         if (currentFloorGeoJSON?.properties?.viewpoint?.center) {
             targetCenter = currentFloorGeoJSON.properties.viewpoint.center;

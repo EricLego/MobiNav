@@ -9,6 +9,10 @@ import './MainMapInterface.css'; // Create this CSS file
 import ObstacleReports from '../features/obstacles/components/ObstacleReports';
 import ObstacleReportForm from '../features/obstacles/components/ObstacleReportForm';
 import { submitObstacleReport } from '../services/mapService';
+import { ObstacleContext } from '../features/obstacles/contexts/ObstacleContext';
+import { RoutingContext } from '../features/routing/context/RoutingContext';
+import RoutePlanner from '../../src/features/routing/components/RoutePlanner';
+import RouteDisplay from '../features/routing/components/RouteDisplay';
 
 // Placeholder components for secondary views (replace with actual imports later)
 const HowItWorksDrawer = ({ isOpen, onClose }) => isOpen ? <div className="drawer-placeholder">How It Works Drawer <button onClick={onClose}>Close</button></div> : null;
@@ -33,7 +37,22 @@ const MainMapInterface = () => {
 
   // --- Contexts ---
   const { location: userLocation, isLocating, locationError: userLocationError, isOnCampus } = useContext(UserLocationContext);
-  
+  // --- Access Routing Context ---
+  const {
+    startPoint,
+    setStartPoint, // Needed for RoutePlanner props
+    endPoint,
+    setEndPoint,   // Needed for RoutePlanner props
+    route,
+    isLoadingRoute,
+    routeError,
+    // Add other context values if RoutePlanner/RouteDisplay need them directly
+    // For now, RoutePlanner seems to get most via props, RouteDisplay uses context internally
+  } = useContext(RoutingContext);
+
+  const { refetchObstacles } = useContext(ObstacleContext);
+
+  // -----------------------------  
   // --- Effects ---
   // Automatically show parking menu when off-campus (similar to HomePage logic)
   useEffect(() => {
@@ -114,6 +133,17 @@ const MainMapInterface = () => {
       const result = await submitObstacleReport(formData);
       console.log("Obstacle report submitted successfully:", result);
 
+      // --- Trigger refetch after successful submission ---
+      if (refetchObstacles) {
+        console.log("Refetching obstacles...");
+        await refetchObstacles(); // Call the refetch function from context/hook
+        console.log("Obstacles refetched.");
+      } else {
+        console.warn("refetchObstacles function not found in context/hook.");
+      }
+      // -------------------------------------------------
+
+
       // TODO: Add success feedback (e.g., toast notification)
       alert("Obstacle reported successfully!"); // Simple feedback for now
 
@@ -130,12 +160,14 @@ const MainMapInterface = () => {
       // Don't call cancelReportingMode() here
       throw error; // Re-throw so the form knows submission failed
     }
-  }, [cancelReportingMode /*, refetchObstacles */]); // Add dependencies
+  }, [cancelReportingMode, refetchObstacles]); // Add dependencies
 
+  // Determine if we are in a routing state (planning or viewing)
+  const isRoutingActive = !!(startPoint || endPoint || route || isLoadingRoute || routeError);
 
   // --- Render Logic ---
   return (
-    <div className={`map-view-container ${isReportingMode ? 'reporting-active' : ''}`}>
+    <div className={`map-view-container ${isReportingMode ? 'reporting-active' : ''} ${isRoutingActive ? 'routing-active' : ''}`}>
 
       {/* --- Caution Tape Border (Rendered when reporting) --- */}
       {isReportingMode && <div className="caution-border"></div>}
@@ -143,12 +175,48 @@ const MainMapInterface = () => {
 
       {/* --- Top Bar Area --- */}
       <div className="map-header-area">
-        <SearchBar />
+         {/* Conditionally render SearchBar OR RoutePlanner/Display based on state */}
+         {/* Option 1: Show SearchBar always, Route components overlay */}
+         {/* <SearchBar /> */}
+
+         {/* Option 2: Replace SearchBar with Route components when routing */}
+         {!isRoutingActive && <SearchBar />}
+
+         {/* --- Routing Components --- */}
+         {/* Show RoutePlanner if planning (start/end set, but no route yet) */}
+         {/* Note: RoutePlanner needs props passed down */}
+         {(startPoint || endPoint) && !route && !isLoadingRoute && !routeError && (
+            <RoutePlanner
+                startPoint={startPoint}
+                setStartPoint={setStartPoint} // Pass setter from context
+                endPoint={endPoint}
+                setEndPoint={setEndPoint}     // Pass setter from context
+                // Pass other necessary props like wheelchairMode, setters, mapRef etc.
+                // wheelchairMode={...}
+                // setWheelchairMode={...}
+                // mapRef={...}
+                // handlePlaceSelect={...} // You might need specific handlers
+                // calculateRoute={...} // Function to trigger route calculation
+                // campusBoundary={...}
+            />
+         )}
+
+         {/* Show RouteDisplay if route is loaded or loading/error */}
+         {/* RouteDisplay uses context internally for route, loading, error */}
+         {(route || isLoadingRoute || routeError) && (
+            <RouteDisplay />
+         )}
+         {/* ------------------------- */}
+
+
         {/* Category Carousel: Rendered but hidden on mobile via CSS */}
-        <CategoryCarousel
-          className="category-carousel-web"
-          onSelectCategory={handleCategorySelect}
-        />
+        {/* Conditionally hide if routing UI takes precedence? */}
+        {!isRoutingActive && (
+            <CategoryCarousel
+              className="category-carousel-web"
+              onSelectCategory={handleCategorySelect}
+            />
+        )}
       </div>
 
       {/* --- Main Content Area --- */}

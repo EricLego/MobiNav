@@ -1,84 +1,102 @@
 import React, { useState, useEffect } from 'react'; // Import useState, useEffect, useContext
-import { Link } from 'react-router-dom';
+// Remove Link if no longer needed for internal navigation in this component,
+// or keep it if other Links are present.
+// import { Link } from 'react-router-dom';
 import Header from '../features/layout/Header';
 import Footer from '../features/layout/Footer';
-import GoogleMapCore from '../features/map/components/GoogleMapCore';
-import ObstacleReports from '../features/data/components/ObstacleReports';
+import ObstacleReports from '../features/obstacles/components/ObstacleReports'; // Adjust path if needed
 import HowItWorks from '../features/layout/HowItWorks';
 import './HomePage.css';
-import useIsMobile from '../hooks/useIsMobile';
-import { useUserLocation } from '../features/location/UserLocationContext';
 import ParkingMenu from '../features/parking/components/ParkingMenu';
 
 const HomePage = () => {
-  const isMobile = useIsMobile();
-  // Get location status from context
-  const { isOnCampus, isLocating, locationError } = useUserLocation();
-  // State to control parking menu visibility
-  const [showParkingMenu, setShowParkingMenu] = useState(false);
+  // const isMobile = useIsMobile();
+  // const { isOnCampus, isLocating, locationError } = useUserLocation();
+  // const [showParkingMenu, setShowParkingMenu] = useState(false);
 
-  // Effect to automatically show the parking menu when off-campus
-  useEffect(() => {
-    // Show if NOT on campus, NOT currently locating, and NO location error
-    if (!isOnCampus && !isLocating && !locationError) {
-      console.log("User is off-campus, showing parking menu.");
-      setShowParkingMenu(true);
-    } else {
-      // Optionally hide if user location changes to on-campus later
-      // setShowParkingMenu(false);
-    }
-    // Dependencies: Run when these states change
-  }, [isOnCampus, isLocating, locationError]);
+  // useEffect(() => {
+  //   if (!isOnCampus && !isLocating && !locationError) {
+  //     console.log("User is off-campus, showing parking menu.");
+  //     setShowParkingMenu(true);
+  //   } else {
+  //     // setShowParkingMenu(false); // Optional: hide if location changes
+  //   }
+  // }, [isOnCampus, isLocating, locationError]);
 
 
-    
+  // --- Define the Video URL ---
+  const demoVideoUrl = "https://www.example.com/your-demo-video"; // <-- REPLACE WITH YOUR ACTUAL VIDEO URL
+
   return (
     <div className="page-wrapper">
       <Header />
 
       <div className="homepage">
-      
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1>Find Your Way Around <span>KSU</span>, Hassle-Free!</h1>
-          <p>MobiNav helps students with mobility needs navigate the Kennesaw State University campus efficiently with real-time accessible routing and obstacle reports.</p>
-          <div className="cta-buttons">
-            <Link to="/route" className="btn btn-primary">Plan Your Route</Link>
-            <Link to="/map" className="btn btn-secondary">View Campus Map</Link>
-            <Link to="/report" className="btn btn-secondary">Report an Obstacle</Link>
-          </div>
-        </div>
-        <div className="hero-background" aria-hidden="true">
-          {/* Animated map background implemented with CSS */}
-        </div>
-      </section>
-      
-        {/* Add position: relative to the map section */}
-        <section className="map-section" style={{ position: 'relative' }}>
-          {/* Conditionally render ParkingMenu INSIDE the map section */}
-          {/* Pass isOpen prop */}
-          <ParkingMenu isOpen={showParkingMenu} onClose={() => setShowParkingMenu(false)} />
 
-          <GoogleMapCore />
-        
+        {/* Hero Section */}
+        <section className="hero-section">
+          <div className="hero-content">
+            <h1>Find Your Way Around <span>KSU</span>, Hassle-Free!</h1>
+            <p>MobiNav helps students with mobility needs navigate the Kennesaw State University campus efficiently with real-time accessible routing and obstacle reports.</p>
+            <div className="cta-buttons">
+              {/* Keep other links as needed */}
+              {/* <Link to="/route" className="btn btn-primary">Plan Your Route</Link> */}
+
+              {/* --- Link to Video (can keep or remove if video player is prominent) --- */}
+              <a
+                href={demoVideoUrl}
+                className="btn btn-secondary"
+                target="_blank" // Open in new tab
+                rel="noopener noreferrer" // Security best practice for target="_blank"
+              >
+                Watch Demo Video
+              </a>
+              {/* --- End Link --- */}
+
+              {/* Keep other links as needed */}
+              {/* <Link to="/report" className="btn btn-secondary">Report an Obstacle</Link> */}
+            </div>
+          </div>
+          <div className="hero-background" aria-hidden="true">
+            {/* Animated map background implemented with CSS */}
+          </div>
         </section>
-      
-      {/* Obstacle Reports Section */}
-      <section className="obstacles-section">
-        
-        <h2>Recent Obstacle Reports</h2>
-        <ObstacleReports />
-      </section>
-      
-      {/* How It Works */}
-      <section className="how-it-works">
-        <h2>How It Works</h2>
-        <HowItWorks />
-      </section>
-      
-      <Footer />
-    </div>
+
+        {/* --- Video Player Section --- */}
+        <section className="video-section"> {/* Renamed class for clarity */}
+          <h2>Product Demonstration</h2>
+          <div className="video-player-container"> {/* Optional: Add a container for styling */}
+            <video
+              width="100%" // Adjust width as needed, 100% makes it responsive
+              controls // Show default video controls (play, pause, volume, etc.)
+              // Optional: Add a poster image shown before the video loads
+              // poster="/path/to/your-video-poster.jpg"
+              aria-label="MobiNav Product Demonstration Video" // Accessibility
+            >
+              <source src={demoVideoUrl} type="video/mp4" /> {/* Specify video type */}
+              {/* Add more <source> tags for different video formats if needed (e.g., webm, ogg) */}
+              Your browser does not support the video tag.
+              {/* Fallback text for older browsers */}
+            </video>
+          </div>
+        </section>
+        {/* --- End Video Player Section --- */}
+
+
+        {/* Obstacle Reports Section */}
+        <section className="obstacles-section">
+          <h2>Recent Obstacle Reports</h2>
+          <ObstacleReports />
+        </section>
+
+        {/* How It Works */}
+        <section className="how-it-works">
+          <h2>How It Works</h2>
+          <HowItWorks />
+        </section>
+
+        <Footer />
+      </div>
     </div>
   );
 };

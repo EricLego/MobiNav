@@ -176,8 +176,8 @@ section h2:after {
   border-radius: var(--border-radius-sm);
 }
 
-/* Map Section */
-.map-section {
+/* Video Section */
+.video-section {
   background-color: var(--ksu-white);
   border-top: 1px solid var(--ksu-gray-light);
   border-bottom: 1px solid var(--ksu-gray-light);

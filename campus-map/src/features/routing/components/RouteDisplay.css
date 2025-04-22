@@ -1,47 +1,76 @@
-/* src/styles/RouteDisplay.css */
+/* src/features/routing/components/RouteDisplay.css */
 
 .route-display {
+  /* --- Positioning (Example: Top Right) --- */
+  position: absolute; /* Position relative to the nearest positioned ancestor (likely map-header-area) */
+  top: var(--space-md); /* Adjust as needed */
+  right: var(--space-md); /* Adjust as needed */
+  z-index: 10; /* Ensure it's above the map but potentially below modals */
+  /* --------------------------------------- */
+
   background-color: var(--ksu-white);
-  padding: var(--space-md);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-sm);
-  margin-top: var(--space-md);
-  max-height: 40vh; /* Limit height and allow scrolling */
-  overflow-y: auto;
+  box-shadow: var(--shadow-md); /* Slightly stronger shadow for overlay */
   border: 1px solid var(--ksu-gray-light);
-  font-size: 0.95rem;
+  font-size: 0.9rem; /* Slightly smaller base font for compactness */
+  overflow: hidden; /* Hide overflow initially */
+  display: flex; /* Use flexbox for column layout */
+  flex-direction: column; /* Stack summary and instructions vertically */
+
+  /* --- Default/Web Dimensions --- */
+  width: 40vw;
+  max-height: 25vh; /* Use max-height to allow shrinking if content is less */
 }
 
-.route-display.loading,
-.route-display.error {
-  text-align: center;
-  padding: var(--space-lg);
-  color: var(--ksu-gray-dark);
-}
-
-.route-display.error p {
-    color: var(--danger);
-    margin-bottom: var(--space-md);
+/* --- Inner Content Scrolling --- */
+.route-summary,
+.route-instructions {
+  padding: var(--space-sm) var(--space-md); /* Reduced padding */
+  overflow-y: auto; /* Allow vertical scrolling *within* these sections */
 }
 
 .route-summary {
   border-bottom: 1px solid var(--ksu-gray-light);
-  padding-bottom: var(--space-md);
-  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  margin-bottom: 0; /* Remove margin between sections */
   position: relative; /* For positioning the clear button */
+  flex-shrink: 0; /* Prevent summary from shrinking too much */
+}
+
+.route-instructions {
+   flex-grow: 1; /* Allow instructions to take remaining space */
+   padding-top: var(--space-sm);
+}
+/* ------------------------------- */
+
+
+.route-display.loading,
+.route-display.error {
+  text-align: center;
+  padding: var(--space-md); /* Keep padding for loading/error */
+  color: var(--ksu-gray-dark);
+  /* Reset flex properties for simple loading/error state */
+  display: block;
+  overflow-y: auto; /* Allow scrolling if error message is long */
+}
+
+.route-display.error p {
+    color: var(--danger);
+    margin-bottom: var(--space-sm); /* Reduced margin */
 }
 
 .route-summary h3 {
   margin-top: 0;
-  margin-bottom: var(--space-sm);
-  font-size: 1.1rem;
+  margin-bottom: var(--space-xs); /* Reduced margin */
+  font-size: 1rem; /* Slightly smaller heading */
   color: var(--ksu-black);
 }
 
 .route-summary p {
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.3; /* Tighter line height */
   color: var(--ksu-gray-dark);
+  font-size: 0.85rem; /* Smaller text for summary details */
 }
 
 .route-summary strong {
@@ -50,11 +79,11 @@
 }
 
 .clear-route-button {
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-sm); /* Smaller padding */
   background-color: var(--ksu-gray-light);
   border: 1px solid var(--ksu-gray);
   border-radius: var(--border-radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Smaller font */
   font-weight: 600;
   cursor: pointer;
   transition: background-color var(--transition-fast);
@@ -64,10 +93,10 @@
 
 .clear-route-button.small {
     position: absolute;
-    top: 0; /* Adjust as needed */
-    right: 0; /* Adjust as needed */
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.8rem;
+    top: var(--space-xs); /* Adjust positioning */
+    right: var(--space-xs); /* Adjust positioning */
+    padding: 2px 6px; /* Even smaller padding */
+    font-size: 0.75rem;
     margin-top: 0;
 }
 
@@ -79,56 +108,38 @@
 
 .route-instructions h3 {
   margin-top: 0;
-  margin-bottom: var(--space-md);
-  font-size: 1.1rem;
+  margin-bottom: var(--space-sm); /* Reduced margin */
+  font-size: 1rem; /* Smaller heading */
   color: var(--ksu-black);
 }
 
 .route-instructions ol {
-  list-style: none; /* Use custom counters or icons */
+  list-style: none;
   padding: 0;
   margin: 0;
-  counter-reset: step-counter;
 }
 
 .route-instructions li {
-  padding: var(--space-sm) 0;
+  padding: var(--space-xs) 0; /* Reduced padding */
   border-bottom: 1px dashed var(--ksu-gray-light);
   display: flex;
-  align-items: flex-start; /* Align items to the top */
-  gap: var(--space-sm);
-  line-height: 1.5;
+  align-items: flex-start;
+  gap: var(--space-xs); /* Reduced gap */
+  line-height: 1.4; /* Slightly tighter */
+  font-size: 0.85rem; /* Smaller instruction text */
 }
 
 .route-instructions li:last-child {
   border-bottom: none;
 }
 
-/* Optional: Add step numbers */
-/* .route-instructions li::before {
-  content: counter(step-counter);
-  counter-increment: step-counter;
-  font-weight: bold;
-  color: var(--ksu-gold);
-  background-color: var(--ksu-black);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: var(--space-sm);
-  flex-shrink: 0;
-  font-size: 0.85rem;
-} */
-
 .maneuver-icon {
-    font-size: 1.2rem;
+    font-size: 1rem; /* Smaller icon */
     color: var(--ksu-black);
-    width: 20px; /* Ensure consistent width */
+    width: 18px; /* Adjust width */
     text-align: center;
     flex-shrink: 0;
-    margin-top: 2px; /* Align better with text */
+    margin-top: 1px; /* Fine-tune alignment */
 }
 
 .instruction-text {
@@ -138,17 +149,64 @@
 
 .step-distance {
   color: var(--ksu-gray);
-  font-size: 0.85rem;
-  white-space: nowrap; /* Prevent wrapping */
-  margin-left: var(--space-sm);
+  font-size: 0.75rem; /* Smaller distance text */
+  white-space: nowrap;
+  margin-left: var(--space-xs); /* Reduced margin */
 }
 
-/* High Contrast Adjustments */
+/* --- Mobile Adjustments --- */
+/* Example: Apply styles for screens smaller than 768px */
+@media (max-width: 767px) {
+  .route-display {
+    width: 80vw;       /* Wider on mobile */
+    max-height: 20vh;    /* Shorter on mobile */
+    /* Adjust positioning if needed for mobile */
+    /* top: var(--space-sm); */
+    /* right: var(--space-sm); */
+    /* left: var(--space-sm); */ /* Center it? */
+    /* margin: 0 auto; */ /* Center horizontally if using left/right */
+    font-size: 0.85rem; /* Even smaller base font */
+  }
+
+  .route-summary,
+  .route-instructions {
+    padding: var(--space-xs) var(--space-sm); /* Further reduce padding */
+  }
+
+  .route-summary h3,
+  .route-instructions h3 {
+    font-size: 0.9rem;
+  }
+
+   .route-summary p,
+   .route-instructions li {
+     font-size: 0.8rem;
+   }
+
+   .maneuver-icon {
+     font-size: 0.9rem;
+     width: 16px;
+   }
+
+   .step-distance {
+     font-size: 0.7rem;
+   }
+
+   .clear-route-button.small {
+     top: 2px;
+     right: var(--space-xs);
+   }
+}
+
+
+/* --- High Contrast Adjustments (Keep existing) --- */
 .high-contrast .route-display {
     background-color: var(--ksu-black);
     border-color: var(--ksu-gold);
     color: var(--ksu-white);
 }
+
+/* ... rest of your high-contrast styles ... */
 
 .high-contrast .route-summary,
 .high-contrast .route-instructions li {

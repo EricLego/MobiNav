@@ -1,5 +1,5 @@
 // src/components/MapOverlays.js
-import React, { useState, useContext, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useContext, useMemo, useEffect, useCallback, useRef} from 'react';
 import { Marker, InfoWindow, Polyline, Data } from '@react-google-maps/api';
 
 // --- Import contexts for data (These will be created later) ---
@@ -19,6 +19,7 @@ import { getMapIcon } from '../../../components/icons/mapIcons';
 // import useEvents from '../hooks/useEvents';
 // import useSearch from '../hooks/useSearch';
 
+import ObstacleReportCard from '../../obstacles/components/ObstacleReportCard'; // <-- Import here
 
 
 const MapOverlays = () => {
@@ -46,7 +47,32 @@ const MapOverlays = () => {
   // State to manage which InfoWindow is open
   const [selectedMarker, setSelectedMarker] = useState(null); // Holds the data of the selected marker
   const [currentZoom, setCurrentZoom] = useState(null);
+  const polylineRef = useRef(null);
 
+    // --- Add Logging ---
+    console.log("MapOverlays rendering. Route:", route);
+    // -------------------
+    // --- Callback for when Polyline loads ---
+    const handlePolylineLoad = useCallback((poly) => {
+        console.log("Polyline instance loaded:", poly);
+        polylineRef.current = poly; // Store the instance
+    }, []);
+    // --------------------------------------
+
+    // --- UPDATED Callback for when Polyline unmounts ---
+    const handlePolylineUnmount = useCallback((polyInstance) => {
+        // The library passes the instance being unmounted here!
+        console.log("Polyline instance unmounting. Clearing map reference.", polyInstance);
+        // Explicitly remove the specific instance passed by the library
+        if (polyInstance) {
+            polyInstance.setMap(null);
+        }
+        // Clear the ref if it happens to hold the same instance
+        if (polylineRef.current === polyInstance) {
+             polylineRef.current = null;
+        }
+    }, []); // No dependencies needed here as we use the argument
+    // -----------------------------------------
 
     // --- Filter Entrances for Selection ---
     const entrancesForSelectedBuilding = useMemo(() => {
@@ -67,12 +93,21 @@ const MapOverlays = () => {
         }
   };
 
-  const handleMarkerClick = (markerData) => {
+  // Updated handler to ensure type is part of the state object
+  const handleMarkerClick = (markerData, type) => {
     if(typeof markerData.lat === 'number' && typeof markerData.lng === 'number') {
-        // Ensure lat/lng are numbers before setting
-        setSelectedMarker(markerData);
+        // Add the type to the object before setting state
+        setSelectedMarker({ ...markerData, type });
+    } else if (markerData.latitude && markerData.longitude) {
+        // Handle cases where coords might be named latitude/longitude (like entrances)
+        setSelectedMarker({
+            ...markerData,
+            lat: markerData.latitude, // Map to lat/lng for consistency
+            lng: markerData.longitude,
+            type
+        });
     } else {
-        console.warn("Invalid coordinates for marker:", markerData);
+        console.warn("Invalid or missing coordinates for marker:", markerData);
     }
   };
 
@@ -211,6 +246,13 @@ const MapOverlays = () => {
   const googleMapsReady = useMemo(() => !!(window.google && window.google.maps), []);
   const canRenderMarkers = isMapLoaded && googleMapsReady && currentZoom !== null;
 
+    // --- Add Logging for Polyline Condition ---
+    const shouldRenderPolyline = route && route.geometry && route.geometry.length > 0;
+    console.log("Should render polyline?", shouldRenderPolyline);
+    // -----------------------------------------
+
+
+
   if (!canRenderMarkers) {
       return null; // Or a loading indicator
   }
@@ -239,7 +281,7 @@ const MapOverlays = () => {
                     let fillColor = 'rgba(0, 0, 255, 0.3)'; // Semi-transparent blue fill
                     let strokeColor = '#0000FF'; // Blue outline
                     let strokeWeight = 1;
-            
+
                     // Example: Style rooms differently
                     if (feature.getProperty('category') === 'room') {
                         fillColor = 'rgba(200, 200, 200, 0.5)'; // Light gray fill
@@ -249,7 +291,7 @@ const MapOverlays = () => {
                         strokeColor = '#008000'; // Dark green outline
                         strokeWeight = 2;
                     }
-            
+
                     return ({
                         fillColor: fillColor,
                         strokeColor: strokeColor,
@@ -260,7 +302,7 @@ const MapOverlays = () => {
                 }}
               />
           )}
-    
+
           {/* --- Routing Markers (Render regardless of indoor view?) --- */}
           {/* Use startPoint from RoutingContext */}
           {startPoint && startPoint.lat && startPoint.lng && (
@@ -268,7 +310,7 @@ const MapOverlays = () => {
                   key="start-point"
                   position={{ lat: startPoint.lat, lng: startPoint.lng }}
                   label="A" // Or use a custom icon
-                  onClick={() => handleMarkerClick({ ...startPoint, type: 'start' })}
+                  onClick={() => handleMarkerClick(startPoint, 'start')} // Pass type
               />
           )}
           {/* Use endPoint from RoutingContext */}
@@ -277,26 +319,32 @@ const MapOverlays = () => {
                   key="end-point"
                   position={{ lat: endPoint.lat, lng: endPoint.lng }}
                   label="B" // Or use a custom icon
-                  onClick={() => handleMarkerClick({ ...endPoint, type: 'end' })}
+                  onClick={() => handleMarkerClick(endPoint, 'end')} // Pass type
               />
           )}
-    
-          {/* --- Route Polyline (Render regardless of indoor view?) --- */}
-          {route && route.geometry && route.geometry.length > 0 && (
-              <>
-                  {console.log("Rendering Polyline with geometry:", route.geometry)}
-                  <Polyline
-                      path={route.geometry} // Assuming geometry is an array of {lat, lng}
-                      options={{
-                          strokeColor: '#FFC629', // KSU Gold
-                          strokeOpacity: 0.8,
-                          strokeWeight: 6,
-                          geodesic: true,
-                          zIndex: 1 // Ensure route is drawn above other map features if needed
-                      }}
-                  />
-              </>
-          )}
+
+            {/* --- Route Polyline --- */}
+            {shouldRenderPolyline && (
+                <>
+                    {console.log("Rendering Polyline with geometry:", route.geometry)}
+                    <Polyline
+                        key={route ? `route-${route.summary?.distance}-${route.summary?.duration}` : 'no-route'}
+                        path={route.geometry}
+                        options={{
+                            strokeColor: '#FFC629',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 6,
+                            geodesic: true,
+                            zIndex: 1
+                        }}
+                        // --- Add Load and Unmount Handlers ---
+                        onLoad={handlePolylineLoad}
+                        onUnmount={handlePolylineUnmount}
+                        // ------------------------------------
+                    />
+                </>
+            )}
+
 
 
         {/* --- User Location Marker --- */}
@@ -312,7 +360,7 @@ const MapOverlays = () => {
             />
         )}
 
-    
+
             {/* --- Conditional Marker Rendering --- */}
 
             {/* MODE 1: Selecting an Entrance */}
@@ -322,10 +370,10 @@ const MapOverlays = () => {
                     <Marker
                         key={`bldg-select-${selectedBuildingForEntrance.building_id}`}
                         position={{ lat: selectedBuildingForEntrance.lat, lng: selectedBuildingForEntrance.lng }}
-                        icon={getMapIcon('building')} 
+                        icon={getMapIcon('building')}
                         visible={currentZoom >= 16}
                         title={`Select an entrance for ${selectedBuildingForEntrance.name}`}
-                        zIndex={5} 
+                        zIndex={5}
                     />
                     {/* Render ONLY entrances for the selected building */}
                     {entrancesForSelectedBuilding.map((entrance) => (
@@ -362,16 +410,16 @@ const MapOverlays = () => {
                       )
                   ))}
 
-    
+
                   {/* Obstacle Markers (Using fetched data) */}
                   {filteredMarkers.obstacles.map((obstacle) => (
                       (typeof obstacle.lat === 'number' && typeof obstacle.lng === 'number') && (
                           <Marker
-                              key={`obs-${obstacle.obstacle_id}`}
+                              key={`obs-${obstacle.obstacle_id || obstacle.id}`} // Use appropriate ID
                               position={{ lat: obstacle.lat, lng: obstacle.lng }}
                               icon={getMapIcon('obstacle')}
                               visible={currentZoom >= 16}
-                              title={obstacle.description || 'Obstacle'}
+                              title={obstacle.description || obstacle.details || 'Obstacle'} // Use a relevant field for title
                               // Pass 'obstacle' type to handler
                               onClick={() => handleMarkerClick(obstacle, 'obstacle')}
                           />
@@ -387,62 +435,81 @@ const MapOverlays = () => {
                       onClick={() => handleMarkerClick({ ...event, type: 'event' })}
                     />
                   ))} */}
-    
+
                     {/* --- Selected Search Result Marker --- */}
-                    {selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng && (
+                    {/* Only show if it's the selected one and type is search */}
+                    {selectedSearchResult && selectedSearchResult.lat && selectedSearchResult.lng && selectedMarker?.type === 'search' && (
                         <Marker
                             key="search-result-marker"
                             position={{ lat: selectedSearchResult.lat, lng: selectedSearchResult.lng }}
                             label={{ text: '📍', fontSize: '20px' }}
                             title={selectedSearchResult.name}
-                            onClick={() => handleMarkerClick({ ...selectedSearchResult, type: 'search' })}
+                            onClick={() => handleMarkerClick(selectedSearchResult, 'search')} // Pass type
                             animation={window.google.maps.Animation.DROP}
                         />
                     )}
               </>
           )}
-    
+
           {/* --- Info Window (Render regardless of indoor view, but content depends) --- */}
           {selectedMarker && selectedMarker.lat && selectedMarker.lng && ( // Added coordinate check
               <InfoWindow
+                  // Use a consistent key, maybe based on marker ID if available
+                  key={selectedMarker.id || selectedMarker.obstacle_id || selectedMarker.building_id || 'selected-info'}
                   position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
                   onCloseClick={handleInfoWindowClose}
               >
-                  <div className="info-window">
-                      <h3>{selectedMarker.name || selectedMarker.description || 'Selected Location'}</h3>
-                      {/* ... (Conditional rendering for different types remains the same) ... */}
-    
-                      {/* --- Actions --- */}
-                      <div className="info-actions">
-                          {/* Only show Set Start/End if NOT in indoor view */}
-                          {!selectedBuildingId && (
-                              <>
-                                  <button onClick={() => {
-                                      console.log('Set as Start:', selectedMarker);
-                                      startSelect(selectedMarker); // Update routing context
-                                      handleInfoWindowClose(); // Close window after setting
-                                  }}>Set Start</button>
-                                  <button onClick={() => {
-                                      console.log('Set as End:', selectedMarker);
-                                      endSelect(selectedMarker); // Update routing context
-                                      handleInfoWindowClose(); // Close window after setting
-                                  }}>Set End</button>
-                              </>
-                          )}
-                          {/* Show Indoor View button only for buildings and when NOT already inside */}
-                          {selectedMarker.type === 'building' && !selectedBuildingId && (
-                              <button onClick={() => {
-                                  enterIndoorView(selectedMarker);
-                                  handleInfoWindowClose();
-                              }}>Indoor View</button>
-                          )}
-                      </div>
-                  </div>
+                  <> {/* Use Fragment to allow conditional rendering */}
+                      {/* --- Render Obstacle Card --- */}
+                      {selectedMarker.type === 'obstacle' ? (
+                          <ObstacleReportCard report={selectedMarker} />
+                      ) : (
+                          /* --- Render Default InfoWindow Content --- */
+                          <div className="info-window">
+                              <h3>{selectedMarker.name || selectedMarker.description || 'Selected Location'}</h3>
+                              {/* Add other details based on type if needed */}
+                              {selectedMarker.type === 'building' && selectedMarker.category && (
+                                <p>Category: {selectedMarker.category}</p>
+                              )}
+                               {selectedMarker.type === 'entrance' && (
+                                <p>Entrance</p> // Simple indicator
+                              )}
+                              {/* ... other potential details ... */}
+
+                              {/* --- Actions --- */}
+                              <div className="info-actions">
+                                  {/* Only show Set Start/End if NOT in indoor view and NOT an obstacle */}
+                                  {!selectedBuildingId && selectedMarker.type !== 'obstacle' && (
+                                      <>
+                                          <button onClick={() => {
+                                              console.log('Set as Start:', selectedMarker);
+                                              startSelect(selectedMarker); // Update routing context
+                                              handleInfoWindowClose(); // Close window after setting
+                                          }}>Set Start</button>
+                                          <button onClick={() => {
+                                              console.log('Set as End:', selectedMarker);
+                                              endSelect(selectedMarker); // Update routing context
+                                              handleInfoWindowClose(); // Close window after setting
+                                          }}>Set End</button>
+                                      </>
+                                  )}
+                                  {/* Show Indoor View button only for buildings and when NOT already inside */}
+                                  {selectedMarker.type === 'building' && !selectedBuildingId && (
+                                      <button onClick={() => {
+                                          enterIndoorView(selectedMarker);
+                                          handleInfoWindowClose();
+                                      }}>Indoor View</button>
+                                  )}
+                                  {/* Add other actions specific to non-obstacle types if needed */}
+                              </div>
+                          </div>
+                      )}
+                  </>
               </InfoWindow>
           )}
         </>
       );
-    };
-    
+
+};
 
 export default MapOverlays;

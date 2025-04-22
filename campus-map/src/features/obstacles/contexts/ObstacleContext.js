@@ -8,15 +8,15 @@ const defaultObstacleContextValue = {
   obstacles: [],
   isLoadingObstacles: true,
   obstacleError: null,
+  refetchObstacles: async () => {}, // Add refetch function placeholder
   // State managed by the context for UI controls
-  filter: 'all', // 'all', 'pending', 'resolved' (matches ObstacleReports)
-  sortBy: 'date', // 'date', 'severity', 'votes' (matches ObstacleReports)
-  selectedObstacle: null, // For potential detail views
+  filter: 'all',
+  sortBy: 'date',
+  selectedObstacle: null,
   // Actions (Setters)
   setFilter: () => {},
   setSortBy: () => {},
   setSelectedObstacle: () => {},
-  // Potentially add actions later for reporting, updating, etc.
 };
 
 // --- Create the Context ---
@@ -24,11 +24,12 @@ export const ObstacleContext = createContext(defaultObstacleContextValue);
 
 // --- Create the Provider Component ---
 export const ObstacleProvider = ({ children }) => {
-  // --- Get obstacle data from the dedicated hook ---
+  // --- Get obstacle data AND refetch function from the hook ---
   const {
     obstacles: fetchedObstacles,
     isLoading: isLoadingObstacles,
-    error: obstacleError
+    error: obstacleError,
+    refetchObstacles // Get the refetch function from the hook
   } = useObstacles();
 
   // --- State for UI controls (filtering, sorting, selection) ---
@@ -50,13 +51,12 @@ export const ObstacleProvider = ({ children }) => {
   }, []);
 
   // --- Assemble the context value ---
-  // Use useMemo to prevent unnecessary re-renders of consumers
-  // if the context value object itself hasn't changed identity.
   const value = useMemo(() => ({
     // Data from hook
     obstacles: fetchedObstacles,
     isLoadingObstacles,
     obstacleError,
+    refetchObstacles, // Provide the refetch function
     // UI State
     filter,
     sortBy,
@@ -69,6 +69,7 @@ export const ObstacleProvider = ({ children }) => {
     fetchedObstacles,
     isLoadingObstacles,
     obstacleError,
+    refetchObstacles, // Add refetchObstacles to dependency array
     filter,
     sortBy,
     selectedObstacle,

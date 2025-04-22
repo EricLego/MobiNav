@@ -1,5 +1,5 @@
-// src/mobile/hooks/useObstacles.js
-import { useState, useEffect } from 'react';
+// src/features/obstacles/hooks/useObstacles.js
+import { useState, useEffect, useCallback } from 'react'; // Import useCallback
 import { fetchObstacles } from '../../../services/mapService'; // Adjust path if needed
 
 const useObstacles = () => {
@@ -7,38 +7,42 @@ const useObstacles = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Wrap the fetching logic in useCallback so we can return it
+  const loadObstacles = useCallback(async () => {
+    console.log("Executing loadObstacles..."); // Add log
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchObstacles();
+      // Assuming the API returns lat/lng directly now based on previous context
+      const formattedData = data.map(obs => ({
+          ...obs,
+          lat: parseFloat(obs.latitude),
+          lng: parseFloat(obs.longitude),
+          type: 'obstacle' // Add a type
+      }));
+      setObstacles(formattedData);
+      console.log("Obstacles fetched and formatted:", formattedData); // Log success
+    } catch (err) {
+      console.error("Failed to load obstacles:", err);
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []); // Empty dependency array: the function itself doesn't depend on props/state
+
+  // Run loadObstacles on initial mount
   useEffect(() => {
-    const loadObstacles = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await fetchObstacles();
-        // TODO: Need to determine obstacle lat/lng.
-        // The current Obstacle model doesn't have lat/lng directly.
-        // We might need to fetch related building/entrance/path data
-        // OR modify the backend API to return coordinates.
-        // For now, let's assume the API *will* return lat/lng.
-        const formattedData = data.map(obs => ({
-            ...obs,
-            // Assuming backend provides these directly or via joins:
-            lat: parseFloat(obs.latitude), // Placeholder - adjust based on actual API response
-            lng: parseFloat(obs.longitude), // Placeholder - adjust based on actual API response
-            type: 'obstacle' // Add a type
-        }));
-        setObstacles(formattedData);
-        console.log(formattedData);
-      } catch (err) {
-        console.error("Failed to load obstacles:", err);
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadObstacles();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [loadObstacles]); // Include loadObstacles in dependency array
 
-  return { obstacles, isLoading, error };
+  // Return the state and the function to trigger a refetch
+  return {
+      obstacles,
+      isLoading,
+      error,
+      refetchObstacles: loadObstacles // Expose the fetching function
+  };
 };
 
 export default useObstacles;
