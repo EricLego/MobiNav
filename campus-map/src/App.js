@@ -23,8 +23,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001'; /
 // --- Mock// --- Updated API Check Function ---
 async function checkApiConnection() {
   // Use a simple GET endpoint from your API, like fetching buildings
-  const healthCheckUrl = `${API_BASE_URL}/api/buildings`; // Target your actual API endpoint
-
+  const healthCheckUrl = `${API_BASE_URL}/api/buildings`; // Make sure API_BASE_URL has http://  
   try {
     console.log(`Checking API connection at: ${healthCheckUrl}`);
     const response = await fetch(healthCheckUrl, {
