@@ -63,21 +63,17 @@ const HomePage = () => {
         </section>
 
         {/* --- Video Player Section --- */}
-        <section className="video-section"> {/* Renamed class for clarity */}
+        <section className="video-section">
           <h2>Product Demonstration</h2>
-          <div className="video-player-container"> {/* Optional: Add a container for styling */}
-            <video
-              width="100%" // Adjust width as needed, 100% makes it responsive
-              controls // Show default video controls (play, pause, volume, etc.)
-              // Optional: Add a poster image shown before the video loads
-              // poster="/path/to/your-video-poster.jpg"
-              aria-label="MobiNav Product Demonstration Video" // Accessibility
-            >
-              <source src={demoVideoUrl} type="video/mp4" /> {/* Specify video type */}
-              {/* Add more <source> tags for different video formats if needed (e.g., webm, ogg) */}
-              Your browser does not support the video tag.
-              {/* Fallback text for older browsers */}
-            </video>
+          <div className="video-player-container" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', maxWidth: '100%' }}>
+            <iframe 
+              src={`https://www.youtube.com/embed/${demoVideoUrl.split('/').pop()}`}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              title="MobiNav Product Demonstration Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </section>
         {/* --- End Video Player Section --- */}
