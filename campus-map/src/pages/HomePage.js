@@ -25,7 +25,7 @@ const HomePage = () => {
 
 
   // --- Define the Video URL ---
-  const demoVideoUrl = "https://www.example.com/your-demo-video"; // <-- REPLACE WITH YOUR ACTUAL VIDEO URL
+  const demoVideoUrl = "https://youtu.be/N8zvhVa96Zk"; // Video URL updated
 
   return (
     <div className="page-wrapper">
