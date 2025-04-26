@@ -7,7 +7,7 @@ NET_FILE = "KSUMarietta.net.xml.gz"
 SIMULATION_STEPS = 86400  # Simulation is preset to run for one day. However, the simulation will stop when no pedestrians are in the network any longer
 congested_lanes = set()  # set global congested lanes variable
 
-stats_type = "MWF"  # leave "" if desire is to pull current day data (e.g., MWF for Monday, Wednesday, Friday; TTh for Tuesday, Thursday; and SSu for Saturday and Sunday)
+stats_type = ""  # leave "" if desire is to pull current day data or enter day schedule desired (e.g., MWF for Monday, Wednesday, Friday; TTh for Tuesday, Thursday; and SSu for Saturday and Sunday)
 
 # PostgreSQL connection details
 DB_HOST = "localhost"  # Use "localhost" for local database

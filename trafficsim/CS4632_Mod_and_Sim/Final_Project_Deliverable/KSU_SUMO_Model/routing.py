@@ -22,14 +22,9 @@ def get_edge_from_gps(lat, lon):
 
 
 def find_route(start_edge, end_edge):
-    route_options = [
-        1,
-        3,
-        5,
-    ]  # Bias towards best routing types
-    # (1 = shortes path, 3 = shortest path with consideration of congestion conditions,
-    # 5 = shorted path using historical data)
-    route_weights = [0.5, 0.3, 0.2]
+    route_options = [1, 3]  # Bias towards best routing types
+    # (1 = shortes path, 3 = alternative path with consideration of congestion conditions)
+    route_weights = [0.7, 0.3]
 
     for _ in range(3):
         route_type = random.choices(route_options, weights=route_weights)[0]
